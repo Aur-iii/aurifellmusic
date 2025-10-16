@@ -141,109 +141,140 @@
     <p class="credits">© <span id="y"></span> Auri Fell • <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a></p>
   </footer>
 
-  <!-- EmailJS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
-  <script>
-    document.getElementById('y').textContent = new Date().getFullYear();
+<script>
+  document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Mobile menu logic (mirror index/about behavior so backdrop toggles)
-    const btnOut = document.getElementById('menuBtn');
-    const btnIn  = document.getElementById('menuBtnIn');
-    const card   = document.getElementById('menuCard');
-    const backdrop = document.getElementById('backdrop');
+  // Mobile menu logic (mirror index/about behavior so backdrop toggles)
+  const btnOut = document.getElementById('menuBtn');
+  const btnIn  = document.getElementById('menuBtnIn');
+  const card   = document.getElementById('menuCard');
+  const backdrop = document.getElementById('backdrop');
 
-    function setOpen(on){
-      if (!card) return;
-      const willOpen = !!on;
+  function setOpen(on){
+    if (!card) return;
+    const willOpen = !!on;
 
-      card.classList.toggle('open', willOpen);
-      document.body.classList.toggle('menu-open', willOpen);
+    card.classList.toggle('open', willOpen);
+    document.body.classList.toggle('menu-open', willOpen);
 
-      btnOut?.classList.toggle('is-open', willOpen);
-      btnIn?.classList.toggle('is-open', willOpen);
-      btnOut?.setAttribute('aria-expanded', String(willOpen));
+    btnOut?.classList.toggle('is-open', willOpen);
+    btnIn?.classList.toggle('is-open', willOpen);
+    btnOut?.setAttribute('aria-expanded', String(willOpen));
 
-      backdrop?.classList.toggle('show', willOpen);
+    backdrop?.classList.toggle('show', willOpen);
 
-      if (willOpen) {
-        setTimeout(()=>{
-          const first = card.querySelector('.menu-list a');
-          first?.focus();
-        }, 280);
-      }
+    if (willOpen) {
+      setTimeout(()=>{
+        const first = card.querySelector('.menu-list a');
+        first?.focus();
+      }, 280);
+    }
+  }
+
+  btnOut?.addEventListener('click',()=>setOpen(!card?.classList.contains('open')));
+  btnIn?.addEventListener('click',()=>setOpen(false));
+  backdrop?.addEventListener('click',()=>setOpen(false));
+  document.addEventListener('keydown',(e)=>{if(e.key==='Escape')setOpen(false)});
+
+  document.addEventListener('click',(e)=>{
+    const inside = e.target.closest('#menuCard, #menuBtn');
+    if(!inside) setOpen(false);
+  });
+
+  // EmailJS contact form
+  (function(){
+    const EMAILJS_PUBLIC_KEY = "MLLlLku8J8USwTVeg";
+    const SERVICE_ID = "service_aurifellmusic";
+    const TEMPLATE_ID = "template_aurifellmusic";
+
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+    const form         = document.getElementById('contactForm');
+    const emailEl      = document.getElementById('email');      // <-- email field
+    const reason       = document.getElementById('reason');
+    const customRow    = document.getElementById('customTitleRow');
+    const customTitle  = document.getElementById('customTitle');
+    const message      = document.getElementById('message');
+    const subjectField = document.getElementById('subject');
+    const statusEl     = document.getElementById('formStatus');
+    const honeypot     = document.getElementById('hp');
+
+    // Ensure the email field uses HTML5 validation
+    if (emailEl) {
+      emailEl.setAttribute('type', 'email');
+      emailEl.setAttribute('required', '');
+      emailEl.addEventListener('input', () => {
+        // clear any previous status when user edits
+        statusEl.style.display = 'none';
+        statusEl.textContent = '';
+      });
     }
 
-    btnOut?.addEventListener('click',()=>setOpen(!card?.classList.contains('open')));
-    btnIn?.addEventListener('click',()=>setOpen(false));
-    backdrop?.addEventListener('click',()=>setOpen(false));
-    document.addEventListener('keydown',(e)=>{if(e.key==='Escape')setOpen(false)});
+    // Auto-grow textarea
+    function autogrow(){ message.style.height='auto'; message.style.height=message.scrollHeight+'px'; }
+    message.addEventListener('input', autogrow); autogrow();
 
-    document.addEventListener('click',(e)=>{
-      const inside = e.target.closest('#menuCard, #menuBtn');
-      if(!inside) setOpen(false);
-    });
+    // Show/hide custom title
+    function toggleCustom(){
+      const isOther = reason.value === 'Other';
+      customRow.style.display = isOther ? 'block' : 'none';
+      customTitle.required = isOther;
+    }
+    reason.addEventListener('change', toggleCustom); toggleCustom();
 
-    // EmailJS contact form
-    (function(){
-      const EMAILJS_PUBLIC_KEY = "MLLlLku8J8USwTVeg";
-      const SERVICE_ID = "service_aurifellmusic";
-      const TEMPLATE_ID = "template_aurifellmusic";
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+      if (honeypot.value) return; // bot trap
 
-      const form = document.getElementById('contactForm');
-      const reason = document.getElementById('reason');
-      const customRow = document.getElementById('customTitleRow');
-      const customTitle = document.getElementById('customTitle');
-      const message = document.getElementById('message');
-      const subjectField = document.getElementById('subject');
-      const statusEl = document.getElementById('formStatus');
-      const honeypot = document.getElementById('hp');
+      // ---- Email + required fields validation ----
+      const emailVal = (emailEl?.value || '').trim();
+      const hasValidEmail = emailEl ? (emailEl.checkValidity ? emailEl.checkValidity() : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) : false;
 
-      // Auto-grow textarea
-      function autogrow(){ message.style.height='auto'; message.style.height=message.scrollHeight+'px'; }
-      message.addEventListener('input', autogrow); autogrow();
-
-      // Show/hide custom title
-      function toggleCustom(){
-        const isOther = reason.value === 'Other';
-        customRow.style.display = isOther ? 'block' : 'none';
-        customTitle.required = isOther;
+      if (!hasValidEmail) {
+        statusEl.style.display='block';
+        statusEl.style.color='var(--red)';
+        statusEl.textContent='Please enter a valid email address.';
+        emailEl?.focus();
+        emailEl?.reportValidity?.();
+        return;
       }
-      reason.addEventListener('change', toggleCustom); toggleCustom();
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+      if (!message.value.trim() || !reason.value) {
+        statusEl.style.display='block'; statusEl.style.color='var(--yellow)';
+        statusEl.textContent='Please fill out all required fields.'; 
+        return;
+      }
 
-        if (honeypot.value) return;
+      subjectField.value = (reason.value === 'Other')
+        ? customTitle.value.trim()
+        : `[${reason.value}]`;
 
-        if (!message.value.trim() || !reason.value) {
-          statusEl.style.display='block'; statusEl.style.color='var(--yellow)';
-          statusEl.textContent='Please fill out all required fields.'; return;
+      statusEl.style.display='block'; statusEl.style.color='var(--muted)';
+      statusEl.textContent='Sending…';
+
+      try {
+        const res = await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form);
+        if (res.status === 200) {
+          statusEl.style.color='var(--blue)';
+          statusEl.textContent='Message sent! Thank you 💙';
+          form.reset(); 
+          autogrow(); 
+          toggleCustom();
+        } else { 
+          throw new Error('EmailJS error'); 
         }
+      } catch (err) {
+        console.error(err);
+        statusEl.style.color='var(--red)';
+        statusEl.textContent='Something went wrong. Please try again.';
+      }
+    });
+  })();
+</script>
 
-        subjectField.value = (reason.value === 'Other')
-          ? customTitle.value.trim()
-          : `[${reason.value}]`;
-
-        statusEl.style.display='block'; statusEl.style.color='var(--muted)';
-        statusEl.textContent='Sending…';
-
-        try {
-          const res = await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form);
-          if (res.status === 200) {
-            statusEl.style.color='var(--blue)';
-            statusEl.textContent='Message sent! Thank you 💙';
-            form.reset(); autogrow(); toggleCustom();
-          } else { throw new Error('EmailJS error'); }
-        } catch (err) {
-          console.error(err);
-          statusEl.style.color='var(--red)';
-          statusEl.textContent='Something went wrong. Please try again.';
-        }
-      });
-    })();
-  </script>
 </body>
 </html>
