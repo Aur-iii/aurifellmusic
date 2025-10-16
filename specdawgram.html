@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SpecDAWgram — Art DAW mock</title>
+<meta name="theme-color" content="#0b0920" />
+<style>
+  /* ---------------- TOKENS (Auri palette) ---------------- */
+  :root{
+    --bg:#0b0920; --bg-2:#120d33; --panel:#1a143f;
+    --muted:#b6b1d6; --text:#f2eaff;
+    --accent:#c44bff; --accent-2:#5c6bff;
+    --red:#d33b53; --green:#26c27a; --blue:#5aa3ff; --yellow:#ffd36a;
+    --radius:18px; --shadow:0 10px 35px rgba(14,9,50,.6); --border:rgba(255,255,255,.08);
+    --gutter:20px; --maxw:1200px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; color:var(--text); background:var(--bg);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  /* big fixed gradient backdrop */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:-1;
+    background:
+      radial-gradient(120vmax 70vmax at 10% -10%, var(--accent-2) 0%, transparent 55%),
+      linear-gradient(180deg, var(--bg-2), var(--bg));
+    background-repeat:no-repeat;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 var(--gutter)}
+
+  /* ---------------- HEADER (dev page: not sticky) ---------------- */
+  header{padding:22px 0 10px}
+  .brand{display:flex; align-items:center; gap:14px}
+  .logo{
+    width:58px; height:58px; border-radius:12px; flex:0 0 auto; box-shadow:0 6px 20px rgba(14,9,50,.55);
+    display:grid; place-items:center; background:linear-gradient(180deg, rgba(196,75,255,.18), rgba(26,20,63,.9)); border:1px solid var(--border);
+  }
+  .logo svg{width:30px; height:30px}
+  .title{
+    margin:0; font-weight:900; letter-spacing:.4px; font-size:30px;
+    background:linear-gradient(90deg,#fff,var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .sub{color:var(--muted); font-size:13px; margin-top:6px}
+
+  /* ---------------- PANELS ---------------- */
+  .row{display:grid; grid-template-columns: 280px 1fr 260px; gap:16px; margin:16px 0}
+  @media (max-width:1100px){ .row{grid-template-columns: 1fr} }
+  .card{
+    background:linear-gradient(180deg, rgba(196,75,255,.12), rgba(26,20,63,.9));
+    border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--border); padding:14px;
+  }
+  .card h2{margin:0 0 10px; font-size:14px; color:var(--muted); text-transform:uppercase; letter-spacing:.8px}
+  .soft{background:linear-gradient(180deg, rgba(92,107,255,.06), rgba(18,13,51,.7))}
+  .chips{display:flex; flex-wrap:wrap; gap:8px}
+
+  /* ---------------- TOOLBAR (left) ---------------- */
+  .tool{display:flex; align-items:center; gap:10px; width:100%; padding:9px 10px; border-radius:12px;
+        background:linear-gradient(180deg, rgba(92,107,255,.12), rgba(36,35,97,.45)); border:1px solid rgba(255,255,255,.14);
+        color:#ffe7ff; font-weight:800; letter-spacing:.2px; cursor:pointer}
+  .tool:hover{background:linear-gradient(180deg, rgba(92,107,255,.2), rgba(36,35,97,.6)); color:#fff}
+  .tool.active{
+    background:linear-gradient(180deg, rgba(90,163,255,.22), rgba(36,35,97,.65));
+    box-shadow:inset 0 0 0 1px rgba(90,163,255,.55), 0 10px 26px rgba(11,9,32,.45); color:#fff
+  }
+  .tool svg{width:18px; height:18px}
+  .group{display:grid; gap:8px}
+  .divider{height:1px; background:rgba(255,255,255,.1); margin:8px 0}
+
+  /* ---------------- BRUSH HUD ---------------- */
+  .hud{display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin-top:6px}
+  .hud .control{background:rgba(26,20,63,.75); border:1px solid var(--border); border-radius:12px; padding:10px}
+  .control label{display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--muted); margin-bottom:6px}
+  .control output{color:#fff; font-variant-numeric:tabular-nums}
+  input[type="range"]{width:100%}
+  /* cute slider */
+  input[type="range"]{
+    -webkit-appearance:none; height:6px; border-radius:999px; background:rgba(255,255,255,.12); outline:none
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+    background:linear-gradient(180deg, rgba(196,75,255,1), rgba(140,46,231,1)); border:1px solid rgba(255,255,255,.25); box-shadow:0 2px 6px rgba(0,0,0,.35)
+  }
+  .row-mini{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .chip{
+    display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border-radius:999px;
+    background:rgba(92,107,255,.12); border:1px solid rgba(255,255,255,.14); color:#ffe7ff; font-size:12px; font-weight:700
+  }
+  .chip.badge-yellow{color:#1a143f; background:linear-gradient(180deg,#ffd36a,#e6b84f); border-color:rgba(0,0,0,.15)}
+  .chip .dot{width:10px; height:10px; border-radius:50%}
+  .dot.gray{background:#999}
+  .dot.white{background:#fff; box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+  .btn{
+    appearance:none; border:none; border-radius:12px; padding:10px 12px; font-weight:800; letter-spacing:.3px; cursor:pointer;
+    color:#fff; border:1px solid rgba(255,255,255,.16); box-shadow:0 10px 26px rgba(11,9,32,.55);
+    background:linear-gradient(180deg, rgba(196,75,255,1), rgba(140,46,231,1));
+  }
+  .btn.alt{background:linear-gradient(180deg, rgba(92,102,255,1), rgba(58,66,214,1))}
+  .btn.ghost{background:rgba(26,20,63,.75); border:1px solid var(--border)}
+  .btn:active{transform:translateY(1px)}
+
+  /* ---------------- CANVAS (middle) ---------------- */
+  .canvas-wrap{position:relative; min-height:420px; display:flex; align-items:center; justify-content:center; border-radius:14px;
+    background:linear-gradient(180deg, rgba(26,20,63,.85), rgba(26,20,63,.65)); border:1px solid var(--border);
+  }
+  /* placeholder spectrogram grid */
+  .fake-spectro{
+    width:100%; height:420px; border-radius:12px; overflow:hidden; position:relative;
+    background:
+      linear-gradient(to right, rgba(255,255,255,.05) 1px, transparent 1px) 0 0/28px 100%,
+      linear-gradient(to bottom, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/100% 22px,
+      radial-gradient(ellipse at top left, rgba(92,107,255,.12), transparent 40%),
+      radial-gradient(ellipse at bottom right, rgba(196,75,255,.10), transparent 40%),
+      #151136;
+  }
+  .axes{position:absolute; inset:0; pointer-events:none}
+  .axis-x,.axis-y{position:absolute; color:rgba(255,255,255,.6); font-size:10px}
+  .axis-x{left:8px; right:8px; bottom:6px; display:flex; justify-content:space-between}
+  .axis-y{top:8px; bottom:8px; left:6px; display:flex; flex-direction:column; justify-content:space-between; text-align:left}
+  .watermark{
+    position:absolute; inset:auto 12px 10px auto; color:rgba(255,255,255,.25); font-weight:800; font-size:12px;
+    letter-spacing:.3px; background:rgba(0,0,0,.15); padding:4px 8px; border-radius:8px; border:1px solid rgba(255,255,255,.1)
+  }
+
+  /* ---------------- RIGHT SIDEBAR ---------------- */
+  .layer-row{display:flex; align-items:center; gap:8px; padding:8px; border:1px solid rgba(255,255,255,.12);
+             background:rgba(26,20,63,.75); border-radius:10px}
+  .drag{width:12px; height:16px; opacity:.6; background:
+        linear-gradient(#9aa, #9aa) 0 3px/100% 2px no-repeat,
+        linear-gradient(#9aa, #9aa) 0 7px/100% 2px no-repeat,
+        linear-gradient(#9aa, #9aa) 0 11px/100% 2px no-repeat}
+  .layer-name{font-weight:700}
+  .layer-ops{margin-left:auto; display:flex; gap:6px}
+  .mini{padding:6px 8px; border-radius:8px; background:rgba(92,107,255,.18); border:1px solid rgba(255,255,255,.14); font-size:11px; font-weight:800; color:#fff}
+  .mini.red{background:rgba(211,59,83,.22)}
+  .rowy{display:flex; gap:8px; flex-wrap:wrap}
+
+  /* ---------------- TRANSPORT ---------------- */
+  .transport{display:flex; align-items:center; gap:10px; justify-content:center; padding:10px; border-radius:12px;
+    background:linear-gradient(180deg, rgba(92,107,255,.06), rgba(18,13,51,.7)); border:1px solid var(--border)}
+  .tbtn{width:40px; height:40px; border-radius:10px; display:grid; place-items:center;
+        background:rgba(26,20,63,.9); border:1px solid var(--border); box-shadow:var(--shadow); cursor:pointer}
+  .tbtn:hover{background:rgba(26,20,63,1)}
+  .time{color:#fff; font-weight:800; letter-spacing:.3px; padding:6px 10px; border-radius:8px; border:1px solid var(--border); background:rgba(26,20,63,.7)}
+
+  /* ---------------- FOOTER ---------------- */
+  footer{color:var(--muted); font-size:12px; text-align:center; padding:20px 0 40px}
+  .credits a{color:#ffd782; text-decoration:none; border-bottom:1px dotted rgba(255,255,255,.25)}
+  .credits a:hover{text-decoration:underline}
+
+  /* Motion respect */
+  @media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important} }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- HEADER -->
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <!-- Inline app glyph -->
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 19c4-7 14-7 18 0" stroke="currentColor" stroke-width="2" opacity=".85"/>
+            <rect x="10.8" y="4" width="2.4" height="8" rx="1.2" fill="currentColor"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="title">SpecDAWgram</h1>
+          <div class="sub">paint sound on a spectrogram • v0 mock (UI only)</div>
+          <div class="row-mini" style="margin-top:8px">
+            <span class="chip badge-yellow">Demo • non-functional</span>
+            <span class="chip" title="Local server status mock"><span class="dot gray"></span> server: not connected</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN GRID -->
+    <section class="row">
+      <!-- LEFT: Tools + Brush HUD -->
+      <aside class="card soft">
+        <h2>Tools</h2>
+        <div class="group" id="toolList">
+          <button class="tool active" data-tool="paint" title="Paint">
+            <!-- paint icon -->
+            <svg viewBox="0 0 24 24" fill="none"><path d="M3 17c3-1 4 2 7 1l11-11a2 2 0 0 0-3-3L7 15c-1 3-4 4-4 2Z" fill="currentColor"/></svg>
+            <span>Paint</span>
+          </button>
+          <button class="tool" data-tool="text" title="Text">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 6V4h16v2h-7v14h-2V6H4Z" fill="currentColor"/></svg>
+            <span>Text</span>
+          </button>
+          <button class="tool" data-tool="eraser" title="Eraser">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M16 3 21 8 11 18H6L3 15 13 5z" stroke="currentColor" stroke-width="2"/></svg>
+            <span>Eraser</span>
+          </button>
+          <div class="divider"></div>
+          <button class="tool" data-tool="blur" title="Blur (area)">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="2" opacity=".9"/><circle cx="12" cy="12" r="3" fill="currentColor" opacity=".5"/></svg>
+            <span>Blur</span>
+          </button>
+          <button class="tool" data-tool="scatter" title="Scatter (area)">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12h.01M8 7h.01M12 5h.01M16 9h.01M20 13h.01M9 15h.01M13 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span>Scatter</span>
+          </button>
+          <button class="tool" data-tool="glitch" title="Glitch (area)">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 8h8M12 8l2 4h6M4 16h6l2-4" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg>
+            <span>Glitch</span>
+          </button>
+          <button class="tool" data-tool="shine" title="Shine (directional)">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12h10" stroke="currentColor" stroke-width="2"/><path d="M14 12l-2-2M14 12l-2 2" stroke="currentColor" stroke-width="2"/><path d="M18 12v4" stroke="currentColor" stroke-width="2"/></svg>
+            <span>Shine</span>
+          </button>
+        </div>
+
+        <div class="divider"></div>
+        <h2>Brush</h2>
+        <div class="hud">
+          <div class="control">
+            <label><span>Size</span><output id="oSize">28</output></label>
+            <input id="size" type="range" min="2" max="128" value="28" />
+          </div>
+          <div class="control">
+            <label><span>Hardness</span><output id="oHard">0.60</output></label>
+            <input id="hard" type="range" min="0" max="1" step="0.01" value="0.60" />
+          </div>
+          <div class="control">
+            <label><span>Strength (opacity)</span><output id="oStr">0.45</output></label>
+            <input id="str" type="range" min="0" max="1" step="0.01" value="0.45" />
+          </div>
+        </div>
+
+        <div class="row-mini" style="margin-top:10px">
+          <span class="chip"><strong>Flow</strong>&nbsp;80%</span>
+          <span class="chip"><strong>Pressure →</strong>&nbsp;Strength</span>
+        </div>
+
+        <div id="textControls" style="display:none; margin-top:10px">
+          <div class="divider"></div>
+          <h2>Text</h2>
+          <div class="row-mini">
+            <span class="chip"><span class="dot white"></span> White = Loud</span>
+            <span class="chip"><span class="dot gray"></span> Black = Quiet</span>
+          </div>
+          <div class="row-mini" style="margin-top:8px">
+            <button class="btn ghost" disabled>Font: System</button>
+            <button class="btn ghost" disabled>Weight: 700</button>
+            <button class="btn ghost" disabled>Pick grayscale…</button>
+          </div>
+        </div>
+
+        <div id="shineControls" style="display:none; margin-top:10px">
+          <div class="divider"></div>
+          <h2>Shine</h2>
+          <div class="hud">
+            <div class="control">
+              <label><span>Threshold</span><output id="oThr">0.60</output></label>
+              <input id="thr" type="range" min="0" max="1" step="0.01" value="0.60" />
+            </div>
+            <div class="control">
+              <label><span>Length</span><output id="oLen">48</output></label>
+              <input id="len" type="range" min="8" max="128" step="1" value="48" />
+            </div>
+            <div class="control">
+              <label><span>Decay</span><output id="oDec">0.70</output></label>
+              <input id="dec" type="range" min="0" max="1" step="0.01" value="0.70" />
+            </div>
+          </div>
+          <div class="row-mini" style="margin-top:8px">
+            <span class="chip">Mode: Both</span>
+            <button class="btn alt" disabled>Set direction ↔︎</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MIDDLE: Canvas + Transport + Import/Export -->
+      <main>
+        <div class="card canvas-wrap">
+          <div class="fake-spectro" aria-hidden="true">
+            <div class="axes">
+              <div class="axis-x"><span>0:00</span><span>0:15</span><span>0:30</span><span>0:45</span><span>1:00</span></div>
+              <div class="axis-y"><span>20 kHz</span><span>10 kHz</span><span>5 kHz</span><span>1 kHz</span><span>100 Hz</span></div>
+            </div>
+            <div class="watermark">UI Preview</div>
+          </div>
+        </div>
+
+        <div class="rowy" style="margin-top:12px">
+          <button class="btn">Import audio</button>
+          <button class="btn">Import image</button>
+          <button class="btn alt">Export WAV</button>
+          <button class="btn alt">Export PNG</button>
+          <button class="btn ghost">Save .sdg</button>
+          <span class="chip">Gamma: 1.0</span>
+          <span class="chip">Floor: −60 dB</span>
+        </div>
+
+        <div class="card soft" style="margin-top:12px">
+          <div class="transport">
+            <button class="tbtn" title="Play/Pause">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button class="tbtn" title="Return to start">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v12l-8-6 8-6zm2 0h2v12h-2z"/></svg>
+            </button>
+            <button class="tbtn" title="Loop">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h9a3 3 0 110 6H7m0 0l3-3m-3 3l3 3" opacity=".9"/></svg>
+            </button>
+            <span class="time">00:00.0 / 01:00.0</span>
+          </div>
+        </div>
+      </main>
+
+      <!-- RIGHT: Layers -->
+      <aside class="card soft">
+        <h2>Layers</h2>
+        <div class="group">
+          <div class="layer-row">
+            <div class="drag" aria-hidden="true"></div>
+            <span class="layer-name">Paint 1</span>
+            <div class="layer-ops">
+              <button class="mini">Hide</button>
+              <button class="mini">Solo</button>
+              <button class="mini red">Del</button>
+            </div>
+          </div>
+          <div class="layer-row">
+            <div class="drag" aria-hidden="true"></div>
+            <span class="layer-name">Text “hello”</span>
+            <div class="layer-ops">
+              <button class="mini">Hide</button>
+              <button class="mini">Solo</button>
+              <button class="mini red">Del</button>
+            </div>
+          </div>
+          <div class="layer-row">
+            <div class="drag" aria-hidden="true"></div>
+            <span class="layer-name">Import (audio)</span>
+            <div class="layer-ops">
+              <button class="mini">Hide</button>
+              <button class="mini">Solo</button>
+              <button class="mini red">Del</button>
+            </div>
+          </div>
+          <div class="rowy" style="margin-top:8px">
+            <button class="btn">+ Paint</button>
+            <button class="btn">+ Text</button>
+            <button class="btn">+ Import</button>
+          </div>
+        </div>
+
+        <div class="divider" style="margin:12px 0"></div>
+        <h2>Presets</h2>
+        <div class="chips">
+          <span class="chip">Soft Brush</span>
+          <span class="chip">Bright Text</span>
+          <span class="chip">Shine Bloom</span>
+        </div>
+      </aside>
+    </section>
+
+    <footer>
+      <div class="credits">
+        <small>© <span id="y"></span> SpecDAWgram (UI mock) • designed for Auri’s dev pages • <a href="#" onclick="return false;">cozy queer-coded jazz</a></small>
+      </div>
+    </footer>
+  </div>
+
+<script>
+  // Year stamp
+  document.getElementById('y').textContent = new Date().getFullYear();
+
+  // Mini interactivity just for CodePen feels (no real audio)
+  const $ = (s, p=document) => p.querySelector(s);
+  const $$ = (s, p=document) => Array.from(p.querySelectorAll(s));
+
+  // Tools toggling + contextual panels
+  const toolList = $('#toolList');
+  const textControls = $('#textControls');
+  const shineControls = $('#shineControls');
+  toolList.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.tool'); if(!btn) return;
+    $$('.tool', toolList).forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const t = btn.dataset.tool;
+    textControls.style.display = (t === 'text') ? 'block' : 'none';
+    shineControls.style.display = (t === 'shine') ? 'block' : 'none';
+  });
+
+  // Range → output mirrors
+  const bind = (id, out, fmt= v=>v) => {
+    const el = $(id); const o = $(out);
+    const upd = ()=> o.textContent = fmt(el.value);
+    el.addEventListener('input', upd); upd();
+  };
+  bind('#size', '#oSize', v=>v);
+  bind('#hard', '#oHard', v=>Number(v).toFixed(2));
+  bind('#str', '#oStr', v=>Number(v).toFixed(2));
+  bind('#thr', '#oThr', v=>Number(v).toFixed(2));
+  bind('#len', '#oLen', v=>v);
+  bind('#dec', '#oDec', v=>Number(v).toFixed(2));
+</script>
+</body>
+</html>

@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="alternate icon" type="image/png" href="./assets/auri-a-color.png" sizes="32x32">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Beheader</title>
+
+  <style>
+    /* Auri-style palette (your snippet), plus minimal additions for the inside button row */
+    :root {
+      --bg: #0b0920;          /* deep indigo-black */
+      --bg-2: #120d33;        /* darker violet */
+      --panel: #1a143f;       /* panel violet */
+      --muted: #b6b1d6;       /* muted lilac text */
+      --text: #f2eaff;        /* near-white with lilac tint */
+
+      --accent: #c44bff;      /* electric magenta-violet */
+      --accent-2: #5c6bff;    /* indigo */
+
+      /* Status colors kept distinct for validation */
+      --red: #d33b53;         /* hot pink-red */
+      --red-2: #6f1330;
+      --green: #26c27a;       /* neon green */
+      --green-2: #0e5a3c;
+      --blue: #5aa3ff;        /* selection outline */
+      --yellow: #ffd36a;
+
+      --outline: 3px;
+      --radius: 18px;
+    }
+
+    /* brand row inside header */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;            /* allow text to truncate nicely */
+}
+.brand .logo {
+  width: 58px;             /* tweak if you want bigger/smaller */
+  height: 58px;
+  flex: 0 0 auto;
+  border-radius: 12px;     /* rounds the black square a bit */
+  box-shadow: 0 6px 20px rgba(14,9,50,.55);
+  object-fit: cover;
+   user-select:none; -webkit-user-drag:none;
+  image-rendering:-webkit-optimize-contrast;
+}
+.brand .brand-text { display: flex; flex-direction: column; min-width: 0; }
+.brand .brand-text .sub { margin-top: 2px; }
+
+/* keep header tidy on small screens */
+@media (max-width: 700px) {
+  header { flex-wrap: wrap; gap: 10px; }
+  .controls { width: 100%; justify-content: flex-start; }
+}
+
+
+    /* Overlay (spinner) */
+    #overlay {
+      position: fixed; inset: 0; display: none; place-items: center;
+      background: rgba(10,9,32,.55); backdrop-filter: blur(2px);
+      z-index: 9998;
+    }
+    #overlay.show { display: grid; }
+    .spinner {
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 3px solid rgba(255,255,255,.25);
+      border-top-color: #fff; animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status { margin-top: 10px; color: #e2dbff; font-size: 13px; text-align: center; }
+
+    /* Toast */
+    #toast{
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(8px);
+      background: rgba(36,35,97,.95);
+      border: 1px solid rgba(255,255,255,.14);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 10px;
+      box-shadow: 0 10px 26px rgba(11,9,32,.55);
+      opacity: 0;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 9999;
+      pointer-events: none;
+      font-size: 13px;
+    }
+    #toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    html { background-color: var(--bg); }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: none; min-height: 100dvh; overflow-x: hidden;
+      color: var(--text);
+    }
+
+    /* Fixed, scalable background gradient */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(120vmax 70vmax at 10% -10%, var(--accent-2) 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg-2), var(--bg));
+      background-repeat: no-repeat;
+    }
+
+    
+
+    a { color: var(--accent); }
+    .wrap { max-width: 1100px; margin: 24px auto 64px; padding: 0 20px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    h1 { font-weight: 900; letter-spacing: 0.4px; font-size: 30px; margin: 0; background: linear-gradient(90deg, #fff, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .sub { color: var(--muted); font-size: 13px; margin-top: 6px; }
+    
+    .credits {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      opacity: .9;
+    }
+    .credits a {
+      color: #ffdca8;
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(255,255,255,.25);
+    }
+    .credits a:hover { text-decoration: underline; }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .card { background: linear-gradient(180deg, rgba(196,75,255,.12), rgba(26,20,63,.9)); border-radius: var(--radius); box-shadow: 0 10px 35px rgba(14,9,50,.6); padding: 16px; border: 1px solid rgba(255,255,255,.08); }
+    .card h2 { margin: 0 0 10px; font-size: 16px; font-weight: 800; }
+
+    .lists { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+
+    .list { background: linear-gradient(180deg, rgba(92,107,255,.06), rgba(18,13,51,.7)); border: 1px dashed rgba(255,255,255,.14); border-radius: 14px; min-height: 120px; padding: 10px; }
+    .list h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .8px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; background: rgba(92,107,255,.12); border: 1px solid rgba(255,255,255,.1); color: #ffe7ff; padding: 8px 10px; border-radius: 999px; font-size: 12px; position: relative; user-select: none; }
+    .chip[data-required="true"]::after { content: "required"; color: #ffdca8; font-size: 10px; padding-left: 6px; opacity: .9; }
+
+    .dropzone { position: relative; border-radius: 16px; height: 210px; display: grid; place-items: center; border: 2px dashed rgba(255,255,255,.18); user-select: none; cursor: default; transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease; }
+    .dropzone .label { text-align: center; pointer-events: none; }
+    .dropzone .hint { color: var(--muted); font-size: 12px; }
+    .dropzone.red { background: linear-gradient(180deg, rgba(211,59,83,.16), rgba(111,19,48,.28)); box-shadow: inset 0 0 0 2px rgba(211,59,83,.5); }
+    .dropzone.green { background: linear-gradient(180deg, rgba(38,194,122,.16), rgba(14,90,60,.28)); box-shadow: inset 0 0 0 2px rgba(38,194,122,.55); }
+    .dropzone.drag { transform: scale(1.01); border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(255,211,106,.15), inset 0 0 0 2px rgba(255,211,106,.45); }
+    .dropzone.selected { outline: var(--outline) solid var(--blue); outline-offset: 2px; }
+
+    /* Inside button row */
+    .inside-actions {
+      position: absolute; bottom: 12px; left: 12px; right: 12px;
+      display: flex; justify-content: center; gap: 10px;
+    }
+
+    input[type="file"] { display: none; }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; }
+    .btn { appearance: none; border: none; border-radius: 12px; padding: 12px 14px; font-weight: 800; letter-spacing: .3px; cursor: pointer; box-shadow: 0 10px 26px rgba(11,9,32,.55); background: linear-gradient(180deg, rgba(92,107,255,.9), rgba(36,35,97,.95)); color: white; border: 1px solid rgba(255,255,255,.14); transition: transform .05s ease, filter .2s ease, opacity .2s ease; }
+    .btn.small { padding: 8px 12px; font-size: 12px; }
+    .btn:active { transform: translateY(1px); }
+    .btn[disabled] { opacity: .45; cursor: not-allowed; }
+    .btn.red { background: linear-gradient(180deg, rgba(211,59,83,.9), rgba(111,19,48,.95)); }
+    .btn.blue { background: linear-gradient(180deg, rgba(92,107,255,.9), rgba(36,35,97,.95)); }
+    .btn.green { background: linear-gradient(180deg, rgba(38,194,122,.9), rgba(14,90,60,.95)); }
+
+    .opt-list { margin-top: 8px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,.09); }
+    .opt-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; background: rgba(18,13,51,.8); border-bottom: 1px solid rgba(255,255,255,.06); font-size: 13px; user-select: none; }
+    .opt-item:last-child { border-bottom: none; }
+    .opt-item.selected { background: rgba(90,163,255,.18); box-shadow: inset 0 0 0 1px rgba(90,163,255,.5); }
+    .opt-item small { color: var(--muted); }
+
+    footer { margin-top: 20px; color: var(--muted); font-size: 12px; }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 12px; padding: 2px 6px; border-radius: 6px; background: rgba(26,20,63,.9); border: 1px solid rgba(255,255,255,.12); }
+    .hintbar { margin-top: 10px; color: #e2dbff; font-size: 12px; }
+
+    /* Allowed-type badges row */
+    .opt-head { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+    .opt-allowed { display: flex; flex-wrap: wrap; gap: 6px; }
+    .allowed { font-size: 11px; padding: 6px 8px; background: rgba(196,75,255,.14); border: 1px solid rgba(255,255,255,.1); border-radius: 999px; }
+
+    /* ---------- Server gate (offline guard) ---------- */
+    #serverGate{
+      position:fixed; inset:0; display:none; place-items:center;
+      background:rgba(12,10,30,.55);
+      backdrop-filter:blur(5px) saturate(110%);
+      -webkit-backdrop-filter:blur(5px) saturate(110%);
+      z-index:9999;
+    }
+    #serverGate.open{ display:grid; }
+    .gate-panel{
+      background:rgba(26,20,63,.92);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+      padding:18px;
+      max-width:360px; width:calc(100% - 40px);
+      text-align:center; box-shadow:0 10px 35px rgba(14,9,50,.6);
+    }
+    .gate-panel h3{ margin:0 0 8px; font-size:16px; font-weight:800; }
+    .gate-panel p{  margin:0 0 14px; color:var(--muted); font-size:13px; }
+    .gate-actions{ display:flex; justify-content:center; }
+  </style>
+
+</head>
+<meta name="theme-color" content="#0b0920">
+<body>
+  <div class="wrap" id="app">
+    <header>
+  <div class="brand">
+    <!-- use your file path; this assumes the PNG is next to index.html -->
+    <img class="logo" src="./assets/beheader.png" alt="Beheader logo">
+    <div class="brand-text">
+      <h1>Beheader</h1>
+      <div class="sub">Create an image/media polyglot.</div>
+    </div>
+  </div>
+
+  <!-- your existing controls block -->
+  <div class="controls">
+    <button class="btn" id="uploadOptionalBtn" title="Upload optional helper files">Upload optional file</button>
+    <button class="btn red" id="removeSelectedBtn" disabled>Remove selected</button>
+    <button class="btn green" id="beheadBtn" disabled>Behead</button>
+  </div>
+</header>
+
+
+    <div class="grid">
+      <div class="card">
+        <h2>Required files</h2>
+        <div class="grid" style="grid-template-columns:1fr; gap:12px;">
+          <div class="dropzone red" id="imageZone" data-type="image" aria-label="Image drop area" tabindex="0">
+            <input id="imageInput" type="file" accept="image/*" />
+            <div class="label">
+              <b>Image</b>
+              <div class="hint">PNG/JPEG/WebP/GIF. Drag here or use the button below.</div>
+              <div class="sub" id="imageStatus">No file</div>
+            </div>
+            <div class="inside-actions">
+              <button class="btn small blue" id="imagePickBtn">Upload image</button>
+            </div>
+          </div>
+
+          <div class="dropzone red" id="mediaZone" data-type="media" aria-label="Media drop area" tabindex="0">
+            <input id="mediaInput" type="file" accept="audio/*,video/*" />
+            <div class="label">
+              <b>Media</b>
+              <div class="hint">Audio/Video (e.g., MP3, WAV, MP4). Drag here or use the button below.</div>
+              <div class="sub" id="mediaStatus">No file</div>
+            </div>
+            <div class="inside-actions">
+              <button class="btn small blue" id="mediaPickBtn">Upload media</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="lists">
+          <div class="list" id="reqList">
+            <h3>Required (live)</h3>
+            <div class="chips" id="reqChips"></div>
+          </div>
+          <div class="list" id="optList">
+            <h3>Optional (live)</h3>
+            <div class="opt-head">
+              <div class="sub">Allowed types:</div>
+              <div class="opt-allowed" id="optAllowed"></div>
+            </div>
+            <div class="opt-list" id="optItems"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>How it works</h2>
+        <p class="sub">Provide an <strong>image</strong> and a <strong>media</strong> file, optionally add helper files, then hit <span class="kbd">Behead</span>. After saving, everything resets to red.</p>
+        <div class="hintbar">
+          <ul>
+            <li>Clicking a box selects it (blue outline). Use the button inside the box to upload.</li>
+            <li>Drag & drop still works onto each box.</li>
+            <li>Use <span class="kbd">Remove selected</span> to clear just the highlighted item.</li>
+          </ul>
+        </div>
+        <p class="sub"><strong><br>Keyboard:</strong></p>
+        <div class="hintbar">
+            <ul>
+                <li><span class="kbd">Enter</span> on a selected box clicks its upload button.</li>
+                <li><span class="kbd">Esc</span> removes selection.</li>
+                <li><span class="kbd">⌘Cmd + U</span> uploads extra files.</li>
+                <li><span class="kbd">⌘Cmd + B</span> beheads.</li>
+            </ul>
+        </div>
+      </div>
+    </div>
+    
+           
+
+
+    <!-- Optional files (specific accept list) -->
+    <input type="file" id="optionalInput" multiple accept=".html,.htm,.pdf,.zip,.jar,.apk,.docx,.pptx,.xlsx,*" style="display:none" />
+  
+    <div class="credits">
+      made possible thanks to
+      <a href="https://github.com/p2r3/beheader" target="_blank" rel="noopener noreferrer">
+        p2r3/beheader
+      </a>
+    </div>
+
+    <!-- Overlay + Toast -->
+    <div id="overlay">
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="spinner"></div>
+        <div class="status">Beheading…</div>
+      </div>
+    </div>
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <!-- Server gate (shown until localhost replies) -->
+    <div id="serverGate" class="open" role="alertdialog" aria-modal="true" aria-labelledby="gateTitle" aria-describedby="gateDesc">
+      <div class="gate-panel">
+        <h3 id="gateTitle">Waiting for local server</h3>
+        <p id="gateDesc">Looking for <code>http://localhost:5173</code>. Start your server, then ping.</p>
+        <div class="gate-actions">
+          <button class="btn blue" id="pingBtn">Ping server</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.wrap -->
+
+  <script>
+  (function(){
+    const API_BASE = 'http://localhost:5173'; // your local server
+    const allowedExts = ['.html','.htm','.pdf','.zip','.jar','.apk','.docx','.pptx','.xlsx','*'];
+
+    const $ = sel => document.querySelector(sel);
+    const imageZone = $('#imageZone');
+    const mediaZone = $('#mediaZone');
+    const imageInput = $('#imageInput');
+    const mediaInput = $('#mediaInput');
+    const imagePickBtn = $('#imagePickBtn');
+    const mediaPickBtn = $('#mediaPickBtn');
+    const imageStatus = $('#imageStatus');
+    const mediaStatus = $('#mediaStatus');
+    const beheadBtn = $('#beheadBtn');
+    const removeSelectedBtn = $('#removeSelectedBtn');
+    const uploadOptionalBtn = $('#uploadOptionalBtn');
+    const optionalInput = $('#optionalInput');
+    const reqChips = $('#reqChips');
+    const optItems = $('#optItems');
+    const optAllowed = $('#optAllowed');
+    const overlay = document.getElementById('overlay');
+
+    let state = {
+      imageFile: null,
+      mediaFile: null,
+      optionalFiles: [],
+      selection: { type: null, index: null } // 'image'|'media'|'opt'
+    };
+
+    // toast helper
+    function toast(msg, ms = 1500) {
+      const el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove('show'), ms);
+    }
+
+    // overlay helper
+    function showOverlay(on = true) {
+      overlay.classList.toggle('show', !!on);
+    }
+
+    function renderAllowed() {
+      optAllowed.innerHTML = '';
+      allowedExts.forEach(ext => {
+        const el = document.createElement('span');
+        el.className = 'allowed';
+        el.textContent = ext;
+        optAllowed.appendChild(el);
+      });
+    }
+
+    const clearSelection = () => {
+      state.selection = { type: null, index: null };
+      imageZone.classList.remove('selected');
+      mediaZone.classList.remove('selected');
+      [...optItems.children].forEach(li => li.classList.remove('selected'));
+      removeSelectedBtn.disabled = true;
+    };
+
+    const humanSize = n => {
+      if (!Number.isFinite(n)) return '';
+      const units = ['B','KB','MB','GB'];
+      let i = 0; let s = n;
+      while (s >= 1024 && i < units.length-1) { s/=1024; i++; }
+      return s.toFixed(s<10?2:1)+' '+units[i];
+    };
+
+    const refreshUI = () => {
+      // Required chips
+      reqChips.innerHTML = '';
+      const imageChip = document.createElement('div');
+      imageChip.className = 'chip';
+      imageChip.dataset.required = 'true';
+      imageChip.textContent = state.imageFile ? `${state.imageFile.name} (${humanSize(state.imageFile.size)})` : 'Image: missing';
+      reqChips.appendChild(imageChip);
+
+      const mediaChip = document.createElement('div');
+      mediaChip.className = 'chip';
+      mediaChip.dataset.required = 'true';
+      mediaChip.textContent = state.mediaFile ? `${state.mediaFile.name} (${humanSize(state.mediaFile.size)})` : 'Media: missing';
+      reqChips.appendChild(mediaChip);
+
+      const imageOk = !!state.imageFile;
+      const mediaOk = !!state.mediaFile;
+      imageZone.classList.toggle('green', imageOk);
+      imageZone.classList.toggle('red', !imageOk);
+      imageStatus.textContent = imageOk ? `${state.imageFile.name} — ${state.imageFile.type || 'type?'} — ${humanSize(state.imageFile.size)}` : 'No file';
+
+      mediaZone.classList.toggle('green', mediaOk);
+      mediaZone.classList.toggle('red', !mediaOk);
+      mediaStatus.textContent = mediaOk ? `${state.mediaFile.name} — ${state.mediaFile.type || 'type?'} — ${humanSize(state.mediaFile.size)}` : 'No file';
+
+      // Optional list
+      optItems.innerHTML = '';
+      if (state.optionalFiles.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'opt-item';
+        empty.innerHTML = '<em>No optional files added yet.</em><small>Choose from the allowed types above</small>';
+        optItems.appendChild(empty);
+      } else {
+        state.optionalFiles.forEach((f, idx) => {
+          const row = document.createElement('div');
+          row.className = 'opt-item';
+          row.tabIndex = 0;
+          row.innerHTML = `<div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${f.name}</div><small>${f.type || 'unknown'} • ${humanSize(f.size)}</small>`;
+          row.addEventListener('click', (e) => { e.stopPropagation(); select('opt', idx); });
+          row.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') select('opt', idx); if (e.key === 'Delete') removeSelected(); });
+          if (state.selection.type === 'opt' && state.selection.index === idx) row.classList.add('selected');
+          optItems.appendChild(row);
+        });
+      }
+
+      beheadBtn.disabled = !(imageOk && mediaOk);
+    };
+
+    const select = (type, index=null) => {
+      clearSelection();
+      state.selection = { type, index };
+      if (type === 'image') imageZone.classList.add('selected');
+      if (type === 'media') mediaZone.classList.add('selected');
+      if (type === 'opt' && index !== null) (optItems.children[index]||{}).classList?.add('selected');
+      removeSelectedBtn.disabled = false;
+    };
+
+    const removeSelected = () => {
+      const { type, index } = state.selection;
+      if (!type) return;
+
+      if (type === 'image') { 
+        state.imageFile = null; 
+        imageInput.value = '';   // reset input
+      }
+      if (type === 'media') { 
+        state.mediaFile = null; 
+        mediaInput.value = '';   // reset input
+      }
+      if (type === 'opt' && index !== null) {
+        state.optionalFiles.splice(index, 1);
+      }
+
+      clearSelection();
+      refreshUI();
+    };
+
+    // Type guards
+    const isImage = (file) => file && file.type.startsWith('image/');
+    const isMedia = (file) => file && (file.type.startsWith('audio/') || file.type.startsWith('video/'));
+
+    // Wire a dropzone (click selects; inside button opens picker)
+    function wireZone(zoneEl, inputEl, checker, assign) {
+      zoneEl.addEventListener('click', () => select(zoneEl.dataset.type));
+      zoneEl.addEventListener('keydown', (e)=>{ 
+        if (e.key === 'Enter') {
+          if (zoneEl === imageZone) imagePickBtn.click(); else if (zoneEl === mediaZone) mediaPickBtn.click();
+        }
+        if (e.key === 'Delete') removeSelected();
+      });
+      zoneEl.tabIndex = 0;
+
+      zoneEl.addEventListener('dragover', (e)=>{ e.preventDefault(); zoneEl.classList.add('drag'); });
+      zoneEl.addEventListener('dragleave', ()=> zoneEl.classList.remove('drag'));
+      zoneEl.addEventListener('drop', (e)=>{
+        e.preventDefault(); zoneEl.classList.remove('drag');
+        const f = e.dataTransfer.files?.[0];
+        if (!f) return;
+        if (!checker(f)) { alert(`That doesn't look like a valid ${zoneEl.dataset.type} file.`); return; }
+        assign(f); refreshUI();
+      });
+
+      inputEl.addEventListener('change', () => {
+        const f = inputEl.files?.[0];
+        if (!f) return;
+        if (!checker(f)) { alert(`That doesn't look like a valid ${zoneEl.dataset.type} file.`); inputEl.value = ''; return; }
+        assign(f);
+        refreshUI();
+        inputEl.value = ''; // reset so picking the same file again works
+      });
+    }
+
+    wireZone(imageZone, imageInput, isImage, (f)=> state.imageFile = f);
+    wireZone(mediaZone, mediaInput, isMedia, (f)=> state.mediaFile = f);
+
+    // Inside upload buttons (reset input before opening so same-file reselect fires)
+    imagePickBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      imageInput.value = '';
+      imageInput.click();
+    });
+    mediaPickBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mediaInput.value = '';
+      mediaInput.click();
+    });
+
+    // Optional files upload
+    uploadOptionalBtn.addEventListener('click', ()=> optionalInput.click());
+    optionalInput.addEventListener('change', ()=>{
+      const files = Array.from(optionalInput.files || []);
+      if (!files.length) return;
+      const validFiles = files.filter(f => {
+        const ext = (f.name.toLowerCase().match(/\.[^.]+$/)?.[0] || '');
+        return allowedExts.includes(ext) || ext === ''; // allow no-extension
+      });
+      if (validFiles.length < files.length) {
+        alert('Some files were skipped because they are not in the allowed optional types.');
+      }
+      state.optionalFiles.push(...validFiles);
+      optionalInput.value = '';
+      refreshUI();
+    });
+
+    // Remove selected
+    removeSelectedBtn.addEventListener('click', () => { removeSelected(); toast('Removed'); });
+
+    // Click outside clears selection
+    document.addEventListener('click', (e)=> {
+      const within = e.target.closest('#imageZone, #mediaZone, .opt-item, #removeSelectedBtn, #uploadOptionalBtn, #imagePickBtn, #mediaPickBtn');
+      if (!within) clearSelection();
+    });
+
+    // Unified keyboard shortcuts (Delete, Esc remove; Cmd/Ctrl+B behead; Cmd/Ctrl+U optional upload)
+    document.addEventListener('keydown', (e) => { 
+      const tag = (e.target && e.target.tagName || '').toLowerCase();
+      const typing = tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable);
+      if (typing) return; // don't hijack shortcuts while typing
+
+      const mod = e.metaKey || e.ctrlKey;
+
+      if (mod && e.key.toLowerCase() === 'b') {
+        const btn = beheadBtn;
+        if (!btn.disabled) { e.preventDefault(); btn.click(); }
+        return;
+      }
+
+      if (mod && e.key.toLowerCase() === 'u') {
+        e.preventDefault();
+        optionalInput.value = '';
+        optionalInput.click();
+        return;
+      }
+
+      if (e.key === 'Delete') {
+        e.preventDefault();
+        if (state.selection.type) { removeSelected(); toast('Removed'); }
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (state.selection.type) { removeSelected(); toast('Removed'); }
+        else clearSelection();
+        return;
+      }
+    });
+
+    // Save with native picker when possible; fallback to download
+    async function saveWithPicker(blob, suggestedName){
+      if (window.showSaveFilePicker) {
+        try {
+          const handle = await window.showSaveFilePicker({ suggestedName });
+          const writable = await handle.createWritable();
+          await writable.write(blob); await writable.close();
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return; // user cancelled
+        }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = suggestedName;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=> URL.revokeObjectURL(url), 1500);
+    }
+
+    // Behead via local server
+    beheadBtn.addEventListener('click', async ()=>{
+      if (!state.imageFile || !state.mediaFile) return;
+      beheadBtn.disabled = true; beheadBtn.textContent = 'Beheading…';
+      showOverlay(true);
+      try {
+        const fd = new FormData();
+        fd.append('image', state.imageFile, state.imageFile.name);
+        fd.append('media', state.mediaFile, state.mediaFile.name);
+        for (const f of state.optionalFiles) fd.append('optional', f, f.name);
+
+        const resp = await fetch(API_BASE + '/behead', { method:'POST', body: fd });
+        if (!resp.ok) throw new Error('Server error');
+        const blob = await resp.blob();
+
+        const suggestedName = 'beheaded.polyglot';
+        await saveWithPicker(blob, suggestedName);
+
+        toast('Saved!');
+
+        // Reset to red
+        state.imageFile = null; imageInput.value = '';
+        state.mediaFile = null; mediaInput.value = '';
+        state.optionalFiles = []; optionalInput.value = '';
+        clearSelection(); refreshUI();
+      } catch (err) {
+        console.error(err);
+        toast('Export failed', 2000);
+        alert('Failed to generate polyglot. Make sure the server is running at http://localhost:5173.');
+      } finally {
+        showOverlay(false);
+        beheadBtn.textContent = 'Behead';
+        beheadBtn.disabled = !(state.imageFile && state.mediaFile);
+      }
+    });
+
+    /* -------- Server gate: blur/lock until localhost:5173 responds -------- */
+    const gate = document.getElementById('serverGate');
+    const pingBtn = document.getElementById('pingBtn');
+
+    async function checkServer() {
+      const endpoints = ['/', '/health', '/status', '/ping'];
+      for (const ep of endpoints) {
+        try {
+          // If server is up, this resolves (opaque response is fine).
+          await fetch(API_BASE + ep, { method:'GET', mode:'no-cors', cache:'no-store' });
+          gate.classList.remove('open');   // unlock UI
+          toast('Local server detected');
+          return true;
+        } catch (e) {
+          // keep trying next endpoint
+        }
+      }
+      gate.classList.add('open'); // keep UI blurred
+      return false;
+    }
+
+    pingBtn.addEventListener('click', async () => {
+      pingBtn.disabled = true;
+      const label = pingBtn.textContent;
+      pingBtn.textContent = 'Pinging…';
+      try {
+        const ok = await checkServer();
+        if (!ok) toast('Still offline');
+      } finally {
+        pingBtn.disabled = false;
+        pingBtn.textContent = label;
+      }
+    });
+
+    // Kick off an initial check on load
+    checkServer();
+
+    // Optional: re-check when browser regains network
+    window.addEventListener('online', () => checkServer());
+
+    // Initial render
+    renderAllowed();
+    refreshUI();
+  })();
+  </script>
+</body>
+</html>

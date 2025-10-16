@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-aurora">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auri Fell Music — Contact</title>
+  <meta name="theme-color" content="#0b0920" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/auri-a-color.png" />
+  <link rel="stylesheet" href="./assets/site.css" />
+</head>
+<body>
+  <a class="visually-hidden" href="#main">Skip to content</a>
+
+  <!-- HEADER -->
+  <header>
+    <div class="wrap brand-row">
+      <div class="brand">
+        <img class="logo" src="./assets/auri-a-color.png" alt="Auri A logo" width="48" height="48" />
+        <span class="title">Auri Fell Music</span>
+      </div>
+
+      <nav aria-label="Primary" id="site-nav">
+        <a class="nav-link" href="index.html">Home</a>
+        <a class="nav-link" href="about.html">About</a>
+        <a class="nav-link" href="music.html">Music</a>
+        <a class="nav-link active" href="contact.html">Contact</a>
+        <a class="nav-link" href="blog.html">Blog</a>
+      </nav>
+
+      <!-- Header kebab that morphs to hamburger -->
+      <button class="hamburger" id="menuBtn" aria-controls="menuCard" aria-expanded="false" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <g class="dots">
+            <circle cx="12" cy="5" r="2"/>
+            <circle cx="12" cy="12" r="2"/>
+            <circle cx="12" cy="19" r="2"/>
+          </g>
+          <g class="lines">
+            <rect x="3" y="5"  width="18" height="2" rx="1"/>
+            <rect x="3" y="11" width="18" height="2" rx="1"/>
+            <rect x="3" y="17" width="18" height="2" rx="1"/>
+          </g>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+<!-- Mobile menu drawer -->
+      <div class="menu-card" id="menuCard" role="dialog" aria-modal="true" aria-label="Menu">
+        <!-- Centered close button that rides the drawer -->
+        <button class="hamburger inside" id="menuBtnIn" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <g class="dots">
+              <circle cx="12" cy="5" r="2"/>
+              <circle cx="12" cy="12" r="2"/>
+              <circle cx="12" cy="19" r="2"/>
+            </g>
+            <g class="lines">
+              <rect x="3" y="5"  width="18" height="2" rx="1"/>
+              <rect x="3" y="11" width="18" height="2" rx="1"/>
+              <rect x="3" y="17" width="18" height="2" rx="1"/>
+            </g>
+          </svg>
+        </button>
+
+        <nav class="menu-list" aria-label="Mobile">
+          <a class="nav-link" href="index.html">Home</a>
+          <a class="nav-link" href="about.html">About</a>
+          <a class="nav-link" href="music.html">Music</a>
+          <a class="nav-link active" href="contact.html">Contact</a>
+          <a class="nav-link" href="blog.html">Blog</a>
+        </nav>
+      </div>
+
+  <!-- page veil (full-height content well) -->
+  <div class="page-veil" aria-hidden="true"></div>
+  <!-- slide-out backdrop -->
+  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+  <!-- MAIN -->
+  <main id="main" class="wrap">
+    <section class="contact" aria-label="Contact Auri">
+      <article class="card" style="max-width: var(--maxw); margin: 30px auto; padding: var(--inner-pad-y) var(--inner-pad-x); box-sizing: border-box;">
+        <h3 style="margin-bottom:14px;">Contact</h3>
+
+        <form id="contactForm" style="display:flex; flex-direction:column; gap:14px;" novalidate>
+          <!-- Reason -->
+          <div>
+            <span style="font-weight:800;">What are you reaching me about?</span>
+            <select id="reason" name="reason" required
+              style="width:100%; margin-top:6px; padding:10px 14px; border-radius:10px; border:1px solid var(--border);
+                     background:rgba(26,20,63,.55); color:var(--text); font-size:16px; box-sizing:border-box;">
+              <option value="General Inquiry" selected>General Inquiry</option>
+              <option value="Commission">Commission</option>
+              <option value="Collaboration">Collaboration</option>
+              <option value="Booking">Booking</option>
+              <option value="Other">Other (custom title)</option>
+            </select>
+          </div>
+
+          <!-- Custom Title -->
+          <div id="customTitleRow" style="display:none;">
+            <label for="customTitle" style="display:block; font-weight:800; margin-bottom:6px;">Title</label>
+            <input id="customTitle" name="title" type="text" placeholder="Email title"
+              style="width:100%; padding:10px 14px; border-radius:10px; border:1px solid var(--border);
+                     background:rgba(26,20,63,.55); color:var(--text); box-sizing:border-box;" />
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label for="email" style="display:block; font-weight:800; margin-bottom:6px;">Your Email</label>
+            <input id="email" name="reply_to" type="email" required placeholder="you@example.com"
+              style="width:100%; padding:10px 14px; border-radius:10px; border:1px solid var(--border);
+                     background:rgba(26,20,63,.55); color:var(--text); box-sizing:border-box;" />
+          </div>
+
+          <!-- Message -->
+          <div>
+            <label for="message" style="display:block; font-weight:800; margin-bottom:6px;">Message</label>
+            <textarea id="message" name="message" rows="6" required placeholder="Tell me a bit about what you have in mind…"
+              style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+                     background:rgba(26,20,63,.55); color:var(--text); resize:none; overflow-y:hidden; box-sizing:border-box;"></textarea>
+          </div>
+
+          <input type="hidden" id="subject" name="subject" value="">
+          <input type="text" name="phone" id="hp" tabindex="-1" autocomplete="off"
+                 style="position:absolute; left:-9999px; opacity:0;" aria-hidden="true" />
+
+          <button type="submit" class="mini-btn" style="width:100%; font-size:16px; font-weight:800; padding:12px 14px;">
+            Send
+          </button>
+
+          <p id="formStatus" style="display:none; font-weight:700; margin-top:10px;"></p>
+        </form>
+      </article>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="floating">
+    <p class="credits">© <span id="y"></span> Auri Fell • <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a></p>
+  </footer>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Mobile menu logic (mirror index/about behavior so backdrop toggles)
+    const btnOut = document.getElementById('menuBtn');
+    const btnIn  = document.getElementById('menuBtnIn');
+    const card   = document.getElementById('menuCard');
+    const backdrop = document.getElementById('backdrop');
+
+    function setOpen(on){
+      if (!card) return;
+      const willOpen = !!on;
+
+      card.classList.toggle('open', willOpen);
+      document.body.classList.toggle('menu-open', willOpen);
+
+      btnOut?.classList.toggle('is-open', willOpen);
+      btnIn?.classList.toggle('is-open', willOpen);
+      btnOut?.setAttribute('aria-expanded', String(willOpen));
+
+      backdrop?.classList.toggle('show', willOpen);
+
+      if (willOpen) {
+        setTimeout(()=>{
+          const first = card.querySelector('.menu-list a');
+          first?.focus();
+        }, 280);
+      }
+    }
+
+    btnOut?.addEventListener('click',()=>setOpen(!card?.classList.contains('open')));
+    btnIn?.addEventListener('click',()=>setOpen(false));
+    backdrop?.addEventListener('click',()=>setOpen(false));
+    document.addEventListener('keydown',(e)=>{if(e.key==='Escape')setOpen(false)});
+
+    document.addEventListener('click',(e)=>{
+      const inside = e.target.closest('#menuCard, #menuBtn');
+      if(!inside) setOpen(false);
+    });
+
+    // EmailJS contact form
+    (function(){
+      const EMAILJS_PUBLIC_KEY = "MLLlLku8J8USwTVeg";
+      const SERVICE_ID = "service_aurifellmusic";
+      const TEMPLATE_ID = "template_aurifellmusic";
+
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+      const form = document.getElementById('contactForm');
+      const reason = document.getElementById('reason');
+      const customRow = document.getElementById('customTitleRow');
+      const customTitle = document.getElementById('customTitle');
+      const message = document.getElementById('message');
+      const subjectField = document.getElementById('subject');
+      const statusEl = document.getElementById('formStatus');
+      const honeypot = document.getElementById('hp');
+
+      // Auto-grow textarea
+      function autogrow(){ message.style.height='auto'; message.style.height=message.scrollHeight+'px'; }
+      message.addEventListener('input', autogrow); autogrow();
+
+      // Show/hide custom title
+      function toggleCustom(){
+        const isOther = reason.value === 'Other';
+        customRow.style.display = isOther ? 'block' : 'none';
+        customTitle.required = isOther;
+      }
+      reason.addEventListener('change', toggleCustom); toggleCustom();
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (honeypot.value) return;
+
+        if (!message.value.trim() || !reason.value) {
+          statusEl.style.display='block'; statusEl.style.color='var(--yellow)';
+          statusEl.textContent='Please fill out all required fields.'; return;
+        }
+
+        subjectField.value = (reason.value === 'Other')
+          ? customTitle.value.trim()
+          : `[${reason.value}]`;
+
+        statusEl.style.display='block'; statusEl.style.color='var(--muted)';
+        statusEl.textContent='Sending…';
+
+        try {
+          const res = await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form);
+          if (res.status === 200) {
+            statusEl.style.color='var(--blue)';
+            statusEl.textContent='Message sent! Thank you 💙';
+            form.reset(); autogrow(); toggleCustom();
+          } else { throw new Error('EmailJS error'); }
+        } catch (err) {
+          console.error(err);
+          statusEl.style.color='var(--red)';
+          statusEl.textContent='Something went wrong. Please try again.';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

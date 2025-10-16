@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-aurora">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auri Fell Music — Music</title>
+  <meta name="theme-color" content="#0b0920" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/auri-a-color.png" />
+  <link rel="stylesheet" href="./assets/site.css" />
+</head>
+
+<body>
+  <a class="visually-hidden" href="#main">Skip to content</a>
+
+  <!-- HEADER -->
+  <header>
+    <div class="wrap brand-row">
+      <div class="brand">
+        <img class="logo" src="./assets/auri-a-color.png" alt="Auri A logo" width="58" height="58" />
+        <span class="title">Auri Fell Music</span>
+      </div>
+
+      <nav aria-label="Primary" id="site-nav">
+        <a class="nav-link" href="index.html">Home</a>
+        <a class="nav-link" href="about.html">About</a>
+        <a class="nav-link active" href="music.html">Music</a>
+        <a class="nav-link" href="contact.html">Contact</a>
+        <a class="nav-link" href="blog.html">Blog</a>
+      </nav>
+
+      <!-- Header kebab that morphs to hamburger -->
+      <button class="hamburger" id="menuBtn" aria-controls="menuCard" aria-expanded="false" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <!-- Dots (kebab) -->
+          <g class="dots">
+            <circle cx="12" cy="5" r="2"/>
+            <circle cx="12" cy="12" r="2"/>
+            <circle cx="12" cy="19" r="2"/>
+          </g>
+          <!-- Lines (hamburger) — rounded ends, square footprint -->
+          <g class="lines">
+            <rect x="3"  y="5"  width="18" height="2" rx="1"/>
+            <rect x="3"  y="11" width="18" height="2" rx="1"/>
+            <rect x="3"  y="17" width="18" height="2" rx="1"/>
+          </g>
+        </svg>
+      </button>
+
+      <!-- Mobile menu drawer -->
+      <div class="menu-card" id="menuCard" role="dialog" aria-modal="true" aria-label="Menu">
+        <!-- Centered close button that rides the drawer -->
+        <button class="hamburger inside" id="menuBtnIn" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <g class="dots">
+              <circle cx="12" cy="5" r="2"/>
+              <circle cx="12" cy="12" r="2"/>
+              <circle cx="12" cy="19" r="2"/>
+            </g>
+            <g class="lines">
+              <rect x="3"  y="5"  width="18" height="2" rx="1"/>
+              <rect x="3"  y="11" width="18" height="2" rx="1"/>
+              <rect x="3"  y="17" width="18" height="2" rx="1"/>
+            </g>
+          </svg>
+        </button>
+
+        <nav class="menu-list" aria-label="Mobile">
+          <a class="nav-link" href="index.html">Home</a>
+          <a class="nav-link" href="about.html">About</a>
+          <a class="nav-link active" href="music.html">Music</a>
+          <a class="nav-link" href="contact.html">Contact</a>
+          <a class="nav-link" href="blog.html">Blog</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <div>
+        <p>MUSIC !!!!!!!!</p>
+    </div>
+  </main>
+
+  <footer class="floating">
+      <p class="credits">© <span id="y"></span> Auri Fell • <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a></p>
+  </footer>
+
+  <script>
+    // Year stamp
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Mobile menu toggle + ESC/outside close
+    const btnOut = document.getElementById('menuBtn');     // header dots→lines
+    const btnIn  = document.getElementById('menuBtnIn');   // centered drawer button
+    const card   = document.getElementById('menuCard');
+
+    function setOpen(on){
+      card.classList.toggle('open', on);
+      document.body.classList.toggle('menu-open', on);
+      btnOut.classList.toggle('is-open', on);
+      btnIn.classList.toggle('is-open', on);
+      btnOut.setAttribute('aria-expanded', String(on));
+      if (on) {
+        // focus first link for a11y after the slide
+        setTimeout(() => {
+          const first = card.querySelector('.menu-list a');
+          first && first.focus();
+        }, 300);
+      }
+    }
+
+    btnOut.addEventListener('click', () => setOpen(!card.classList.contains('open')));
+    btnIn.addEventListener('click',  () => setOpen(false));
+
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') setOpen(false); });
+    document.addEventListener('click', (e)=>{
+      const inside = e.target.closest('#menuCard, #menuBtn');
+      if(!inside) setOpen(false);
+    });
+  </script>
+
+</body>
+</html>
