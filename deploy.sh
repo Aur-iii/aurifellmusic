@@ -19,3 +19,4 @@ git push
 # success feedback
 echo "✅ Site pushed to GitHub Pages!"
 echo "🔗 https://aur-iii.github.io/aurifellmusic"
+open "https://aur-iii.github.io/aurifellmusic"
