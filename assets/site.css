@@ -564,6 +564,22 @@ footer.floating .credits a{ color:var(--blue) } footer.floating .credits a:hover
   background:linear-gradient(180deg, rgba(26,20,63,.96), rgba(14,9,40,.96));
   box-shadow:-12px 0 35px rgba(0,0,0,.45);
   backdrop-filter:blur(16px);
+  padding:0;
+  display:flex;
+  flex-direction: column;
+}
+
+/* top bar (keep full width) */
+#createCard .drawer-header{
+  padding:16px 20px;              /* top/bottom padding only inside bar */
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+
+/* scrollable inner body with nice padding */
+#createCard .drawer-body{
+  padding:20px 24px 24px;         /* actual “around content” padding */
+  overflow-y:auto;
+  flex:1;
 }
 
 /* Small helpers */
@@ -573,6 +589,7 @@ footer.floating .credits a{ color:var(--blue) } footer.floating .credits a:hover
   padding:6px 10px; border-radius:999px;
   background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
   font-weight:700;
+  width:100%;
 }
 .create-preview{ margin-top:8px; display:flex; gap:10px; flex-wrap:wrap }
 .create-preview img{ width:90px; height:90px; object-fit:cover; border-radius:10px; border:1px solid rgba(255,255,255,.12) }
