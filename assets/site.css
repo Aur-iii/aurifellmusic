@@ -990,3 +990,41 @@ footer.floating .credits a{ color:var(--blue) } footer.floating .credits a:hover
   position: relative;
   overflow: hidden;
 }
+
+/* Hide by default (public site). Only show in admin mode */
+.post-admin { display: none; }            /* NEW: safety */
+.admin .blog-post { position: relative; } /* you already had this */
+.admin .post-admin {                      /* NEW: scope visibility to admin */
+  display: flex;
+  position: absolute;
+  top: 8px; right: 8px;
+  gap: 6px;
+  z-index: 20;                            /* bump a bit so it sits over images */
+}
+
+/* Buttons */
+.post-admin .post-btn {
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  font-size: 14px; line-height: 1;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .08s ease-out;
+}
+
+/* Optional variants (nice to have) */
+.post-admin .post-btn--edit   { /* keeps default styling */ }
+.post-admin .post-btn--delete { background: rgba(196,75,255,.6); }  /* NEW */
+
+.post-admin .post-btn:hover   { background: rgba(196,75,255,.75); border-color: rgba(255,255,255,.28); }
+.post-admin .post-btn:active  { transform: translateY(1px) scale(.98); }
+
+/* Keyboard focus (accessibility) — optional but recommended */
+.post-admin .post-btn:focus-visible {
+  outline: 2px solid rgba(196,75,255,.9);
+  outline-offset: 2px;
+}
