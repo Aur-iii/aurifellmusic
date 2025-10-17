@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-aurora">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Auri Fell — Ontario-based vocalist, multi-instrumentalist, and producer blending jazz, folk, indie, and lush a cappella vocal stacks.">
+  <title>Auri Fell Music — Home</title>
+  <meta name="theme-color" content="#0b0920" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/auri-a-color.png" />
+  <link rel="stylesheet" href="./assets/site.css" />
+</head>
+<body>
+  <a class="visually-hidden" href="#main">Skip to content</a>
+
+  <!-- HEADER -->
+  <header>
+    <div class="wrap brand-row">
+      <div class="brand">
+        <img class="logo" src="./assets/auri-a-color.png" alt="Auri A logo" width="48" height="48" />
+        <span class="title">Auri Fell Music</span>
+      </div>
+
+      <nav aria-label="Primary" id="site-nav">
+        <a class="nav-link active" href="indexxx.html">Home</a>
+        <a class="nav-link" href="about.html">About</a>
+        <a class="nav-link" href="music.html">Music</a>
+        <a class="nav-link" href="contact.html">Contact</a>
+        <a class="nav-link" href="blog.html">Blog</a>
+      </nav>
+
+      <!-- Header kebab that morphs to hamburger -->
+      <button class="hamburger" id="menuBtn" aria-controls="menuCard" aria-expanded="false" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <g class="dots">
+            <circle cx="12" cy="5" r="2"/>
+            <circle cx="12" cy="12" r="2"/>
+            <circle cx="12" cy="19" r="2"/>
+          </g>
+          <g class="lines">
+            <rect x="3" y="5"  width="18" height="2" rx="1"/>
+            <rect x="3" y="11" width="18" height="2" rx="1"/>
+            <rect x="3" y="17" width="18" height="2" rx="1"/>
+          </g>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+<!-- Mobile menu drawer -->
+      <div class="menu-card" id="menuCard" role="dialog" aria-modal="true" aria-label="Menu">
+        <!-- Centered close button that rides the drawer -->
+        <button class="hamburger inside" id="menuBtnIn" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <g class="dots">
+              <circle cx="12" cy="5" r="2"/>
+              <circle cx="12" cy="12" r="2"/>
+              <circle cx="12" cy="19" r="2"/>
+            </g>
+            <g class="lines">
+              <rect x="3" y="5"  width="18" height="2" rx="1"/>
+              <rect x="3" y="11" width="18" height="2" rx="1"/>
+              <rect x="3" y="17" width="18" height="2" rx="1"/>
+            </g>
+          </svg>
+        </button>
+
+        <nav class="menu-list" aria-label="Mobile">
+          <a class="nav-link active" href="indexxx.html">Home</a>
+          <a class="nav-link" href="about.html">About</a>
+          <a class="nav-link" href="music.html">Music</a>
+          <a class="nav-link" href="contact.html">Contact</a>
+          <a class="nav-link" href="blog.html">Blog</a>
+        </nav>
+      </div>
+
+  <!-- page veil (full-height content well) -->
+  <div class="page-veil" aria-hidden="true"></div>
+  <!-- slide-out backdrop -->
+  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+  <main id="main" class="wrap">
+    <!-- HERO -->
+    <section class="hero" aria-label="Intro">
+      <div class="top">
+        <img class="wordmark" src="./assets/auri-anagram-color.png" alt="Auri Anagram"
+                 style="max-width:620px;width:min(72vw,620px);filter:drop-shadow(0 10px 30px rgba(14,9,50,.6))"/>
+      </div>
+    </section>
+
+    <div class="soft-div"></div>
+
+    <!-- WELCOME SECTION -->
+    <section class="intro-card">
+      <article class="card" style="max-width: var(--maxw); margin: 0 auto; padding: 28px;">
+        <h2 style="margin-top: 0; margin-bottom: 12px; font-size: 1.6rem; font-weight: 900; 
+                  background: linear-gradient(90deg, #fff, var(--accent)); 
+                  -webkit-background-clip: text; color: transparent;">
+          Welcome ✨
+        </h2>
+
+        <p style="font-size: 1rem; line-height: 1.6; color: var(--text); text-align: left; margin-bottom: 18px;">
+          Hey there, I'm <strong>Auri</strong> — welcome to my website! Here you'll find info about me, my music, 
+          a contact form you can use for general inquiries, commission and collab requests, and my blog where 
+          I’ll post updates about my latest projects (and anything else I feel like sharing).<br><br>
+          You can also subscribe to my mailing list to get notifications when I publish new blog posts or release new music!
+        </p>
+      </article>
+    </section>
+
+    <div class="soft-div"></div>
+
+    <!-- HIGHLIGHTS -->
+    <section class="grid" aria-label="Highlights">
+      <article class="card">
+        <h3>Latest track 🎵🎤️🎹🔊</h3>
+        <p>(TBD)</p>
+        <a class="mini-btn" href="music.html">Listen</a>
+      </article>
+      <article class="card">
+        <h3>Spotlight project 💡</h3>
+        <p>Marrow Creek — (TBD)</p>
+        <a class="mini-btn" href="blog.html">View</a>
+      </article>
+      <article class="card">
+        <h3>What's new ✨‼️</h3>
+        <p>(TBD)</p>
+        <a class="mini-btn" href="blog.html">More</a>
+      </article>
+    </section>
+
+    <div class="i-div tight"></div>
+
+    <!-- SOCIALS -->
+    <section class="socials" aria-label="Social links">
+      <a href="https://www.youtube.com/c/AuriLuve" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><path fill="currentColor" d="M23 9.71a8.5 8.5 0 0 0-.91-4.13a2.92 2.92 0 0 0-1.72-1A78.36 78.36 0 0 0 12 4.27a78.45 78.45 0 0 0-8.34.3a2.87 2.87 0 0 0-1.46.74c-.9.83-1 2.25-1.1 3.45a48.29 48.29 0 0 0 0 6.48a9.55 9.55 0 0 0 .3 2a3.14 3.14 0 0 0 .71 1.36a2.86 2.86 0 0 0 1.49.78a45.18 45.18 0 0 0 6.5.33c3.5.05 6.57 0 10.2-.28a2.88 2.88 0 0 0 1.53-.78a2.49 2.49 0 0 0 .61-1a10.58 10.58 0 0 0 .52-3.4c.04-.56.04-3.94.04-4.54ZM9.74 14.85V8.66l5.92 3.11c-1.66.92-3.85 1.96-5.92 3.08Z"/></svg>    
+      </a>
+      <a href="https://www.instagram.com/auri_luve/?hl=en" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+        <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 15.5a3.53 3.53 0 0 1-2.5-1.04a3.54 3.54 0 0 1-1.04-2.5a3.53 3.53 0 0 1 1.04-2.5A3.54 3.54 0 0 1 12 8.42a3.53 3.53 0 0 1 2.5 1.04a3.54 3.54 0 0 1 1.04 2.5a3.53 3.53 0 0 1-1.04 2.5A3.54 3.54 0 0 1 12 15.5"/><path fill="currentColor" fill-rule="evenodd" d="M7.41 1.07C8.343 1.02 9.87.996 12 .996q3.195 0 4.59.074c.825.03 1.64.17 2.43.417c.803.286 1.53.748 2.14 1.35a5.8 5.8 0 0 1 1.35 2.14c.249.797.398 1.62.442 2.46q.05 1.375.049 4.57q0 3.195-.074 4.59a9.3 9.3 0 0 1-.417 2.43a5.8 5.8 0 0 1-1.35 2.14a5.8 5.8 0 0 1-2.14 1.35a9.3 9.3 0 0 1-2.43.417c-.933.05-2.46.074-4.59.074q-3.195 0-4.59-.074a8 8 0 0 1-2.43-.466a5.3 5.3 0 0 1-2.14-1.3a5.6 5.6 0 0 1-1.35-2.14a9.3 9.3 0 0 1-.417-2.43c-.05-.933-.074-2.46-.074-4.59q0-3.195.074-4.59c.03-.825.17-1.64.417-2.43c.286-.803.748-1.53 1.35-2.14s1.33-1.06 2.14-1.35a9.3 9.3 0 0 1 2.43-.417zm9.72 3.89a1.365 1.365 0 0 1 1.732.178c.257.256.403.604.408.968a1.6 1.6 0 0 1-.432.967a1.24 1.24 0 0 1-.943.408a1.32 1.32 0 0 1-.968-.408a1.37 1.37 0 0 1-.302-1.496a1.37 1.37 0 0 1 .507-.617zM9.25 7.24A5.34 5.34 0 0 1 12 6.499c.967-.006 1.92.25 2.75.741a5.5 5.5 0 0 1 2.01 2.01a5.47 5.47 0 0 1 0 5.5a5.5 5.5 0 0 1-2.01 2.01a5.47 5.47 0 0 1-5.5 0a5.5 5.5 0 0 1-2.01-2.01a5.47 5.47 0 0 1 0-5.5a5.53 5.53 0 0 1 2.01-2.01" clip-rule="evenodd"/></svg>
+      </a>
+      <a href="https://www.tiktok.com/@auri_luve" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 256 256"><path fill="currentColor" d="M232 80v40a8 8 0 0 1-8 8a103.25 103.25 0 0 1-48-11.71V156a76 76 0 0 1-152 0c0-36.9 26.91-69.52 62.6-75.88A8 8 0 0 1 96 88v42.69a8 8 0 0 1-4.57 7.23A20 20 0 1 0 120 156V24a8 8 0 0 1 8-8h40a8 8 0 0 1 8 8a48.05 48.05 0 0 0 48 48a8 8 0 0 1 8 8Z"/></svg>
+      </a>
+      <a href="https://www.facebook.com/auriluve/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 464 488"><path fill="currentColor" d="M462 78q0-30-23-53T386 2H78Q48 2 25 25T2 78v308q0 30 23 53t53 23h154V288h-56v-76h56v-30q0-39 25.5-68.5T318 84h62v76h-62q-5 0-9.5 6t-4.5 15v31h76v76h-76v174h82q30 0 53-23t23-53V78z"/></svg>
+      </a>
+      <a href="https://discord.gg/yuPxHuxY4F" target="_blank" rel="noopener noreferrer" aria-label="Discord">
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 16 16"><path fill="currentColor" d="M13.553 3.016A13.233 13.233 0 0 0 10.253 2a9.068 9.068 0 0 0-.423.86a12.293 12.293 0 0 0-3.664 0A9.112 9.112 0 0 0 5.744 2A13.358 13.358 0 0 0 2.44 3.018C.351 6.108-.215 9.123.068 12.094a13.306 13.306 0 0 0 4.048 2.033a9.78 9.78 0 0 0 .867-1.399a8.605 8.605 0 0 1-1.365-.652c.115-.083.227-.168.335-.251a9.51 9.51 0 0 0 8.094 0c.11.09.222.175.335.251a8.648 8.648 0 0 1-1.368.654a9.7 9.7 0 0 0 .867 1.396a13.248 13.248 0 0 0 4.051-2.03c.332-3.446-.568-6.433-2.379-9.08Zm-8.21 7.25c-.79 0-1.442-.715-1.442-1.596c0-.881.63-1.603 1.439-1.603s1.456.722 1.442 1.603c-.014.88-.636 1.597-1.44 1.597Zm5.315 0c-.79 0-1.44-.715-1.44-1.596c0-.881.63-1.603 1.44-1.603c.81 0 1.452.722 1.438 1.603c-.014.88-.634 1.597-1.438 1.597Z"/></svg>
+      </a>
+    </section>
+
+    <div class="soft-div"></div>
+
+    <!-- TESTIMONIALS -->
+    <section class="card">
+      <div class="i-div tight"></div>
+      <section class="testimonials" aria-label="Testimonials">
+        <button class="arrow left" aria-label="Previous testimonial">←</button>
+
+        <div class="testimonial-card">
+          <div class="t-content">
+            <p class="quote">“Auri is a great person and artist and I love working with them! They're great at taking initiative and getting things done but also takes time to check in and balance everyone's ideas. There's so much art inside of her that it bubbles over and into the world around them with every step she takes. I can't wait to work with her again and I can't wait to see what's next.”</p>
+            <p class="author">— Rubidium Rhyse</p>
+          </div>
+        </div>
+
+        <button class="arrow right" aria-label="Next testimonial">→</button>
+      </section>
+      <div class="i-div tight"></div>
+    </section>
+
+  </main>
+
+  <footer class="floating">
+      <p class="credits">© <span id="y"></span> Auri Fell • <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a></p>
+  </footer>
+
+  <script>
+  (() => {
+    // Year stamp
+    const yEl = document.getElementById('y');
+    if (yEl) yEl.textContent = new Date().getFullYear();
+
+    // Elements
+    const btnOut   = document.getElementById('menuBtn');    // header dots→lines toggle
+    const btnIn    = document.getElementById('menuBtnIn');  // centered drawer button (inside the drawer)
+    const card     = document.getElementById('menuCard');   // the drawer
+    const backdrop = document.getElementById('backdrop');   // the dim/blur layer
+
+    function setOpen(on){
+      if (!card) return;
+      const willOpen = !!on;
+
+      card.classList.toggle('open', willOpen);
+      document.body.classList.toggle('menu-open', willOpen);
+
+      btnOut?.classList.toggle('is-open', willOpen);
+      btnIn?.classList.toggle('is-open', willOpen);
+      btnOut?.setAttribute('aria-expanded', String(willOpen));
+
+      backdrop?.classList.toggle('show', willOpen);
+
+      if (willOpen) {
+        // focus first link after opening animation
+        setTimeout(() => {
+          const first = card.querySelector('.menu-list a');
+          first?.focus();
+        }, 280);
+      }
+    }
+
+    // Header toggle: open/close
+    btnOut?.addEventListener('click', () => setOpen(!card?.classList.contains('open')));
+
+    // Inside button: close
+    btnIn?.addEventListener('click',  () => setOpen(false));
+
+    // Backdrop click: close
+    backdrop?.addEventListener('click', () => setOpen(false));
+
+    // ESC: close
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') setOpen(false); });
+
+    // Click outside drawer & buttons: close
+    document.addEventListener('click', (e)=>{
+      const insideCard = e.target.closest('#menuCard');
+      const onBtnOut   = e.target.closest('#menuBtn');
+      const onBtnIn    = e.target.closest('#menuBtnIn');
+      if (!insideCard && !onBtnOut && !onBtnIn) setOpen(false);
+    });
+
+    // Close drawer after tapping a menu link (mobile)
+    document.querySelectorAll('#menuCard .menu-list a').forEach(a=>{
+      a.addEventListener('click', ()=> setOpen(false));
+    });
+
+    (function(){
+      const quotes = [
+        { text: "“Auri is a great person and artist and I love working with them! They're great at taking initiative and getting things done but also takes time to check in and balance everyone's ideas. There's so much art inside of her that it bubbles over and into the world around them with every step she takes. I can't wait to work with her again and I can't wait to see what's next.”", author: "— Rubidium Rhyse" },
+        { text: "“530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530 530”", author: "— HqpgDI" },
+        { text: "“530 char max”", author: "— ..." }
+      ];
+
+      let i = 0;
+      const tContent = document.querySelector(".t-content");
+      const quoteEl  = document.querySelector(".quote");
+      const authorEl = document.querySelector(".author");
+
+      if (!tContent || !quoteEl || !authorEl) return; // safety if markup missing
+
+      function render(idx){
+        quoteEl.textContent  = quotes[idx].text;
+        authorEl.textContent = quotes[idx].author;
+      }
+
+      function show(n){
+        i = (n + quotes.length) % quotes.length;
+        tContent.classList.add("is-fading");        // fade out
+        setTimeout(() => {
+          render(i);                                // swap text mid-fade
+          tContent.classList.remove("is-fading");   // fade back in
+        }, 180);
+      }
+
+      // initial render (in case you change the starter text later)
+      render(i);
+
+      document.querySelector(".arrow.left") .addEventListener("click", () => show(i - 1));
+      document.querySelector(".arrow.right").addEventListener("click", () => show(i + 1));
+    })();
+
+  })();
+</script>
+</body>
+</html>
