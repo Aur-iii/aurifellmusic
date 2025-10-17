@@ -99,6 +99,58 @@
     </div>
   </aside>
 
+  <!-- =========================
+     CREATE POST DRAWER
+     ========================= -->
+<aside class="menu-card create-card" id="createCard" role="dialog" aria-modal="true" aria-label="Create post">
+  <button class="hamburger inside" id="createClose" aria-label="Close create post">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <g class="dots"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></g>
+      <g class="lines"><rect x="3" y="5" width="18" height="2" rx="1"/><rect x="3" y="11" width="18" height="2" rx="1"/><rect x="3" y="17" width="18" height="2" rx="1"/></g>
+    </svg>
+  </button>
+
+  <header class="follow-head"><h3 class="follow-title">Create a post</h3></header>
+
+  <form id="createForm" class="follow-form" novalidate>
+    <!-- Title -->
+    <div class="follow-field">
+      <label class="follow-label" for="postTitle">Title</label>
+      <input id="postTitle" class="follow-input" type="text" placeholder="Post title" required />
+    </div>
+
+    <!-- Hero image + side -->
+    <div class="follow-field">
+      <label class="follow-label">Hero image</label>
+      <input id="postHero" class="follow-input" type="file" accept="image/*" />
+      <div class="create-row">
+        <label class="chip"><input type="radio" name="heroSide" value="left"> Left</label>
+        <label class="chip"><input type="radio" name="heroSide" value="right" checked> Right</label>
+      </div>
+      <div id="heroPreview" class="create-preview"></div>
+    </div>
+
+    <!-- Body -->
+    <div class="follow-field">
+      <label class="follow-label" for="postBody">Body</label>
+      <textarea id="postBody" class="follow-input" rows="6" placeholder="Write your post. Blank lines = new paragraphs."></textarea>
+    </div>
+
+    <!-- Gallery -->
+    <div class="follow-field">
+      <label class="follow-label">Gallery</label>
+      <input id="postGallery" class="follow-input" type="file" accept="image/*" multiple />
+      <div id="galleryPreview" class="create-gallery-list" aria-live="polite"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="follow-actions">
+      <button type="submit" id="publishPost" class="follow-btn follow-btn-primary">Publish</button>
+      <button type="button" id="createCancel" class="follow-btn follow-btn-tertiary">Cancel</button>
+    </div>
+  </form>
+</aside>
+
   <!-- page veil (full-height content well) -->
   <div class="page-veil" aria-hidden="true"></div>
   <!-- slide-out backdrop -->
@@ -107,7 +159,7 @@
   <main class="wrap" id="main">
 
     <div class="i-div tight"> </div>
-
+  
     <!-- Blog Header -->
     <section class="blog-header">
       <div class="blog-info">
@@ -115,7 +167,7 @@
         <div class="blog-buttons">
           <!-- kept exactly as-is per your request -->
           <button class="follow-btn" type="button">Follow</button>
-          <button class="create-btn hidden" type="button">Create Post</button>
+          <button class="create-btn" type="button">Create Post</button>
         </div>
       </div>
 
@@ -208,27 +260,56 @@
   const submitFollow = document.getElementById('submitFollow');
   const unfollowBtn = document.getElementById('unfollowBtn');
 
-  // ---------------- DRAWER HANDLING ----------------
+  // ---------------- CREATE DRAWER ----------------
+  const createBtn      = document.querySelector('.blog-header .create-btn');
+  const createCard     = document.getElementById('createCard');
+  const createClose    = document.getElementById('createClose');
+  const createCancel   = document.getElementById('createCancel');
+  const createForm     = document.getElementById('createForm');
+  const postTitle      = document.getElementById('postTitle');
+  const postHero       = document.getElementById('postHero');
+  const heroPreview    = document.getElementById('heroPreview');
+  const postBody       = document.getElementById('postBody');
+  const postGallery    = document.getElementById('postGallery');
+  const galleryPreview = document.getElementById('galleryPreview');
+  const publishPost    = document.getElementById('publishPost');
+
+  const postsHost      = document.querySelector('.blog-posts');
+  const showMoreBtn    = document.querySelector('.show-more');
+  const showLessBtn    = document.querySelector('.show-less');
+
+  // local gallery state (because FileList is read-only)
+  let galleryFiles = [];
+
   function openDrawer(which){
     const wasFollowOpen = followCard?.classList.contains('open');
-    const openMenu      = which === 'menu';
-    const openFollow    = which === 'follow';
-    const anyOpen       = !!which;
+    const wasCreateOpen = createCard?.classList.contains('open');
+
+    const openMenu    = which === 'menu';
+    const openFollow  = which === 'follow';
+    const openCreate  = which === 'create';
+    const anyOpen     = !!which;
 
     menuCard?.classList.toggle('open', openMenu);
     followCard?.classList.toggle('open', openFollow);
+    createCard?.classList.toggle('open', openCreate);
     document.body.classList.toggle('menu-open', anyOpen);
     backdrop?.classList.toggle('show', anyOpen);
 
-    // if we just closed the follow drawer, reset it
-    if (!anyOpen && wasFollowOpen) resetFollowDrawer();
-
-    // if we switched from follow -> menu, also reset
+    // Reset drawers we just closed or switched away from
+    if (!anyOpen && (wasFollowOpen || wasCreateOpen)) {
+      if (wasFollowOpen) resetFollowDrawer();
+      if (wasCreateOpen) resetCreateDrawer();
+    }
     if (openMenu && wasFollowOpen) resetFollowDrawer();
+    if (openMenu && wasCreateOpen) resetCreateDrawer();
+    if (openFollow && wasCreateOpen) resetCreateDrawer();
+    if (openCreate && wasFollowOpen) resetFollowDrawer();
 
+    // Focus first control in the opened drawer
     if (anyOpen) {
       setTimeout(() => {
-        const host = openMenu ? menuCard : followCard;
+        const host = openMenu ? menuCard : (openFollow ? followCard : createCard);
         const first = host?.querySelector('input,button,a,select,textarea,[tabindex]:not([tabindex="-1"])');
         first?.focus();
       }, 220);
@@ -252,6 +333,13 @@
     }
   }
 
+    function resetCreateDrawer(){
+    if (createForm) createForm.reset();
+    if (heroPreview) heroPreview.innerHTML = '';
+    galleryFiles = [];
+    if (galleryPreview) galleryPreview.innerHTML = '';
+  }
+
   // NAV triggers
   btnOut?.addEventListener('click', () => {
     const isOpen = menuCard?.classList.contains('open');
@@ -266,6 +354,131 @@
   });
   followClose?.addEventListener('click', () => openDrawer(null));
   followCancel?.addEventListener('click', () => openDrawer(null));
+
+  // CREATE triggers
+  createBtn?.addEventListener('click', () => {
+    const isOpen = createCard?.classList.contains('open');
+    openDrawer(isOpen ? null : 'create');
+  });
+  createClose?.addEventListener('click', () => openDrawer(null));
+  createCancel?.addEventListener('click', () => openDrawer(null));
+
+  // Close when clicking outside (extend your existing global click handler)
+  document.addEventListener('click', e => {
+    const inside = e.target.closest('#menuCard, #menuBtn, #followCard, .blog-header .follow-btn, #createCard, .blog-header .create-btn');
+    if (!inside) openDrawer(null);
+  });
+
+  // Hero preview (single)
+  postHero?.addEventListener('change', () => {
+    heroPreview.innerHTML = '';
+    const file = postHero.files?.[0];
+    if (!file) return;
+    const img = document.createElement('img');
+    img.alt = 'Hero preview';
+    img.src = URL.createObjectURL(file);
+    heroPreview.appendChild(img);
+  });
+
+  // Gallery preview chips (add/remove)
+  postGallery?.addEventListener('change', () => {
+    galleryFiles = [...postGallery.files];
+    renderGalleryChips();
+  });
+
+  function renderGalleryChips(){
+    galleryPreview.innerHTML = '';
+    galleryFiles.forEach((file, idx) => {
+      const chip = document.createElement('div');
+      chip.className = 'file-chip';
+      chip.textContent = file.name;
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.textContent = 'Remove';
+      rm.addEventListener('click', () => {
+        galleryFiles.splice(idx, 1);
+        renderGalleryChips();
+      });
+      chip.appendChild(rm);
+      galleryPreview.appendChild(chip);
+    });
+  }
+
+  // Format date like "Oct 15, 2025"
+    function formatDate(d=new Date()){
+    return d.toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' });
+  }
+
+  // Get side choice from radio buttons
+  function sideChoice(){
+    const el = createForm?.querySelector('input[name="heroSide"]:checked');
+    return (el?.value === 'left') ? 'left' : 'right';
+  }
+
+  // Split body by blank lines -> <p>…</p>
+  function bodyToParagraphs(text){
+    return text
+      .split(/\n\s*\n/g)          // blank-line paragraph breaks
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(p => `<p>${escapeHTML(p)}</p>`)
+      .join('\n');
+  }
+  // Simple HTML escape
+  function escapeHTML(s){
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // Build <div class="post-gallery collage"> with up to 4 thumbs (rest goes into +N)
+  async function buildCollage(gFiles){
+    if (!gFiles.length) return '';
+    const urls = await Promise.all(gFiles.map(f => URL.createObjectURL(f)));
+    const thumbs = urls.slice(0,4).map(u => `<div class="thumb"><img src="${u}" alt=""></div>`).join('');
+    // We’ll let normalizePostGalleries compute +N and dataset for the lightbox
+    return `<div class="post-gallery collage">${thumbs}</div>`;
+  }
+  // CREATE form submit
+  createForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = (postTitle?.value || '').trim();
+    const body  = (postBody?.value  || '').trim();
+    if (!title) { postTitle?.focus(); return; }
+
+    const heroFile = postHero.files?.[0] || null;
+    const heroURL  = heroFile ? URL.createObjectURL(heroFile) : '';
+    const side     = sideChoice(); // 'left' or 'right'
+
+    const galleryHTML = await buildCollage(galleryFiles);
+
+    const article = document.createElement('article');
+    article.className = `blog-post ${side}`;
+    article.innerHTML = `
+      ${heroURL ? `<img class="post-image" src="${heroURL}" alt="">` : ''}
+      <div class="post-content">
+        <p class="post-date">${formatDate()}</p>
+        <h3 class="post-title">${escapeHTML(title)}</h3>
+        ${body ? bodyToParagraphs(body) : ''}
+        ${galleryHTML}
+      </div>
+    `;
+
+    // Prepend to the top
+    postsHost?.insertBefore(article, postsHost.firstChild);
+
+    // Initialize collage dataset + lightbox (+N badge etc.)
+    try { normalizePostGalleries(article); } catch {}
+
+    // Optional: ping your local server (kept no-op friendly)
+    // submitCreate({ title, side, body, hasHero: !!heroFile, galleryCount: galleryFiles.length })
+    //   .catch(e => console.warn('Local create-post failed (ok for now):', e.message));
+
+    // Close + reset
+    openDrawer(null);
+
+    // If you use Show more/less controls, recompute totals
+    try { recomputeShowButtons(); } catch {}
+  });
+
 
   // Global close events
   document.addEventListener('keydown', e => { if (e.key === 'Escape') openDrawer(null); });
@@ -326,73 +539,92 @@
     setTimeout(() => openDrawer(null), 1000);
   });
 
-// --- Local server detection + CSRF (Safari-safe) ---
-(function(){
-  var CREATE_BTN = document.querySelector('.create-btn');
-  var HEALTH_URL = 'http://localhost:5173/health';
-  var CREATE_URL = 'http://localhost:5173/create-post';
-  var RECHECK_MS = 20000; // 20s, no numeric separators for Safari
-  var _csrf = null;
-
-  // Start hidden (prevents flicker / covers Safari parse issues)
-  if (CREATE_BTN) CREATE_BTN.classList.add('hidden');
-
-  // Ping health: expects plain text "ok:<token>"
-  function ping(){
-    return fetch(HEALTH_URL, {
-      method: 'GET',
-      mode: 'cors',
-      cache: 'no-store',
-      headers: { 'Accept': 'text/plain' }
-    })
-    .then(function(res){
-      if (!res.ok) throw new Error('HTTP '+res.status);
-      return res.text();
-    })
-    .then(function(text){
-      var parts = (text || '').split(':');
-      if (parts[0] !== 'ok' || !parts[1]) throw new Error('bad payload');
-      _csrf = parts[1];
-      CREATE_BTN && CREATE_BTN.classList.remove('hidden');
-      return true;
-    })
-    .catch(function(){
-      _csrf = null;
-      CREATE_BTN && CREATE_BTN.classList.add('hidden');
-      return false;
-    });
+  function recomputeShowButtons(){
+    const total = postsHost?.querySelectorAll('.blog-post').length || 0;
+    // assume globals: visible, STEP, lastDelta, and buttons exist
+    if (typeof visible === 'number') {
+      visible = Math.min(total, Math.max(visible + 1, STEP));
+      // Apply visibility
+      (postsHost?.querySelectorAll('.blog-post') || []).forEach((post, idx) => {
+        post.style.display = (idx < visible) ? '' : 'none';
+      });
+      // Buttons
+      if (total <= STEP) {
+        showMoreBtn?.classList.add('hidden');
+        showLessBtn?.classList.add('hidden');
+      } else {
+        showMoreBtn?.classList.toggle('hidden', visible >= total);
+        showLessBtn?.classList.toggle('hidden', visible <= STEP);
+      }
+    }
   }
 
-  // Example create call (wire this to your drawer submit later)
-  async function submitCreate(payload){
-    if (!_csrf) throw new Error('No local token — server not detected.');
-    var res = await fetch(CREATE_URL, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF': _csrf
-      },
-      body: JSON.stringify(payload || { demo: true })
+// --- Local server detection + CSRF (Safari-safe) PASTE BACK HERE WHEN PUBLISHING ---
+  (function(){
+    var CREATE_BTN = document.querySelector('.create-btn');
+    var HEALTH_URL = 'http://localhost:5173/health';
+    var CREATE_URL = 'http://localhost:5173/create-post';
+    var RECHECK_MS = 20000; // 20s, no numeric separators for Safari
+    var _csrf = null;
+
+    // Start hidden (prevents flicker / covers Safari parse issues)
+    if (CREATE_BTN) CREATE_BTN.classList.add('hidden');
+
+    // Ping health: expects plain text "ok:<token>"
+    function ping(){
+      return fetch(HEALTH_URL, {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-store',
+        headers: { 'Accept': 'text/plain' }
+      })
+      .then(function(res){
+        if (!res.ok) throw new Error('HTTP '+res.status);
+        return res.text();
+      })
+      .then(function(text){
+        var parts = (text || '').split(':');
+        if (parts[0] !== 'ok' || !parts[1]) throw new Error('bad payload');
+        _csrf = parts[1];
+        CREATE_BTN && CREATE_BTN.classList.remove('hidden');
+        return true;
+      })
+      .catch(function(){
+        _csrf = null;
+        CREATE_BTN && CREATE_BTN.classList.add('hidden');
+        return false;
+      });
+    }
+
+    // Example create call (wire this to your drawer submit later)
+    async function submitCreate(payload){
+      if (!_csrf) throw new Error('No local token — server not detected.');
+      var res = await fetch(CREATE_URL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF': _csrf
+        },
+        body: JSON.stringify(payload || { demo: true })
+      });
+      if (!res.ok) throw new Error('Create failed: '+res.status);
+      return res.json();
+    }
+
+    // Initial + periodic re-ping
+    document.addEventListener('DOMContentLoaded', function(){
+      ping();
+      setInterval(ping, RECHECK_MS);
     });
-    if (!res.ok) throw new Error('Create failed: '+res.status);
-    return res.json();
-  }
 
-  // Initial + periodic re-ping
-  document.addEventListener('DOMContentLoaded', function(){
-    ping();
-    setInterval(ping, RECHECK_MS);
-  });
+    // For now, clicking the button tries a demo create (replace with drawer)
+    CREATE_BTN && CREATE_BTN.addEventListener('click', function(){
+      // Replace this with: openDrawer('create') once your drawer exists
+      openDrawer('create');
+    });
+  })();
 
-  // For now, clicking the button tries a demo create (replace with drawer)
-  CREATE_BTN && CREATE_BTN.addEventListener('click', function(){
-    // Replace this with: openDrawer('create') once your drawer exists
-    submitCreate({ hello: 'queenslander gander' })
-      .then(function(){ console.log('Create OK'); })
-      .catch(function(e){ console.warn('Create failed:', e.message); });
-  });
-})();
 
   // ---------------- GALLERY SETUP (unchanged) ----------------
   function normalizePostGalleries(root = document){

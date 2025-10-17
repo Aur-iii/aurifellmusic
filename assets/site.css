@@ -557,6 +557,39 @@ footer.floating .credits a{ color:var(--blue) } footer.floating .credits a:hover
 .follow-status.status--success{ color:var(--green); background:rgba(38,194,122,.15); box-shadow:0 0 12px rgba(38,194,122,.25); border:1px solid rgba(38,194,122,.3); }
 .follow-status.status--error{ color:var(--red); background:rgba(211,59,83,.15); box-shadow:0 0 12px rgba(211,59,83,.25); border:1px solid rgba(211,59,83,.3); }
 
+/* CREATE DRAWER (inherits .menu-card + follow styles) */
+#createCard{
+  right:0; left:auto; width:auto;
+  border-left:1px solid rgba(255,255,255,.266);
+  background:linear-gradient(180deg, rgba(26,20,63,.96), rgba(14,9,40,.96));
+  box-shadow:-12px 0 35px rgba(0,0,0,.45);
+  backdrop-filter:blur(16px);
+}
+
+/* Small helpers */
+.create-row{ display:flex; gap:10px; flex-wrap:wrap }
+.chip{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius:999px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+  font-weight:700;
+}
+.create-preview{ margin-top:8px; display:flex; gap:10px; flex-wrap:wrap }
+.create-preview img{ width:90px; height:90px; object-fit:cover; border-radius:10px; border:1px solid rgba(255,255,255,.12) }
+
+.create-gallery-list{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px }
+.file-chip{
+  display:flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius:10px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+  font-size:14px; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.file-chip button{
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.08);
+  color:#fff; border-radius:8px; padding:4px 6px; cursor:pointer;
+}
+
 /* --- BLOG GALLERY PREVIEW (drop-in, non-invasive) --- */
 .post-gallery{
   margin-top: 12px;
