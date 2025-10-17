@@ -326,57 +326,73 @@
     setTimeout(() => openDrawer(null), 1000);
   });
 
-// --- Local server detection to toggle "Create post" button ---
-const CREATE_BTN   = document.querySelector('.create-btn');   // was getElementById
-const LOCAL_PORT   = 5173;
-const HEALTH_PATH  = '/health';
-const HEALTH_URL   = `http://localhost:${LOCAL_PORT}${HEALTH_PATH}`;
-const PING_TIMEOUT = 900;          // ms
-const RECHECK_MS   = 20_000;       // re-ping every 20s
+// --- Local server detection + CSRF (Safari-safe) ---
+(function(){
+  var CREATE_BTN = document.querySelector('.create-btn');
+  var HEALTH_URL = 'http://localhost:5173/health';
+  var CREATE_URL = 'http://localhost:5173/create-post';
+  var RECHECK_MS = 20000; // 20s, no numeric separators for Safari
+  var _csrf = null;
 
-function withTimeout(ms) {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), ms);
-  return { signal: ctrl.signal, cancel: () => clearTimeout(t) };
-}
+  // Start hidden (prevents flicker / covers Safari parse issues)
+  if (CREATE_BTN) CREATE_BTN.classList.add('hidden');
 
-async function pingLocalServer() {
-  const { signal, cancel } = withTimeout(PING_TIMEOUT);
-  try {
-    const res = await fetch(HEALTH_URL, {
+  // Ping health: expects plain text "ok:<token>"
+  function ping(){
+    return fetch(HEALTH_URL, {
       method: 'GET',
       mode: 'cors',
       cache: 'no-store',
-      signal,
-      headers: { 'Accept': 'application/json' }
+      headers: { 'Accept': 'text/plain' }
+    })
+    .then(function(res){
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      return res.text();
+    })
+    .then(function(text){
+      var parts = (text || '').split(':');
+      if (parts[0] !== 'ok' || !parts[1]) throw new Error('bad payload');
+      _csrf = parts[1];
+      CREATE_BTN && CREATE_BTN.classList.remove('hidden');
+      return true;
+    })
+    .catch(function(){
+      _csrf = null;
+      CREATE_BTN && CREATE_BTN.classList.add('hidden');
+      return false;
     });
-    cancel();
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    // If you want to verify payload:
-    // const data = await res.json(); if (!data?.ok) throw new Error('bad health payload');
-    CREATE_BTN?.classList.remove('hidden');
-    return true;
-  } catch {
-    CREATE_BTN?.classList.add('hidden');
-    return false;
   }
-}
 
-// initial ping + periodic re-check
-document.addEventListener('DOMContentLoaded', () => {
-  // start hidden until proven alive
-  CREATE_BTN?.classList.add('hidden');
-  pingLocalServer();
-  setInterval(pingLocalServer, RECHECK_MS);
-});
+  // Example create call (wire this to your drawer submit later)
+  async function submitCreate(payload){
+    if (!_csrf) throw new Error('No local token — server not detected.');
+    var res = await fetch(CREATE_URL, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF': _csrf
+      },
+      body: JSON.stringify(payload || { demo: true })
+    });
+    if (!res.ok) throw new Error('Create failed: '+res.status);
+    return res.json();
+  }
 
-// (optional) hook up action
-CREATE_BTN?.addEventListener('click', () => {
-  console.log('Create Post clicked');
-  // e.g. openDrawer('create')
-});
+  // Initial + periodic re-ping
+  document.addEventListener('DOMContentLoaded', function(){
+    ping();
+    setInterval(ping, RECHECK_MS);
+  });
 
-
+  // For now, clicking the button tries a demo create (replace with drawer)
+  CREATE_BTN && CREATE_BTN.addEventListener('click', function(){
+    // Replace this with: openDrawer('create') once your drawer exists
+    submitCreate({ hello: 'queenslander gander' })
+      .then(function(){ console.log('Create OK'); })
+      .catch(function(e){ console.warn('Create failed:', e.message); });
+  });
+})();
 
   // ---------------- GALLERY SETUP (unchanged) ----------------
   function normalizePostGalleries(root = document){
