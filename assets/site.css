@@ -416,7 +416,7 @@ footer.floating .credits a{ color:var(--blue) } footer.floating .credits a:hover
 *{ scrollbar-width:thin; scrollbar-color: rgba(255, 255, 255, 0.423) transparent }
 
 /* ---------------- BLOG PAGE ---------------- */
-.hidden{ display:none !important; }
+.create-btn.hidden{ display:none !important; }
 
 .blog-header { 
   display:flex; 
