@@ -489,7 +489,8 @@ postGallery?.addEventListener('change', () => {
 });
 
 /* ----- Caption editor elements (lazy-injected) ----- */
-let capOverlay = null, capInput = null, capSave = null, capCancel = null;
+let capOverlay = null, capInput = null, capSave = null, capCancel = null, capPreview = null;
+let capPreviewUrl = null;
 let editingIndex = null;
 
 function ensureCaptionEditor(){
@@ -501,6 +502,7 @@ function ensureCaptionEditor(){
   capOverlay.innerHTML = `
     <div class="cap-editor" role="dialog" aria-modal="true" aria-labelledby="capTitle">
       <h4 id="capTitle" class="cap-title">Edit image caption</h4>
+      <img id="capPreview" class="cap-preview" alt="" />
       <textarea id="capInput" class="cap-input" rows="3" placeholder="Write a short blurb…"></textarea>
       <div class="cap-actions">
         <button type="button" id="capSave" class="follow-btn follow-btn-primary">Save</button>
@@ -508,9 +510,10 @@ function ensureCaptionEditor(){
       </div>
     </div>`;
   (createCard || document.body).appendChild(capOverlay);
-  capInput  = capOverlay.querySelector('#capInput');
-  capSave   = capOverlay.querySelector('#capSave');
-  capCancel = capOverlay.querySelector('#capCancel');
+  capPreview = capOverlay.querySelector('#capPreview');
+  capInput   = capOverlay.querySelector('#capInput');
+  capSave    = capOverlay.querySelector('#capSave');
+  capCancel  = capOverlay.querySelector('#capCancel');
 
   capSave.addEventListener('click', () => {
     if (editingIndex !== null && galleryFiles[editingIndex]) {
@@ -528,7 +531,15 @@ function openCaptionEditor(index){
   ensureCaptionEditor();
   editingIndex = index;
   const f = galleryFiles[index];
+
+  // preview image
+  if (capPreviewUrl) { URL.revokeObjectURL(capPreviewUrl); capPreviewUrl = null; }
+  capPreviewUrl = URL.createObjectURL(f);
+  capPreview.src = capPreviewUrl;
+
+  // caption field
   capInput.value = (f && f._caption) ? f._caption : '';
+
   capOverlay.classList.add('is-open');
   capOverlay.setAttribute('aria-hidden','false');
   setTimeout(()=>capInput.focus(), 0);
@@ -536,6 +547,8 @@ function openCaptionEditor(index){
 function closeCaptionEditor(){
   if (!capOverlay) return;
   editingIndex = null;
+  if (capPreviewUrl) { URL.revokeObjectURL(capPreviewUrl); capPreviewUrl = null; }
+  if (capPreview) capPreview.removeAttribute('src');
   capOverlay.classList.remove('is-open');
   capOverlay.setAttribute('aria-hidden','true');
 }
@@ -701,8 +714,6 @@ showLessBtn?.addEventListener('click', () => {
 });
 
 /* ---------- LOCAL SERVER DETECTION (keeps Create button clickable on file://) ---------- */
-// In file:// mode: show Create button and skip pings.
-// When served over http(s): start hidden; reveal after /health ok (expects text "ok:<token>")
 (function(){
   var CREATE_BTN = document.querySelector('.create-btn');
   var HEALTH_URL = 'http://localhost:5173/health';
@@ -748,8 +759,6 @@ showLessBtn?.addEventListener('click', () => {
     }
   });
 
-  // When you wire real POSTs, you'll use _csrf and CREATE_URL.
-  // For now we just open the drawer; publish happens entirely client-side.
   CREATE_BTN && CREATE_BTN.addEventListener('click', function(){
     openDrawer('create');
   });
@@ -870,7 +879,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   normalizePostGalleries();
 });
 </script>
-
 
 </body>
 </html>
