@@ -576,11 +576,39 @@ footer.floating .credits a{ color:var(--blue) } footer.floating .credits a:hover
   border-bottom:1px solid rgba(255,255,255,.12);
 }
 
-/* scrollable inner body with nice padding */
+/* Smooth, contained scrolling for the drawer body */
 #createCard .drawer-body{
-  padding:20px 24px 24px;        /* actual “around content” padding */
+  padding:20px 24px 24px;
   overflow-y:auto;
   flex:1;
+  -webkit-overflow-scrolling: touch;   /* iOS momentum */
+  overscroll-behavior: contain;        /* no bounce bleed */
+  scrollbar-gutter: stable both-edges; /* keeps layout steady */
+  scrollbar-width: thin;               /* Firefox */
+}
+
+/* Optional: pretty scrollbar (WebKit) */
+#createCard .drawer-body::-webkit-scrollbar{
+  width:10px;
+}
+#createCard .drawer-body::-webkit-scrollbar-track{
+  background: rgba(255,255,255,0.06);
+  border-radius: 10px;
+}
+#createCard .drawer-body::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.18);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+#createCard .drawer-body::-webkit-scrollbar-thumb:hover{
+  background: rgba(255,255,255,0.28);
+}
+
+/* Disable manual resize on textareas inside the Create drawer */
+#createCard textarea{
+  resize: none;              /* hide the bottom-right handle */
+  overflow: auto;            /* still scroll inside the field if long */
 }
 
 /* Small helpers */
@@ -736,7 +764,7 @@ footer.floating .credits a{ color:var(--blue) } footer.floating .credits a:hover
 .cap-preview{
   width:100%;
   max-height:220px;
-  object-fit:cover;
+  object-fit:contain;
   border-radius:10px;
   border:1px solid rgba(255,255,255,.14);
   margin:6px 0 10px;
