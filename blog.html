@@ -115,7 +115,7 @@
         <div class="blog-buttons">
           <!-- kept exactly as-is per your request -->
           <button class="follow-btn" type="button">Follow</button>
-          <button class="create-btn">Create Post</button>
+          <button class="create-btn hidden" type="button">Create Post</button>
         </div>
       </div>
 
@@ -325,6 +325,58 @@
     if (submitFollow) submitFollow.textContent = "Follow";
     setTimeout(() => openDrawer(null), 1000);
   });
+
+// --- Local server detection to toggle "Create post" button ---
+const CREATE_BTN   = document.querySelector('.create-btn');   // was getElementById
+const LOCAL_PORT   = 5173;
+const HEALTH_PATH  = '/health';
+const HEALTH_URL   = `http://localhost:${LOCAL_PORT}${HEALTH_PATH}`;
+const PING_TIMEOUT = 900;          // ms
+const RECHECK_MS   = 20_000;       // re-ping every 20s
+
+function withTimeout(ms) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  return { signal: ctrl.signal, cancel: () => clearTimeout(t) };
+}
+
+async function pingLocalServer() {
+  const { signal, cancel } = withTimeout(PING_TIMEOUT);
+  try {
+    const res = await fetch(HEALTH_URL, {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'no-store',
+      signal,
+      headers: { 'Accept': 'application/json' }
+    });
+    cancel();
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    // If you want to verify payload:
+    // const data = await res.json(); if (!data?.ok) throw new Error('bad health payload');
+    CREATE_BTN?.classList.remove('hidden');
+    return true;
+  } catch {
+    CREATE_BTN?.classList.add('hidden');
+    return false;
+  }
+}
+
+// initial ping + periodic re-check
+document.addEventListener('DOMContentLoaded', () => {
+  // start hidden until proven alive
+  CREATE_BTN?.classList.add('hidden');
+  pingLocalServer();
+  setInterval(pingLocalServer, RECHECK_MS);
+});
+
+// (optional) hook up action
+CREATE_BTN?.addEventListener('click', () => {
+  console.log('Create Post clicked');
+  // e.g. openDrawer('create')
+});
+
+
 
   // ---------------- GALLERY SETUP (unchanged) ----------------
   function normalizePostGalleries(root = document){
