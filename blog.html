@@ -154,6 +154,17 @@
         <button type="button" id="createCancel" class="follow-btn follow-btn-tertiary">Cancel</button>
       </div>
     </form>
+    <!-- Caption editor overlay (Create drawer only) -->
+    <div id="capOverlay" class="cap-editor-overlay" aria-hidden="true">
+      <div class="cap-editor" role="dialog" aria-modal="true" aria-labelledby="capTitle">
+        <h4 id="capTitle" class="cap-title">Edit image caption</h4>
+        <textarea id="capInput" class="cap-input" rows="3" placeholder="Write a short blurb…"></textarea>
+        <div class="cap-actions">
+          <button type="button" id="capSave"   class="follow-btn follow-btn-primary">Save</button>
+          <button type="button" id="capCancel" class="follow-btn follow-btn-tertiary">Cancel</button>
+        </div>
+      </div>
+    </div>
   </div>
 </aside>
 
@@ -292,13 +303,14 @@ const showMoreBtn = document.querySelector('.show-more');
 const showLessBtn = document.querySelector('.show-less');
 
 /* ---------- STATE ---------- */
-let galleryFiles = [];      // FileList is read-only, so we mirror it here
+let galleryFiles = [];      // Accumulated gallery files
 
 // Show more/less state (STEP logic)
 const STEP = 3;
 let visible = 0;
 let lastDelta = STEP;
 
+/* ---------- FOLLOW: EmailJS ---------- */
 const EJS_SERVICE  = "service_aurifellmusic";
 const EJS_TEMPLATE = "send_to_follower";
 const SITE_NAME    = "Auri Fell — Blog";
@@ -397,6 +409,7 @@ function resetCreateDrawer(){
   if (heroPreview) heroPreview.innerHTML = '';
   galleryFiles = [];
   if (galleryPreview) galleryPreview.innerHTML = '';
+  closeCaptionEditor(); // also close caption editor if open
 }
 
 /* ---------- TRIGGERS (open/close) ---------- */
@@ -424,7 +437,13 @@ createClose?.addEventListener('click', () => openDrawer(null));
 createCancel?.addEventListener('click', () => openDrawer(null));
 
 /* ---------- OUTSIDE-CLICK + ESC ---------- */
-document.addEventListener('keydown', e => { if (e.key === 'Escape') openDrawer(null); });
+document.addEventListener('keydown', e => { 
+  if (e.key === 'Escape') {
+    // Close caption editor first if open; otherwise close drawer
+    if (capOverlay?.classList.contains('is-open')) closeCaptionEditor();
+    else openDrawer(null);
+  }
+});
 backdrop?.addEventListener('click', () => openDrawer(null));
 // whitelist all drawers + their buttons
 document.addEventListener('click', e => {
@@ -443,26 +462,129 @@ postHero?.addEventListener('change', () => {
   img.src = URL.createObjectURL(file);
   heroPreview.appendChild(img);
 });
-// Gallery preview chips (add/remove)
+
+/* ---------- CREATE: gallery accumulation + minimal image grid ---------- */
+// Deduplicate by name|size|lastModified
+function dedupeFiles(files){
+  const seen = new Set();
+  const out = [];
+  for (const f of files){
+    const key = [f.name, f.size, f.lastModified].join('|');
+    if (!seen.has(key)){
+      seen.add(key);
+      out.push(f);
+    }
+  }
+  return out;
+}
+
+// Append new picks to galleryFiles, dedupe, then clear input
 postGallery?.addEventListener('change', () => {
-  galleryFiles = [...postGallery.files];
+  const picked = Array.from(postGallery.files || []);
+  if (!picked.length) return;
+  galleryFiles = dedupeFiles(galleryFiles.concat(picked));
   renderGalleryChips();
+  // allow re-selecting the same file later
+  postGallery.value = '';
 });
+
+/* ----- Caption editor elements (lazy-injected) ----- */
+let capOverlay = null, capInput = null, capSave = null, capCancel = null;
+let editingIndex = null;
+
+function ensureCaptionEditor(){
+  if (capOverlay) return;
+  capOverlay = document.createElement('div');
+  capOverlay.id = 'capOverlay';
+  capOverlay.className = 'cap-editor-overlay';
+  capOverlay.setAttribute('aria-hidden','true');
+  capOverlay.innerHTML = `
+    <div class="cap-editor" role="dialog" aria-modal="true" aria-labelledby="capTitle">
+      <h4 id="capTitle" class="cap-title">Edit image caption</h4>
+      <textarea id="capInput" class="cap-input" rows="3" placeholder="Write a short blurb…"></textarea>
+      <div class="cap-actions">
+        <button type="button" id="capSave" class="follow-btn follow-btn-primary">Save</button>
+        <button type="button" id="capCancel" class="follow-btn follow-btn-tertiary">Cancel</button>
+      </div>
+    </div>`;
+  (createCard || document.body).appendChild(capOverlay);
+  capInput  = capOverlay.querySelector('#capInput');
+  capSave   = capOverlay.querySelector('#capSave');
+  capCancel = capOverlay.querySelector('#capCancel');
+
+  capSave.addEventListener('click', () => {
+    if (editingIndex !== null && galleryFiles[editingIndex]) {
+      galleryFiles[editingIndex]._caption = (capInput.value || '').trim();
+    }
+    closeCaptionEditor();
+  });
+  capCancel.addEventListener('click', closeCaptionEditor);
+  capOverlay.addEventListener('click', (e) => {
+    if (e.target === capOverlay) closeCaptionEditor();
+  });
+}
+
+function openCaptionEditor(index){
+  ensureCaptionEditor();
+  editingIndex = index;
+  const f = galleryFiles[index];
+  capInput.value = (f && f._caption) ? f._caption : '';
+  capOverlay.classList.add('is-open');
+  capOverlay.setAttribute('aria-hidden','false');
+  setTimeout(()=>capInput.focus(), 0);
+}
+function closeCaptionEditor(){
+  if (!capOverlay) return;
+  editingIndex = null;
+  capOverlay.classList.remove('is-open');
+  capOverlay.setAttribute('aria-hidden','true');
+}
+
+/* ----- Gallery chip/grid renderer with ✎ + ✕ ----- */
 function renderGalleryChips(){
   galleryPreview.innerHTML = '';
   galleryFiles.forEach((file, idx) => {
-    const chip = document.createElement('div');
-    chip.className = 'file-chip';
-    chip.textContent = file.name;
+    const url = URL.createObjectURL(file);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'thumb-wrap';
+
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = '';
+
+    // ✏️ edit (top-left)
+    const edit = document.createElement('button');
+    edit.type = 'button';
+    edit.className = 'thumb-edit';
+    edit.innerHTML = '✎';
+    edit.title = 'Edit caption';
+    edit.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      openCaptionEditor(idx);
+    });
+
+    // ❌ remove (top-right)
     const rm = document.createElement('button');
     rm.type = 'button';
-    rm.textContent = 'Remove';
-    rm.addEventListener('click', () => {
+    rm.className = 'thumb-remove';
+    rm.innerHTML = '✕';
+    rm.title = 'Remove image';
+    rm.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      URL.revokeObjectURL(url);
       galleryFiles.splice(idx, 1);
+      if (editingIndex !== null) {
+        if (idx === editingIndex) closeCaptionEditor();
+        else if (idx < editingIndex) editingIndex -= 1;
+      }
       renderGalleryChips();
     });
-    chip.appendChild(rm);
-    galleryPreview.appendChild(chip);
+
+    wrap.appendChild(img);
+    wrap.appendChild(edit);
+    wrap.appendChild(rm);
+    galleryPreview.appendChild(wrap);
   });
 }
 
@@ -486,11 +608,15 @@ function bodyToParagraphs(text){
 function escapeHTML(s){
   return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-// Build collage wrapper with up to 4 thumbs (rest -> +N)
+
+// Build collage wrapper with ALL thumbs + captions; normalizer will prune to 4 and add +N
 async function buildCollage(gFiles){
   if (!gFiles.length) return '';
   const urls = await Promise.all(gFiles.map(f => URL.createObjectURL(f)));
-  const thumbs = urls.slice(0,4).map(u => `<div class="thumb"><img src="${u}" alt=""></div>`).join('');
+  const thumbs = urls.map((u, i) => {
+    const cap = (gFiles[i]._caption || '').replace(/"/g, '&quot;');
+    return `<div class="thumb"><img src="${u}" alt="" data-caption="${cap}"></div>`;
+  }).join('');
   return `<div class="post-gallery collage">${thumbs}</div>`;
 }
 
@@ -629,7 +755,7 @@ showLessBtn?.addEventListener('click', () => {
   });
 })();
 
-/* ---------- GALLERY (unchanged core) ---------- */
+/* ---------- GALLERY (normalize into lightbox) ---------- */
 function normalizePostGalleries(root = document){
   (root.querySelectorAll?.('.post-gallery') || []).forEach(gallery => {
     const thumbs = Array.from(gallery.querySelectorAll('.thumb'));
@@ -663,7 +789,7 @@ function normalizePostGalleries(root = document){
       const extraCount = imgs.length - 4;
       fourth.classList.add('more');
       fourth.setAttribute('data-more', `+${extraCount}`);
-      let badge = fourth.querySelector('.more-badge');
+      let badge = fourth.querySelector('div.more-badge');
       if (!badge) {
         badge = document.createElement('div');
         badge.className = 'more-badge';
@@ -682,7 +808,7 @@ function normalizePostGalleries(root = document){
   });
 }
 
-/* ---------- LIGHTBOX (unchanged) ---------- */
+/* ---------- LIGHTBOX ---------- */
 let lb,lbImg,lbBlurb,lbCounter,lbPrev,lbNext,lbClose,lbList=[],lbIndex=0;
 function ensureLightbox(){
   if (lb) return;
@@ -744,7 +870,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   normalizePostGalleries();
 });
 </script>
-
 
 
 </body>

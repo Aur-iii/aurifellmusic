@@ -564,20 +564,21 @@ footer.floating .credits a{ color:var(--blue) } footer.floating .credits a:hover
   background:linear-gradient(180deg, rgba(26,20,63,.96), rgba(14,9,40,.96));
   box-shadow:-12px 0 35px rgba(0,0,0,.45);
   backdrop-filter:blur(16px);
-  padding:0;
+  padding:0;                     /* no padding on the shell */
   display:flex;
   flex-direction: column;
 }
 
-/* top bar (keep full width) */
-#createCard .drawer-header{
-  padding:16px 20px;              /* top/bottom padding only inside bar */
+/* top bar (keep full width) — support either class name */
+#createCard .drawer-header,
+#createCard .follow-head{
+  padding:16px 20px;
   border-bottom:1px solid rgba(255,255,255,.12);
 }
 
 /* scrollable inner body with nice padding */
 #createCard .drawer-body{
-  padding:20px 24px 24px;         /* actual “around content” padding */
+  padding:20px 24px 24px;        /* actual “around content” padding */
   overflow-y:auto;
   flex:1;
 }
@@ -589,22 +590,147 @@ footer.floating .credits a{ color:var(--blue) } footer.floating .credits a:hover
   padding:6px 10px; border-radius:999px;
   background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
   font-weight:700;
-  width:100%;
+  /* width:100%;  <-- remove full-width so chips sit inline */
 }
 .create-preview{ margin-top:8px; display:flex; gap:10px; flex-wrap:wrap }
-.create-preview img{ width:90px; height:90px; object-fit:cover; border-radius:10px; border:1px solid rgba(255,255,255,.12) }
-
-.create-gallery-list{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px }
-.file-chip{
-  display:flex; align-items:center; gap:8px;
-  padding:6px 10px; border-radius:10px;
-  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
-  font-size:14px; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+.create-preview img{
+  width:90px; height:90px; object-fit:cover;
+  border-radius:10px; border:1px solid rgba(255,255,255,.12)
 }
-.file-chip button{
+
+/* --- Minimal image-only gallery (4-column grid) --- */
+.create-gallery-list{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columns */
+  gap:10px;
+  margin-top:8px;
+  justify-items:start;
+}
+
+.thumb-wrap{
+  position:relative;
+  width:80px;
+  height:80px;
+  border-radius:10px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.thumb-wrap img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  border-radius:inherit;
+}
+
+/* buttons in corners */
+.thumb-remove,
+.thumb-edit{
+  position:absolute;
+  top:6px;
+  background:rgba(0,0,0,.55);
+  border:1px solid rgba(255,255,255,.2);
+  color:#fff;
+  font-size:12px;
+  line-height:1;
+  width:22px;
+  height:22px;
+  border-radius:6px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;                          /* hidden until hover/touch */
+  transition:opacity .15s ease, background .15s ease;
+}
+.thumb-remove{ right:6px; }
+.thumb-edit{ left:6px; }
+
+.thumb-wrap:hover .thumb-remove,
+.thumb-wrap:hover .thumb-edit,
+.thumb-wrap:active .thumb-remove,
+.thumb-wrap:active .thumb-edit{
+  opacity:1;
+}
+
+.thumb-remove:hover,
+.thumb-edit:hover{ background:rgba(196,75,255,.75); }
+
+/* touch: always show buttons */
+@media (pointer:coarse){
+  .thumb-remove, .thumb-edit{ opacity:1; }
+}
+
+/* responsive columns */
+@media (max-width: 520px){
+  .create-gallery-list{ grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 360px){
+  .create-gallery-list{ grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ----- In-drawer caption editor overlay ----- */
+.cap-editor-overlay{
+  position:absolute; inset:0;       /* cover the create drawer */
+  background:rgba(0,0,0,.45);
+  backdrop-filter: blur(4px);
+  display:none; align-items:center; justify-content:center;
+  z-index:20;                        /* above form contents, below global backdrop */
+}
+.cap-editor-overlay.is-open{ display:flex; }
+
+.cap-editor{
+  width:min(560px, 92%);
+  background:linear-gradient(180deg, rgba(28,22,70,.98), rgba(14,10,42,.98));
   border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.08);
-  color:#fff; border-radius:8px; padding:4px 6px; cursor:pointer;
+  border-radius:16px;
+  box-shadow:0 20px 50px rgba(0,0,0,.45);
+  padding:16px;
+}
+.cap-title{ margin:0 0 8px; font-size:16px; }
+.cap-input{
+  width:93%;
+  min-height:88px;
+  resize:vertical;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.05);
+  color:#fff;
+}
+.cap-actions{
+  display:flex; gap:10px; justify-content:flex-end;
+  margin-top:12px;
+}
+
+/* Make the card contain floats, but let text wrap around the hero */
+.blog-post{ display:flow-root; }     /* contain the float */
+
+/* Ensure the inner content DOES NOT create a BFC */
+.blog-post .post-content{
+  display:block;
+  overflow:visible !important;       /* kill any hidden/auto that breaks wrapping */
+  contain:none;                      /* just in case */
+}
+
+/* Wrap the hero image left/right via the side class on <article> */
+.blog-post.left  .post-image{ float:left;  margin:0 20px 12px 0; }
+.blog-post.right .post-image{ float:right; margin:0 0 12px 20px; }
+.blog-post .post-image{
+  width:var(--post-img-size, 180px);
+  height:var(--post-img-size, 180px);
+  object-fit:cover;
+  border-radius:14px;
+  display:block;
+}
+
+/* Long strings should never blow out of the card */
+.blog-post .post-title,
+.blog-post .post-content p{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  hyphens:auto;
 }
 
 /* --- BLOG GALLERY PREVIEW (drop-in, non-invasive) --- */
