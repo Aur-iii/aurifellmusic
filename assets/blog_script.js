@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // your repo config
   const GH = {
-    owner: 'aur-iii',
+    owner: 'Aur-iii',
     repo:  'aurifellmusic',
     branch: 'main',
     postsPath: 'blog/posts'
