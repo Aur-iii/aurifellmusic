@@ -213,20 +213,20 @@ function normalizePostGalleries(root = document){
   });
 }
 
-/* ---------- LOAD POSTS (server if available, otherwise GitHub) ---------- */
+/* ---------- LOAD POSTS DIRECTLY FROM GITHUB (no local server) ---------- */
 document.addEventListener('DOMContentLoaded', async () => {
   const host = document.querySelector('.blog-posts');
   if (!host) return;
 
-  // --- config for your repo ---
+  // your repo config
   const GH = {
     owner: 'aur-iii',
     repo:  'aurifellmusic',
     branch: 'main',
     postsPath: 'blog/posts'
   };
-  const reDateSlug = /^\d{4}-\d{2}-\d{2}-/;
 
+  const reDateSlug = /^\d{4}-\d{2}-\d{2}-/;
   const rawUrl = (rel) =>
     `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/${GH.branch}/${rel.replace(/^\/+/, '')}`;
 
@@ -273,101 +273,61 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `<div class="post-gallery collage">${thumbs}</div>`;
   };
 
-  async function tryServerFirst() {
-    try {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 800); // tiny timeout so we fall back quickly
-      const r = await fetch('http://127.0.0.1:5173/posts', { signal: ctrl.signal, cache:'no-store' });
-      clearTimeout(t);
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.error || 'bad');
-      return j.posts.map(p => ({
-        slug: p.slug,
-        title: p.title,
-        dateISO: p.dateISO,
-        side: p.side || 'right',
-        hero: p.hero || null,
-        gallery: [],
-        captions: [],
-        from: 'server'
-      }));
-    } catch { return null; }
-  }
-
-  async function loadFromGitHub() {
+  try {
+    // list post directories
     const res = await fetch(
       `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${encodeURIComponent(GH.postsPath)}?ref=${GH.branch}`,
-      { cache:'no-store' }
+      { cache: 'no-store' }
     );
-    if (res.status === 404) return [];
+    if (res.status === 404) { host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`; return; }
     if (!res.ok) throw new Error(`GitHub list failed: ${res.status}`);
     const listing = await res.json();
     const dirs = (Array.isArray(listing) ? listing : []).filter(e => e.type === 'dir' && reDateSlug.test(e.name));
+    if (dirs.length === 0) { host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`; return; }
+
+    // newest first
     dirs.sort((a,b) => b.name.localeCompare(a.name));
 
-    const out = [];
+    const frag = document.createDocumentFragment();
     for (const d of dirs) {
       const slug = d.name;
       const mdRes = await fetch(rawUrl(`${GH.postsPath}/${slug}/index.md`), { cache:'no-store' });
-      if (!mdRes.ok) continue;
+      if (!mdRes.ok) { console.warn('skip (no index.md):', slug); continue; }
       const md = await mdRes.text();
       const { fm, body } = parseFrontMatter(md);
+
+      const title = fm.title || 'Untitled';
+      const dateISO = fm.date || '';
+      const side = fm.side === 'left' ? 'left' : 'right';
+
+      // hero fallback to your asset if none in front-matter
       let heroSrc = './assets/auri-headshot-square.png';
       if (fm.hero) {
         const cleanHero = String(fm.hero).replace(/^\.\//,'');
         heroSrc = rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`);
       }
-      out.push({
-        slug,
-        title: fm.title || 'Untitled',
-        dateISO: fm.date || '',
-        side: fm.side === 'left' ? 'left' : 'right',
-        hero: heroSrc,
-        gallery: Array.isArray(fm.gallery) ? fm.gallery : [],
-        captions: Array.isArray(fm.captions) ? fm.captions : [],
-        body
-      });
-    }
-    return out;
-  }
 
-  try {
-    const serverPosts = await tryServerFirst();
-    const posts = serverPosts ?? await loadFromGitHub();
-
-    if (!posts.length) {
-      host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`;
-      return;
-    }
-
-    const frag = document.createDocumentFragment();
-    for (const p of posts) {
       const article = document.createElement('article');
-      article.className = `blog-post ${p.side || 'right'}`;
-      const dateText = toDateText(p.dateISO);
-      const bodyHTML = p.body ? bodyToParagraphs(p.body) : '';
-      const galHTML  = galleryHTML(p.slug, p.gallery, p.captions);
-
+      article.className = `blog-post ${side}`;
       article.innerHTML = `
-        <img class="post-image" src="${p.hero || './assets/auri-headshot-square.png'}" alt="">
+        <img class="post-image" src="${heroSrc}" alt="">
         <div class="post-content">
-          <p class="post-date">${dateText}</p>
-          <h3 class="post-title">${escapeHTML(p.title)}</h3>
-          ${bodyHTML}
-          ${galHTML}
+          <p class="post-date">${toDateText(dateISO)}</p>
+          <h3 class="post-title">${escapeHTML(title)}</h3>
+          ${bodyToParagraphs(body)}
+          ${galleryHTML(slug, Array.isArray(fm.gallery) ? fm.gallery : [], Array.isArray(fm.captions) ? fm.captions : [])}
         </div>
       `;
       frag.appendChild(article);
     }
+
     host.innerHTML = '';
     host.appendChild(frag);
 
-    // re-run your gallery normalizer + show/hide controls
     if (typeof normalizePostGalleries === 'function') normalizePostGalleries();
     if (typeof recomputeShowButtons === 'function') recomputeShowButtons();
   } catch (err) {
-    console.error('Failed to load posts', err);
+    console.error('Failed to load posts from GitHub', err);
     host.innerHTML = `<p class="muted">Couldn’t load posts right now. Try again later.</p>`;
   }
 });
