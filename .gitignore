@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Node / site stuff
+node_modules/
+.env
+*.log
+*.tmp
