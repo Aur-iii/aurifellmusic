@@ -213,6 +213,48 @@ function normalizePostGalleries(root = document){
   });
 }
 
+/* ---------- LOAD POSTS FROM SERVER ---------- */
+document.addEventListener('DOMContentLoaded', async () => {
+  const host = document.querySelector('.blog-posts');
+  if (!host) return;
+
+  try {
+    const res = await fetch('http://127.0.0.1:5173/posts');
+    const json = await res.json();
+
+    if (!json.ok) throw new Error(json.error || 'Bad response');
+    const posts = json.posts || [];
+
+    if (posts.length === 0) {
+      host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`;
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    for (const p of posts) {
+      const el = document.createElement('article');
+      el.className = 'blog-post';
+      el.innerHTML = `
+        <img class="post-hero" src="${p.hero || './assets/auri-headshot-square.png'}" alt="">
+        <div class="post-body">
+          <h2 class="post-title">${p.title}</h2>
+          <time datetime="${p.dateISO || ''}" class="post-date">${new Date(p.dateISO || Date.now()).toLocaleDateString()}</time>
+          <a href="blog/posts/${p.slug}/index.html" class="post-link">Read More →</a>
+        </div>
+      `;
+      frag.appendChild(el);
+    }
+    host.innerHTML = '';
+    host.appendChild(frag);
+
+    normalizePostGalleries();
+  } catch (err) {
+    console.error('Failed to load posts', err);
+    host.innerHTML = `<p class="muted">Couldn’t load posts right now. Try again later.</p>`;
+  }
+});
+
+
 // Lightbox
 let lb,lbImg,lbBlurb,lbCounter,lbPrev,lbNext,lbClose,lbList=[],lbIndex=0;
 function ensureLightbox(){

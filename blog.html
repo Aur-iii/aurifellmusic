@@ -113,9 +113,13 @@
     <div class="soft-div"></div>
 
     <!-- BLOG POSTS (rendered HTML or later via JSON) -->
-    <section class="blog-posts">
+    <section class="blog-posts" aria-label="Blog posts">
+        <p class="muted noscript-message">Loading posts...</p>
       <!-- keep your example post(s) here if you like -->
     </section>
+    <noscript>
+        <p class="muted">JavaScript is disabled - the blog can't load posts dynamically.</p>
+    </noscript>
 
     <div class="blog-controls">
       <button class="show-more">Show More</button>
