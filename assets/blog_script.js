@@ -213,46 +213,165 @@ function normalizePostGalleries(root = document){
   });
 }
 
-/* ---------- LOAD POSTS FROM SERVER ---------- */
+/* ---------- LOAD POSTS (server if available, otherwise GitHub) ---------- */
 document.addEventListener('DOMContentLoaded', async () => {
   const host = document.querySelector('.blog-posts');
   if (!host) return;
 
+  // --- config for your repo ---
+  const GH = {
+    owner: 'aur-iii',
+    repo:  'aurifellmusic',
+    branch: 'main',
+    postsPath: 'blog/posts'
+  };
+  const reDateSlug = /^\d{4}-\d{2}-\d{2}-/;
+
+  const rawUrl = (rel) =>
+    `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/${GH.branch}/${rel.replace(/^\/+/, '')}`;
+
+  const escapeHTML = (s='') => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const toDateText = (iso) =>
+    iso ? new Date(iso).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' }) : '';
+
+  const bodyToParagraphs = (txt='') =>
+    txt.trim().split(/\n\s*\n/g).map(p=>p.trim()).filter(Boolean).map(p=>`<p>${escapeHTML(p)}</p>`).join('\n');
+
+  function parseFrontMatter(md) {
+    let fm = {}, body = md;
+    if (md.startsWith('---')) {
+      const end = md.indexOf('\n---', 3);
+      if (end !== -1) {
+        const block = md.slice(3, end).trim();
+        body = md.slice(end + 4).replace(/^\s+/, '');
+        const lines = block.split(/\r?\n/);
+        let key = null;
+        for (const ln of lines) {
+          const li = ln.match(/^\s*-\s+(.*)$/);
+          if (li && key) { (fm[key] ||= []).push(li[1].replace(/^"(.*)"$/, '$1')); continue; }
+          const kv = ln.match(/^([A-Za-z0-9_]+)\s*:\s*(.*)$/);
+          if (kv) {
+            key = kv[1];
+            let v = kv[2].trim();
+            if (v === '') { fm[key] = []; continue; }
+            fm[key] = v.replace(/^"(.*)"$/, '$1');
+          } else key = null;
+        }
+      }
+    }
+    return { fm, body };
+  }
+
+  const galleryHTML = (slug, gallery = [], captions = []) => {
+    if (!Array.isArray(gallery) || gallery.length === 0) return '';
+    const thumbs = gallery.map((g, i) => {
+      const clean = String(g).replace(/^\.\//,'');
+      const src = rawUrl(`${GH.postsPath}/${slug}/${clean}`);
+      const cap = captions[i] ? ` data-caption="${escapeHTML(String(captions[i]))}"` : '';
+      return `<div class="thumb"><img src="${src}" alt=""${cap}></div>`;
+    }).join('');
+    return `<div class="post-gallery collage">${thumbs}</div>`;
+  };
+
+  async function tryServerFirst() {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 800); // tiny timeout so we fall back quickly
+      const r = await fetch('http://127.0.0.1:5173/posts', { signal: ctrl.signal, cache:'no-store' });
+      clearTimeout(t);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || 'bad');
+      return j.posts.map(p => ({
+        slug: p.slug,
+        title: p.title,
+        dateISO: p.dateISO,
+        side: p.side || 'right',
+        hero: p.hero || null,
+        gallery: [],
+        captions: [],
+        from: 'server'
+      }));
+    } catch { return null; }
+  }
+
+  async function loadFromGitHub() {
+    const res = await fetch(
+      `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${encodeURIComponent(GH.postsPath)}?ref=${GH.branch}`,
+      { cache:'no-store' }
+    );
+    if (res.status === 404) return [];
+    if (!res.ok) throw new Error(`GitHub list failed: ${res.status}`);
+    const listing = await res.json();
+    const dirs = (Array.isArray(listing) ? listing : []).filter(e => e.type === 'dir' && reDateSlug.test(e.name));
+    dirs.sort((a,b) => b.name.localeCompare(a.name));
+
+    const out = [];
+    for (const d of dirs) {
+      const slug = d.name;
+      const mdRes = await fetch(rawUrl(`${GH.postsPath}/${slug}/index.md`), { cache:'no-store' });
+      if (!mdRes.ok) continue;
+      const md = await mdRes.text();
+      const { fm, body } = parseFrontMatter(md);
+      let heroSrc = './assets/auri-headshot-square.png';
+      if (fm.hero) {
+        const cleanHero = String(fm.hero).replace(/^\.\//,'');
+        heroSrc = rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`);
+      }
+      out.push({
+        slug,
+        title: fm.title || 'Untitled',
+        dateISO: fm.date || '',
+        side: fm.side === 'left' ? 'left' : 'right',
+        hero: heroSrc,
+        gallery: Array.isArray(fm.gallery) ? fm.gallery : [],
+        captions: Array.isArray(fm.captions) ? fm.captions : [],
+        body
+      });
+    }
+    return out;
+  }
+
   try {
-    const res = await fetch('http://127.0.0.1:5173/posts');
-    const json = await res.json();
+    const serverPosts = await tryServerFirst();
+    const posts = serverPosts ?? await loadFromGitHub();
 
-    if (!json.ok) throw new Error(json.error || 'Bad response');
-    const posts = json.posts || [];
-
-    if (posts.length === 0) {
+    if (!posts.length) {
       host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`;
       return;
     }
 
     const frag = document.createDocumentFragment();
     for (const p of posts) {
-      const el = document.createElement('article');
-      el.className = 'blog-post';
-      el.innerHTML = `
-        <img class="post-hero" src="${p.hero || './assets/auri-headshot-square.png'}" alt="">
-        <div class="post-body">
-          <h2 class="post-title">${p.title}</h2>
-          <time datetime="${p.dateISO || ''}" class="post-date">${new Date(p.dateISO || Date.now()).toLocaleDateString()}</time>
-          <a href="blog/posts/${p.slug}/index.html" class="post-link">Read More →</a>
+      const article = document.createElement('article');
+      article.className = `blog-post ${p.side || 'right'}`;
+      const dateText = toDateText(p.dateISO);
+      const bodyHTML = p.body ? bodyToParagraphs(p.body) : '';
+      const galHTML  = galleryHTML(p.slug, p.gallery, p.captions);
+
+      article.innerHTML = `
+        <img class="post-image" src="${p.hero || './assets/auri-headshot-square.png'}" alt="">
+        <div class="post-content">
+          <p class="post-date">${dateText}</p>
+          <h3 class="post-title">${escapeHTML(p.title)}</h3>
+          ${bodyHTML}
+          ${galHTML}
         </div>
       `;
-      frag.appendChild(el);
+      frag.appendChild(article);
     }
     host.innerHTML = '';
     host.appendChild(frag);
 
-    normalizePostGalleries();
+    // re-run your gallery normalizer + show/hide controls
+    if (typeof normalizePostGalleries === 'function') normalizePostGalleries();
+    if (typeof recomputeShowButtons === 'function') recomputeShowButtons();
   } catch (err) {
     console.error('Failed to load posts', err);
     host.innerHTML = `<p class="muted">Couldn’t load posts right now. Try again later.</p>`;
   }
 });
+
 
 
 // Lightbox
