@@ -125,16 +125,24 @@ function applyVisibility(){
   const items = postsHost?.querySelectorAll('.blog-post') || [];
   items.forEach((post, idx) => { post.style.display = (idx < visible) ? '' : 'none'; });
 }
-function updateButtons(){
-  const total = postsHost?.querySelectorAll('.blog-post').length || 0;
-  if (total === 0 || total <= STEP) {
-    showMoreBtn?.classList.add('hidden');
-    showLessBtn?.classList.add('hidden');
-  } else {
-    showMoreBtn?.classList.toggle('hidden', visible >= total);
-    showLessBtn?.classList.toggle('hidden', visible <= STEP);
+function updateButtons() {
+  const items  = postsHost?.querySelectorAll('.blog-post') || [];
+  const total  = items.length;
+  const moreBtn = document.querySelector('.show-more');
+  const lessBtn = document.querySelector('.show-less');
+
+  // Hide both if ≤ 3 posts total (or none)
+  if (total <= STEP) {
+    if (moreBtn) moreBtn.style.display = 'none';
+    if (lessBtn) lessBtn.style.display = 'none';
+    return;
   }
+
+  // Otherwise: hide "more" when exhausted; hide "less" when at initial 3
+  if (moreBtn) moreBtn.style.display = visible >= total ? 'none' : '';
+  if (lessBtn) lessBtn.style.display = visible > STEP ? '' : 'none';
 }
+
 function recomputeShowButtons(){
   const total = postsHost?.querySelectorAll('.blog-post').length || 0;
   visible = Math.min(total, Math.max(visible || STEP, STEP));
