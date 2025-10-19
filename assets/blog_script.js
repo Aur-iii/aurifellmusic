@@ -293,7 +293,12 @@ const bodyToParagraphs = (txt = '') => {
     if (dirs.length === 0) { host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`; return; }
 
     // newest first
-    dirs.sort((a,b) => b.name.localeCompare(a.name));
+    dirs.sort((a, b) => {
+      const dateA = new Date(a.name.substring(0, 10));
+      const dateB = new Date(b.name.substring(0, 10));
+      if (dateA.getTime() !== dateB.getTime()) return dateB - dateA; // newest first
+      return a.name.localeCompare(b.name); // tie-break by slug
+    });
 
     const frag = document.createDocumentFragment();
     for (const d of dirs) {
