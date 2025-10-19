@@ -290,7 +290,7 @@ const bodyToParagraphs = (txt = '') => {
     if (!Array.isArray(gallery) || gallery.length === 0) return '';
     const thumbs = gallery.map((g, i) => {
       const clean = String(g).replace(/^\.\//,'');
-      const src = rawUrl(`${GH.postsPath}/${slug}/${clean}`);
+      const src = rawUrl(`${GH.postsPath}/${slug}/${clean}`) + `?t=${Date.now()}`;
       const cap = captions[i] ? ` data-caption="${escapeHTML(String(captions[i]))}"` : '';
       return `<div class="thumb"><img src="${src}" alt=""${cap}></div>`;
     }).join('');
@@ -326,14 +326,14 @@ const bodyToParagraphs = (txt = '') => {
       const { fm, body } = parseFrontMatter(md);
 
       const title = fm.title || 'Untitled';
-      const dateISO = current.fm.date || meta.dateISO || ''; // prefer existing; don't auto-stamp "now" on edit
+      const dateISO = fm.date || '';
       const side = fm.side === 'left' ? 'left' : 'right';
 
       // hero fallback to your asset if none in front-matter
       let heroSrc = './assets/auri-headshot-square.png';
       if (fm.hero) {
         const cleanHero = String(fm.hero).replace(/^\.\//,'');
-        heroSrc = rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`);
+        heroSrc = rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`) + `?t=${Date.now()}`;
       }
 
       const article = document.createElement('article');
