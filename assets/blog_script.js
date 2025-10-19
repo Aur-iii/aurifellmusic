@@ -121,27 +121,36 @@ const STEP = 3;
 let visible = 0;
 let lastDelta = STEP;
 
+function setShown(el, show) {
+  if (!el) return;
+  el.hidden = !show;                 // native, cross-browser
+  el.style.display = show ? '' : 'none'; // belt + suspenders
+  el.classList.toggle('hidden', !show);  // keep class in sync in case CSS uses it
+}
+
 function applyVisibility(){
   const items = postsHost?.querySelectorAll('.blog-post') || [];
   items.forEach((post, idx) => { post.style.display = (idx < visible) ? '' : 'none'; });
 }
+
 function updateButtons() {
   const items  = postsHost?.querySelectorAll('.blog-post') || [];
   const total  = items.length;
   const moreBtn = document.querySelector('.show-more');
   const lessBtn = document.querySelector('.show-less');
 
-  // Hide both if ≤ 3 posts total (or none)
+  // If ≤ STEP, hide both
   if (total <= STEP) {
-    if (moreBtn) moreBtn.style.display = 'none';
-    if (lessBtn) lessBtn.style.display = 'none';
+    setShown(moreBtn, false);
+    setShown(lessBtn, false);
     return;
   }
 
   // Otherwise: hide "more" when exhausted; hide "less" when at initial 3
-  if (moreBtn) moreBtn.style.display = visible >= total ? 'none' : '';
-  if (lessBtn) lessBtn.style.display = visible > STEP ? '' : 'none';
+  setShown(moreBtn, visible < total);
+  setShown(lessBtn, visible > STEP);
 }
+
 
 function recomputeShowButtons(){
   const total = postsHost?.querySelectorAll('.blog-post').length || 0;
