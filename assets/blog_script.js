@@ -234,8 +234,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const toDateText = (iso) =>
     iso ? new Date(iso).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' }) : '';
 
-  const bodyToParagraphs = (txt='') =>
-    txt.trim().split(/\n\s*\n/g).map(p=>p.trim()).filter(Boolean).map(p=>`<p>${escapeHTML(p)}</p>`).join('\n');
+const bodyToParagraphs = (txt = '') => {
+  const norm = String(txt || '').replace(/\r\n?/g, '\n').trim();
+  if (!norm) return '';
+  const paras = norm.split(/\n{2,}/); // blank lines = new paragraph
+  return paras.map(p => {
+    const lines = p.split('\n').map(line => escapeHTML(line));
+    return `<p>${lines.join('<br>')}</p>`; // single \n -> <br>
+  }).join('\n');
+};
 
   function parseFrontMatter(md) {
     let fm = {}, body = md;
