@@ -35,6 +35,10 @@ const EJS_SERVICE  = "service_aurifellmusic";
 const EJS_TEMPLATE = "send_to_follower";
 const SITE_NAME    = "Auri Fell — Blog";
 
+function withCacheBust(url) {
+  return url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
+}
+
 function setFollowStatus(msg, ok = true) {
   if (!followStatus) return;
   followStatus.textContent = msg;
@@ -290,7 +294,7 @@ const bodyToParagraphs = (txt = '') => {
     if (!Array.isArray(gallery) || gallery.length === 0) return '';
     const thumbs = gallery.map((g, i) => {
       const clean = String(g).replace(/^\.\//,'');
-      const src = rawUrl(`${GH.postsPath}/${slug}/${clean}`) + `?t=${Date.now()}`;
+      const src = withCacheBust(rawUrl(`${GH.postsPath}/${slug}/${clean}`));
       const cap = captions[i] ? ` data-caption="${escapeHTML(String(captions[i]))}"` : '';
       return `<div class="thumb"><img src="${src}" alt=""${cap}></div>`;
     }).join('');
@@ -320,7 +324,8 @@ const bodyToParagraphs = (txt = '') => {
     const frag = document.createDocumentFragment();
     for (const d of dirs) {
       const slug = d.name;
-      const mdRes = await fetch(rawUrl(`${GH.postsPath}/${slug}/index.md`) + `?t=${Date.now()}`, { cache:'no-store' });
+      const mdUrl = withCacheBust(rawUrl(`${GH.postsPath}/${slug}/index.md`));
+      const mdRes = await fetch(mdUrl, { cache: 'no-store' });
       if (!mdRes.ok) { console.warn('skip (no index.md):', slug); continue; }
       const md = await mdRes.text();
       const { fm, body } = parseFrontMatter(md);
@@ -333,7 +338,7 @@ const bodyToParagraphs = (txt = '') => {
       let heroSrc = './assets/auri-headshot-square.png';
       if (fm.hero) {
         const cleanHero = String(fm.hero).replace(/^\.\//,'');
-        heroSrc = rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`) + `?t=${Date.now()}`;
+        heroSrc = withCacheBust(rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`));
       }
 
       const article = document.createElement('article');
