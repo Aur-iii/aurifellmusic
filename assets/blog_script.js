@@ -320,13 +320,13 @@ const bodyToParagraphs = (txt = '') => {
     const frag = document.createDocumentFragment();
     for (const d of dirs) {
       const slug = d.name;
-      const mdRes = await fetch(rawUrl(`${GH.postsPath}/${slug}/index.md`), { cache:'no-store' });
+      const mdRes = await fetch(rawUrl(`${GH.postsPath}/${slug}/index.md`) + `?t=${Date.now()}`, { cache:'no-store' });
       if (!mdRes.ok) { console.warn('skip (no index.md):', slug); continue; }
       const md = await mdRes.text();
       const { fm, body } = parseFrontMatter(md);
 
       const title = fm.title || 'Untitled';
-      const dateISO = fm.date || '';
+      const dateISO = current.fm.date || meta.dateISO || ''; // prefer existing; don't auto-stamp "now" on edit
       const side = fm.side === 'left' ? 'left' : 'right';
 
       // hero fallback to your asset if none in front-matter
