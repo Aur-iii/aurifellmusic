@@ -332,7 +332,16 @@ const bodyToParagraphs = (txt = '') => {
     host.appendChild(frag);
 
     if (typeof normalizePostGalleries === 'function') normalizePostGalleries();
-    if (typeof recomputeShowButtons === 'function') recomputeShowButtons();
+
+    // NEW: reset to 3 on fresh render so older posts hide again
+    if (typeof applyVisibility === 'function' && typeof updateButtons === 'function') {
+      visible   = Math.min(STEP, postsHost?.querySelectorAll('.blog-post').length || 0);
+      lastDelta = STEP;
+      applyVisibility();
+      updateButtons();
+    }
+
+    
   } catch (err) {
     console.error('Failed to load posts from GitHub', err);
     host.innerHTML = `<p class="muted">Couldn’t load posts right now. Try again later.</p>`;
