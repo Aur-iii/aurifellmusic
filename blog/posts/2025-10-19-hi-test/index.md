@@ -1,6 +1,6 @@
 ---
 title: "hi test"
-date: 2025-10-19T23:48:37.621Z
+date: Sun Oct 19 2025 19:48:37 GMT-0400 (Eastern Daylight Saving Time)
 side: right
 hero: ./hero.png
 gallery:
@@ -10,3 +10,5 @@ captions:
 ---
 
 pls for the love of god
+
+removed gallery image
