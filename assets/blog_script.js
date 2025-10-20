@@ -327,13 +327,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const dateISO = fm.date || '';
       const side = fm.side === 'left' ? 'left' : 'right';
 
-      // hero (fallback)
-      let heroSrc = './assets/auri-headshot-square.png';
-      if (fm.hero) {
-        const cleanHero = String(fm.hero).replace(/^\.\//,'');
-        heroSrc = withBust(rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`), bust);
-      }
-
       // gallery thumbs html (append same bust to each image)
       const galleryHTML = (() => {
         const gallery = Array.isArray(fm.gallery) ? fm.gallery : [];
