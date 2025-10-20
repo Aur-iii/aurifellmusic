@@ -327,6 +327,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       const dateISO = fm.date || '';
       const side = fm.side === 'left' ? 'left' : 'right';
 
+      // hero (no default — render only if provided)
+      let heroHTML = '';
+      if (fm.hero) {
+        const cleanHero = String(fm.hero).replace(/^\.\//,'');
+        const heroSrc = withBust(rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`), bust);
+        heroHTML = `<img class="post-image" src="${heroSrc}" alt="">`;
+      }
+
       // gallery thumbs html (append same bust to each image)
       const galleryHTML = (() => {
         const gallery = Array.isArray(fm.gallery) ? fm.gallery : [];
@@ -344,7 +352,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const article = document.createElement('article');
       article.className = `blog-post ${side}`;
       article.innerHTML = `
-        <img class="post-image" src="${heroSrc}" alt="">
+        ${heroHTML}
         <div class="post-content">
           <p class="post-date">${toDateText(dateISO)}</p>
           <h3 class="post-title">${escapeHTML(title)}</h3>
