@@ -255,15 +255,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const toDateText = (iso) =>
     iso ? new Date(iso).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' }) : '';
 
-const bodyToParagraphs = (txt = '') => {
-  const norm = String(txt || '').replace(/\r\n?/g, '\n').trim();
-  if (!norm) return '';
-  const paras = norm.split(/\n{2,}/); // blank lines = new paragraph
-  return paras.map(p => {
-    const lines = p.split('\n').map(line => escapeHTML(line));
-    return `<p>${lines.join('<br>')}</p>`; // single \n -> <br>
-  }).join('\n');
-};
+  const bodyToParagraphs = (txt = '') => {
+    const norm = String(txt || '').replace(/\r\n?/g, '\n').trim();
+    if (!norm) return '';
+    const paras = norm.split(/\n{2,}/); // blank lines = new paragraph
+    return paras.map(p => {
+      const lines = p.split('\n').map(line => escapeHTML(line));
+      return `<p>${lines.join('<br>')}</p>`; // single \n -> <br>
+    }).join('\n');
+  };
 
   function parseFrontMatter(md) {
     let fm = {}, body = md;
@@ -324,8 +324,18 @@ const bodyToParagraphs = (txt = '') => {
     const frag = document.createDocumentFragment();
     for (const d of dirs) {
       const slug = d.name;
-      const mdUrl = withCacheBust(rawUrl(`${GH.postsPath}/${slug}/index.md`));
+      // Look up index.md to get its current blob SHA (changes on every edit)
+      const infoRes = await fetch(
+        `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${encodeURIComponent(GH.postsPath)}/${encodeURIComponent(slug)}/index.md?ref=${GH.branch}`,
+        { cache: 'no-store' }
+      );
+      if (!infoRes.ok) { console.warn('skip (no index.md):', slug); continue; }
+      const info = await infoRes.json();  // has .download_url and .sha
+
+      // Use the download_url but add ?t=<sha> so any change invalidates cache everywhere (incl. Safari)
+      const mdUrl = info.download_url + (info.download_url.includes('?') ? '&' : '?') + 't=' + info.sha;
       const mdRes = await fetch(mdUrl, { cache: 'no-store' });
+
       if (!mdRes.ok) { console.warn('skip (no index.md):', slug); continue; }
       const md = await mdRes.text();
       const { fm, body } = parseFrontMatter(md);
@@ -336,9 +346,17 @@ const bodyToParagraphs = (txt = '') => {
 
       // hero fallback to your asset if none in front-matter
       let heroSrc = './assets/auri-headshot-square.png';
+      // Example for hero
       if (fm.hero) {
         const cleanHero = String(fm.hero).replace(/^\.\//,'');
-        heroSrc = withCacheBust(rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`));
+        const heroInfoRes = await fetch(
+          `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${encodeURIComponent(GH.postsPath)}/${encodeURIComponent(slug)}/${encodeURIComponent(cleanHero)}?ref=${GH.branch}`,
+          { cache: 'no-store' }
+        );
+        if (heroInfoRes.ok) {
+          const heroInfo = await heroInfoRes.json();
+          heroSrc = heroInfo.download_url + (heroInfo.download_url.includes('?') ? '&' : '?') + 't=' + heroInfo.sha;
+        }
       }
 
       const article = document.createElement('article');
