@@ -30,6 +30,34 @@ const postsHost   = document.querySelector('.blog-posts');
 const showMoreBtn = document.querySelector('.show-more');
 const showLessBtn = document.querySelector('.show-less');
 
+// Fetch a post's index.md *directly* via the GitHub Contents API (cache-proof).
+// Falls back to the raw URL with a cache buster if needed.
+async function fetchIndexMd(slug) {
+  const apiUrl =
+    `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/` +
+    `${encodeURIComponent(GH.postsPath)}/${encodeURIComponent(slug)}/index.md?ref=${GH.branch}`;
+
+  try {
+    const r = await fetch(apiUrl, { cache: 'no-store' });
+    if (r.ok) {
+      const j = await r.json(); // { content (base64), sha, download_url, ... }
+      const content = atob(String(j.content || '').replace(/\n/g, ''));
+      return { md: content, bust: j.sha || String(Date.now()) };
+    }
+    // non-200 → fall through to raw
+    console.warn('[public] contents API not OK for', slug, r.status);
+  } catch (e) {
+    console.warn('[public] contents API failed for', slug, e);
+  }
+
+  // Fallback: raw CDN with cache-bust
+  const raw = rawUrl(`${GH.postsPath}/${slug}/index.md`);
+  const bust = (raw.includes('?') ? '&' : '?') + 't=' + Date.now();
+  const r2 = await fetch(raw + bust, { cache: 'no-store' });
+  if (!r2.ok) throw new Error('md 404: ' + slug);
+  return { md: await r2.text(), bust: String(Date.now()) };
+}
+
 /* ---------- FOLLOW: EmailJS ---------- */
 const EJS_SERVICE  = "service_aurifellmusic";
 const EJS_TEMPLATE = "send_to_follower";
@@ -333,11 +361,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const info = await infoRes.json();  // has .download_url and .sha
 
       // Use the download_url but add ?t=<sha> so any change invalidates cache everywhere (incl. Safari)
-      const mdUrl = info.download_url + (info.download_url.includes('?') ? '&' : '?') + 't=' + info.sha;
-      const mdRes = await fetch(mdUrl, { cache: 'no-store' });
-
-      if (!mdRes.ok) { console.warn('skip (no index.md):', slug); continue; }
-      const md = await mdRes.text();
+      const { md, bust } = await fetchIndexMd(slug);
       const { fm, body } = parseFrontMatter(md);
 
       const title = fm.title || 'Untitled';
@@ -346,18 +370,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // hero fallback to your asset if none in front-matter
       let heroSrc = './assets/auri-headshot-square.png';
-      // Example for hero
+
+      // hero
       if (fm.hero) {
         const cleanHero = String(fm.hero).replace(/^\.\//,'');
-        const heroInfoRes = await fetch(
-          `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${encodeURIComponent(GH.postsPath)}/${encodeURIComponent(slug)}/${encodeURIComponent(cleanHero)}?ref=${GH.branch}`,
-          { cache: 'no-store' }
-        );
-        if (heroInfoRes.ok) {
-          const heroInfo = await heroInfoRes.json();
-          heroSrc = heroInfo.download_url + (heroInfo.download_url.includes('?') ? '&' : '?') + 't=' + heroInfo.sha;
-        }
+        const base = rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`);
+        heroSrc = base + (base.includes('?') ? '&' : '?') + 't=' + bust;
       }
+
+      // gallery (inside your galleryHTML helper)
+      const srcBase = rawUrl(`${GH.postsPath}/${slug}/${clean}`);
+      const src = srcBase + (srcBase.includes('?') ? '&' : '?') + 't=' + bust;
 
       const article = document.createElement('article');
       article.className = `blog-post ${side}`;
