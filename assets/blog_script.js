@@ -331,7 +331,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       let heroSrc = './assets/auri-headshot-square.png';
       if (fm.hero) {
         const cleanHero = String(fm.hero).replace(/^\.\//,'');
-        heroSrc = withBust(rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`), bust);
       }
 
       // gallery thumbs html (append same bust to each image)
