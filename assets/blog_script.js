@@ -9,8 +9,17 @@
 })();
 const backdrop = document.getElementById('backdrop');
 
+/* ---------- REPO CONFIG ---------- */
+const GH = {
+  owner: 'Aur-iii',
+  repo:  'aurifellmusic',
+  branch: 'main',
+  postsPath: 'blog/posts'
+};
+const rawUrl = (rel) =>
+  `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/${GH.branch}/${String(rel).replace(/^\/+/, '')}`;
+
 /* ---------- ELEMENTS ---------- */
-// Nav
 const btnOut   = document.getElementById('menuBtn');
 const btnIn    = document.getElementById('menuBtnIn');
 const menuCard = document.getElementById('menuCard');
@@ -30,8 +39,52 @@ const postsHost   = document.querySelector('.blog-posts');
 const showMoreBtn = document.querySelector('.show-more');
 const showLessBtn = document.querySelector('.show-less');
 
-// Fetch a post's index.md *directly* via the GitHub Contents API (cache-proof).
-// Falls back to the raw URL with a cache buster if needed.
+/* ---------- HELPERS ---------- */
+const escapeHTML = (s='') => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const toDateText = (iso) =>
+  iso ? new Date(iso).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' }) : '';
+
+const bodyToParagraphs = (txt = '') => {
+  const norm = String(txt || '').replace(/\r\n?/g, '\n').trim();
+  if (!norm) return '';
+  const paras = norm.split(/\n{2,}/); // blank lines = new paragraph
+  return paras.map(p => {
+    const lines = p.split('\n').map(line => escapeHTML(line));
+    return `<p>${lines.join('<br>')}</p>`; // single \n -> <br>
+  }).join('\n');
+};
+
+function parseFrontMatter(md) {
+  let fm = {}, body = md;
+  if (md.startsWith('---')) {
+    const end = md.indexOf('\n---', 3);
+    if (end !== -1) {
+      const block = md.slice(3, end).trim();
+      body = md.slice(end + 4).replace(/^\s+/, '');
+      const lines = block.split(/\r?\n/);
+      let key = null;
+      for (const ln of lines) {
+        const li = ln.match(/^\s*-\s+(.*)$/);
+        if (li && key) { (fm[key] ||= []).push(li[1].replace(/^"(.*)"$/, '$1')); continue; }
+        const kv = ln.match(/^([A-Za-z0-9_]+)\s*:\s*(.*)$/);
+        if (kv) {
+          key = kv[1];
+          let v = kv[2].trim();
+          if (v === '') { fm[key] = []; continue; }
+          fm[key] = v.replace(/^"(.*)"$/, '$1');
+        } else key = null;
+      }
+    }
+  }
+  return { fm, body };
+}
+
+// Cache-bust helper
+function withBust(url, token) {
+  return url + (url.includes('?') ? '&' : '?') + 't=' + token;
+}
+
+// Fetch a post's index.md via GitHub Contents API (cache-proof); fallback to RAW
 async function fetchIndexMd(slug) {
   const apiUrl =
     `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/` +
@@ -44,28 +97,22 @@ async function fetchIndexMd(slug) {
       const content = atob(String(j.content || '').replace(/\n/g, ''));
       return { md: content, bust: j.sha || String(Date.now()) };
     }
-    // non-200 → fall through to raw
     console.warn('[public] contents API not OK for', slug, r.status);
   } catch (e) {
     console.warn('[public] contents API failed for', slug, e);
   }
 
-  // Fallback: raw CDN with cache-bust
+  // Fallback to raw with timestamp bust
   const raw = rawUrl(`${GH.postsPath}/${slug}/index.md`);
-  const bust = (raw.includes('?') ? '&' : '?') + 't=' + Date.now();
-  const r2 = await fetch(raw + bust, { cache: 'no-store' });
+  const r2 = await fetch(withBust(raw, Date.now()), { cache: 'no-store' });
   if (!r2.ok) throw new Error('md 404: ' + slug);
   return { md: await r2.text(), bust: String(Date.now()) };
 }
 
-/* ---------- FOLLOW: EmailJS ---------- */
+/* ---------- FOLLOW: EmailJS (optional) ---------- */
 const EJS_SERVICE  = "service_aurifellmusic";
 const EJS_TEMPLATE = "send_to_follower";
 const SITE_NAME    = "Auri Fell — Blog";
-
-function withCacheBust(url) {
-  return url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
-}
 
 function setFollowStatus(msg, ok = true) {
   if (!followStatus) return;
@@ -112,12 +159,10 @@ function openDrawer(which) {
   const openMenu   = which === 'menu';
   const openFollow = which === 'follow';
   const anyOpen    = !!which;
-
   menuCard?.classList.toggle('open', openMenu);
   followCard?.classList.toggle('open', openFollow);
   document.body.classList.toggle('menu-open', anyOpen);
   backdrop?.classList.toggle('show', anyOpen);
-
   if (anyOpen) {
     setTimeout(() => {
       const host = openMenu ? menuCard : followCard;
@@ -126,21 +171,16 @@ function openDrawer(which) {
     }, 220);
   }
 }
-// Nav
 btnOut?.addEventListener('click', () => {
   const isOpen = menuCard?.classList.contains('open');
   openDrawer(isOpen ? null : 'menu');
 });
 btnIn?.addEventListener('click', () => openDrawer(null));
-
-// Follow
 followBtn?.addEventListener('click', () => {
   const isOpen = followCard?.classList.contains('open');
   openDrawer(isOpen ? null : 'follow');
 });
 followCancel?.addEventListener('click', () => openDrawer(null));
-
-// Outside click + ESC
 document.addEventListener('keydown', e => { if (e.key === 'Escape') openDrawer(null); });
 backdrop?.addEventListener('click', () => openDrawer(null));
 document.addEventListener('click', e => {
@@ -155,9 +195,9 @@ let lastDelta = STEP;
 
 function setShown(el, show) {
   if (!el) return;
-  el.hidden = !show;                 // native, cross-browser
-  el.style.display = show ? '' : 'none'; // belt + suspenders
-  el.classList.toggle('hidden', !show);  // keep class in sync in case CSS uses it
+  el.hidden = !show;
+  el.style.display = show ? '' : 'none';
+  el.classList.toggle('hidden', !show);
 }
 
 function applyVisibility(){
@@ -171,29 +211,18 @@ function updateButtons() {
   const moreBtn = document.querySelector('.show-more');
   const lessBtn = document.querySelector('.show-less');
 
-  // If ≤ STEP, hide both
-  if (total <= STEP) {
-    setShown(moreBtn, false);
-    setShown(lessBtn, false);
-    return;
-  }
-
-  // Otherwise: hide "more" when exhausted; hide "less" when at initial 3
+  if (total <= STEP) { setShown(moreBtn, false); setShown(lessBtn, false); return; }
   setShown(moreBtn, visible < total);
   setShown(lessBtn, visible > STEP);
 }
-
-
 function recomputeShowButtons(){
   const total = postsHost?.querySelectorAll('.blog-post').length || 0;
   visible = Math.min(total, Math.max(visible || STEP, STEP));
-  applyVisibility();
-  updateButtons();
+  applyVisibility(); updateButtons();
 }
 document.addEventListener('DOMContentLoaded', () => {
   const total = postsHost?.querySelectorAll('.blog-post').length || 0;
-  visible = Math.min(total, STEP);
-  lastDelta = STEP;
+  visible = Math.min(total, STEP); lastDelta = STEP;
   applyVisibility(); updateButtons();
 });
 showMoreBtn?.addEventListener('click', () => {
@@ -245,16 +274,11 @@ function normalizePostGalleries(root = document){
       fourth.setAttribute('data-more', `+${extraCount}`);
       let badge = fourth.querySelector('div.more-badge');
       if (!badge) {
-        badge = document.createElement('div');
-        badge.className = 'more-badge';
-        fourth.appendChild(badge);
+        badge = document.createElement('div'); badge.className = 'more-badge'; fourth.appendChild(badge);
       }
       badge.textContent = `+${extraCount}`;
       const fourthImg = fourth.querySelector('img');
-      if (fourthImg && imgs[3]) {
-        fourthImg.src = imgs[3].src;
-        fourthImg.alt = imgs[3].alt || 'Gallery image';
-      }
+      if (fourthImg && imgs[3]) { fourthImg.src = imgs[3].src; fourthImg.alt = imgs[3].alt || 'Gallery image'; }
       Array.from(gallery.querySelectorAll('.thumb')).slice(4).forEach(t => t.remove());
     }
 
@@ -262,75 +286,15 @@ function normalizePostGalleries(root = document){
   });
 }
 
-/* ---------- LOAD POSTS DIRECTLY FROM GITHUB (no local server) ---------- */
+/* ---------- LOAD POSTS DIRECTLY FROM GITHUB (single, cache-proof loader) ---------- */
 document.addEventListener('DOMContentLoaded', async () => {
   const host = document.querySelector('.blog-posts');
   if (!host) return;
 
-  // your repo config
-  const GH = {
-    owner: 'Aur-iii',
-    repo:  'aurifellmusic',
-    branch: 'main',
-    postsPath: 'blog/posts'
-  };
-
   const reDateSlug = /^\d{4}-\d{2}-\d{2}-/;
-  const rawUrl = (rel) =>
-    `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/${GH.branch}/${rel.replace(/^\/+/, '')}`;
-
-  const escapeHTML = (s='') => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const toDateText = (iso) =>
-    iso ? new Date(iso).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' }) : '';
-
-  const bodyToParagraphs = (txt = '') => {
-    const norm = String(txt || '').replace(/\r\n?/g, '\n').trim();
-    if (!norm) return '';
-    const paras = norm.split(/\n{2,}/); // blank lines = new paragraph
-    return paras.map(p => {
-      const lines = p.split('\n').map(line => escapeHTML(line));
-      return `<p>${lines.join('<br>')}</p>`; // single \n -> <br>
-    }).join('\n');
-  };
-
-  function parseFrontMatter(md) {
-    let fm = {}, body = md;
-    if (md.startsWith('---')) {
-      const end = md.indexOf('\n---', 3);
-      if (end !== -1) {
-        const block = md.slice(3, end).trim();
-        body = md.slice(end + 4).replace(/^\s+/, '');
-        const lines = block.split(/\r?\n/);
-        let key = null;
-        for (const ln of lines) {
-          const li = ln.match(/^\s*-\s+(.*)$/);
-          if (li && key) { (fm[key] ||= []).push(li[1].replace(/^"(.*)"$/, '$1')); continue; }
-          const kv = ln.match(/^([A-Za-z0-9_]+)\s*:\s*(.*)$/);
-          if (kv) {
-            key = kv[1];
-            let v = kv[2].trim();
-            if (v === '') { fm[key] = []; continue; }
-            fm[key] = v.replace(/^"(.*)"$/, '$1');
-          } else key = null;
-        }
-      }
-    }
-    return { fm, body };
-  }
-
-  const galleryHTML = (slug, gallery = [], captions = []) => {
-    if (!Array.isArray(gallery) || gallery.length === 0) return '';
-    const thumbs = gallery.map((g, i) => {
-      const clean = String(g).replace(/^\.\//,'');
-      const src = withCacheBust(rawUrl(`${GH.postsPath}/${slug}/${clean}`));
-      const cap = captions[i] ? ` data-caption="${escapeHTML(String(captions[i]))}"` : '';
-      return `<div class="thumb"><img src="${src}" alt=""${cap}></div>`;
-    }).join('');
-    return `<div class="post-gallery collage">${thumbs}</div>`;
-  };
 
   try {
-    // list post directories
+    // 1) list directories in blog/posts
     const res = await fetch(
       `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${encodeURIComponent(GH.postsPath)}?ref=${GH.branch}`,
       { cache: 'no-store' }
@@ -339,28 +303,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!res.ok) throw new Error(`GitHub list failed: ${res.status}`);
     const listing = await res.json();
     const dirs = (Array.isArray(listing) ? listing : []).filter(e => e.type === 'dir' && reDateSlug.test(e.name));
-    if (dirs.length === 0) { host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`; return; }
+    if (!dirs.length) { host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`; return; }
 
-    // newest first
+    // 2) newest first (date DESC, tie-break slug ASC)
     dirs.sort((a, b) => {
-      const dateA = new Date(a.name.substring(0, 10));
-      const dateB = new Date(b.name.substring(0, 10));
-      if (dateA.getTime() !== dateB.getTime()) return dateB - dateA; // newest first
-      return a.name.localeCompare(b.name); // tie-break by slug
+      const ta = new Date(a.name.slice(0,10)).getTime();
+      const tb = new Date(b.name.slice(0,10)).getTime();
+      if (ta !== tb) return tb - ta;
+      return a.name.localeCompare(b.name);
     });
 
     const frag = document.createDocumentFragment();
+
+    // 3) Build each article
     for (const d of dirs) {
       const slug = d.name;
-      // Look up index.md to get its current blob SHA (changes on every edit)
-      const infoRes = await fetch(
-        `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${encodeURIComponent(GH.postsPath)}/${encodeURIComponent(slug)}/index.md?ref=${GH.branch}`,
-        { cache: 'no-store' }
-      );
-      if (!infoRes.ok) { console.warn('skip (no index.md):', slug); continue; }
-      const info = await infoRes.json();  // has .download_url and .sha
 
-      // Use the download_url but add ?t=<sha> so any change invalidates cache everywhere (incl. Safari)
+      // fetch fresh markdown & a stable bust token (blob SHA when available)
       const { md, bust } = await fetchIndexMd(slug);
       const { fm, body } = parseFrontMatter(md);
 
@@ -368,19 +327,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       const dateISO = fm.date || '';
       const side = fm.side === 'left' ? 'left' : 'right';
 
-      // hero fallback to your asset if none in front-matter
+      // hero (fallback)
       let heroSrc = './assets/auri-headshot-square.png';
-
-      // hero
       if (fm.hero) {
         const cleanHero = String(fm.hero).replace(/^\.\//,'');
-        const base = rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`);
-        heroSrc = base + (base.includes('?') ? '&' : '?') + 't=' + bust;
+        heroSrc = withBust(rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`), bust);
       }
 
-      // gallery (inside your galleryHTML helper)
-      const srcBase = rawUrl(`${GH.postsPath}/${slug}/${clean}`);
-      const src = srcBase + (srcBase.includes('?') ? '&' : '?') + 't=' + bust;
+      // gallery thumbs html (append same bust to each image)
+      const galleryHTML = (() => {
+        const gallery = Array.isArray(fm.gallery) ? fm.gallery : [];
+        const captions = Array.isArray(fm.captions) ? fm.captions : [];
+        if (!gallery.length) return '';
+        const thumbs = gallery.map((g, i) => {
+          const clean = String(g).replace(/^\.\//,'');
+          const src = withBust(rawUrl(`${GH.postsPath}/${slug}/${clean}`), bust);
+          const cap = captions[i] ? ` data-caption="${escapeHTML(String(captions[i]))}"` : '';
+          return `<div class="thumb"><img src="${src}" alt=""${cap}></div>`;
+        }).join('');
+        return `<div class="post-gallery collage">${thumbs}</div>`;
+      })();
 
       const article = document.createElement('article');
       article.className = `blog-post ${side}`;
@@ -390,35 +356,32 @@ document.addEventListener('DOMContentLoaded', async () => {
           <p class="post-date">${toDateText(dateISO)}</p>
           <h3 class="post-title">${escapeHTML(title)}</h3>
           ${bodyToParagraphs(body)}
-          ${galleryHTML(slug, Array.isArray(fm.gallery) ? fm.gallery : [], Array.isArray(fm.captions) ? fm.captions : [])}
+          ${galleryHTML}
         </div>
       `;
       frag.appendChild(article);
     }
 
+    // 4) inject + post-init
     host.innerHTML = '';
     host.appendChild(frag);
 
     if (typeof normalizePostGalleries === 'function') normalizePostGalleries();
 
-    // NEW: reset to 3 on fresh render so older posts hide again
+    // reset "show more / less" to 3 visible
     if (typeof applyVisibility === 'function' && typeof updateButtons === 'function') {
       visible   = Math.min(STEP, postsHost?.querySelectorAll('.blog-post').length || 0);
       lastDelta = STEP;
       applyVisibility();
       updateButtons();
     }
-
-    
   } catch (err) {
-    console.error('Failed to load posts from GitHub', err);
+    console.error('[public] load failed', err);
     host.innerHTML = `<p class="muted">Couldn’t load posts right now. Try again later.</p>`;
   }
 });
 
-
-
-// Lightbox
+/* ---------- LIGHTBOX ---------- */
 let lb,lbImg,lbBlurb,lbCounter,lbPrev,lbNext,lbClose,lbList=[],lbIndex=0;
 function ensureLightbox(){
   if (lb) return;
