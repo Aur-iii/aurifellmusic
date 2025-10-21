@@ -169,20 +169,41 @@ followForm?.addEventListener('submit', async (e) => {
 unfollowBtn?.addEventListener('click', async () => {
   const email = (followEmail?.value || "").trim().toLowerCase();
   if (email) { await postSubs('unsubscribe', email); } // ← NEW: remove from repo via Worker
-  setFollowStatus("Unfollowed (local only)", false);
+  setFollowStatus("Unfollowed", false);
   if (submitFollow) submitFollow.textContent = "Follow";
   setTimeout(() => openDrawer(null), 1000);
 });
 
+function resetFollowUI(){
+  if (followEmail) followEmail.value = "";
+  if (followStatus) {
+    followStatus.textContent = "";
+    followStatus.classList.remove("status--error","status--success","is-visible");
+  }
+  if (submitFollow) {
+    submitFollow.textContent = "Follow";
+    submitFollow.disabled = false;
+  }
+}
+
 /* ---------- DRAWERS ---------- */
 function openDrawer(which) {
+  const wasFollowOpen = followCard?.classList.contains('open');
+
   const openMenu   = which === 'menu';
   const openFollow = which === 'follow';
   const anyOpen    = !!which;
+
   menuCard?.classList.toggle('open', openMenu);
   followCard?.classList.toggle('open', openFollow);
   document.body.classList.toggle('menu-open', anyOpen);
   backdrop?.classList.toggle('show', anyOpen);
+
+  // if we just closed the follow drawer, clear the UI
+  if (!anyOpen && wasFollowOpen) {
+    resetFollowUI();
+  }
+
   if (anyOpen) {
     setTimeout(() => {
       const host = openMenu ? menuCard : followCard;
@@ -191,6 +212,7 @@ function openDrawer(which) {
     }, 220);
   }
 }
+
 btnOut?.addEventListener('click', () => {
   const isOpen = menuCard?.classList.contains('open');
   openDrawer(isOpen ? null : 'menu');
