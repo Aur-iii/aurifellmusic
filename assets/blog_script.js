@@ -79,6 +79,23 @@ function parseFrontMatter(md) {
   return { fm, body };
 }
 
+/* ---------- SUBSCRIPTIONS WORKER ---------- */
+const WORKER_URL = "https://auri-subs.auri-e60.workers.dev"; // e.g., https://auri-subs.yourname.workers.dev
+
+async function postSubs(action, email) {
+  try {
+    const r = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify({ action, email })
+    });
+    // ignore body; best-effort write
+    await r.json().catch(()=>{});
+  } catch (e) {
+    console.warn('Subscription worker call failed:', e);
+  }
+}
+
 // Cache-bust helper
 function withBust(url, token) {
   return url + (url.includes('?') ? '&' : '?') + 't=' + token;
@@ -137,6 +154,7 @@ followForm?.addEventListener('submit', async (e) => {
 
   try {
     await sendThanksEmail(email);
+    await postSubs('subscribe', email);             // ← NEW: add to private repo via Worker
     setFollowStatus("Thanks! Check your inbox ✉️", true);
     if (submitFollow) submitFollow.textContent = "Sent ✓";
     setTimeout(() => openDrawer(null), 1200);
@@ -148,7 +166,9 @@ followForm?.addEventListener('submit', async (e) => {
     if (submitFollow) submitFollow.disabled = false;
   }
 });
-unfollowBtn?.addEventListener('click', () => {
+unfollowBtn?.addEventListener('click', async () => {
+  const email = (followEmail?.value || "").trim().toLowerCase();
+  if (email) { await postSubs('unsubscribe', email); } // ← NEW: remove from repo via Worker
   setFollowStatus("Unfollowed (local only)", false);
   if (submitFollow) submitFollow.textContent = "Follow";
   setTimeout(() => openDrawer(null), 1000);
