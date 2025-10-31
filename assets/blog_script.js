@@ -48,9 +48,27 @@ const bodyToParagraphs = (txt = '') => {
   const norm = String(txt || '').replace(/\r\n?/g, '\n').trim();
   if (!norm) return '';
   const paras = norm.split(/\n{2,}/); // blank lines = new paragraph
+
   return paras.map(p => {
-    const lines = p.split('\n').map(line => escapeHTML(line));
-    return `<p>${lines.join('<br>')}</p>`; // single \n -> <br>
+    // Escape HTML but then restore allowed tags
+    let safe = escapeHTML(p);
+
+    // Convert URLs or Markdown-style links to clickable <a> tags
+    // Match raw URLs
+    safe = safe.replace(
+      /https?:\/\/[^\s<>"']+/g,
+      url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+    );
+
+    // Optionally: also support markdown-style [text](url)
+    safe = safe.replace(
+      /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+      (m, text, href) =>
+        `<a href="${href}" target="_blank" rel="noopener noreferrer">${escapeHTML(text)}</a>`
+    );
+
+    const lines = safe.split('\n').join('<br>');
+    return `<p>${lines}</p>`;
   }).join('\n');
 };
 
