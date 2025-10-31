@@ -507,6 +507,21 @@ footer.floating .credits a{ color:var(--blue) } footer.floating .credits a:hover
   text-decoration-color: var(--accent-2);
 }
 
+/* Blog post links: visible + underlined */
+.blog-post .post-content a,
+.blog-post .post-content a:link,
+.blog-post .post-content a:visited {
+  color: var(--accent) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+.blog-post .post-content a:hover,
+.blog-post .post-content a:focus {
+  color: var(--accent-2) !important;
+  text-decoration-color: var(--accent-2);
+}
+
 /* Show more/less buttons */
 .blog-controls{ display:flex; justify-content:center; gap:16px; margin-bottom:60px; }
 .blog-controls button{
