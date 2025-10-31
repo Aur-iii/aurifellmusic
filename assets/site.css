@@ -522,6 +522,12 @@ footer.floating .credits a{ color:var(--blue) } footer.floating .credits a:hover
   text-decoration-color: var(--accent-2);
 }
 
+.blog-post .post-content a:hover {
+  color: var(--accent-2);
+  text-decoration-color: var(--accent-2);
+  text-shadow: 0 0 8px var(--accent-2);
+}
+
 /* Show more/less buttons */
 .blog-controls{ display:flex; justify-content:center; gap:16px; margin-bottom:60px; }
 .blog-controls button{
