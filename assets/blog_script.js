@@ -344,30 +344,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (res.status === 404) { host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`; return; }
     if (!res.ok) throw new Error(`GitHub list failed: ${res.status}`);
     const listing = await res.json();
-    const dirs = (Array.isArray(listing) ? listing : []).filter(e => e.type === 'dir' && reDateSlug.test(e.name));
+    const dirs = (Array.isArray(listing) ? listing : []).filter(e => e.type === 'dir' && /^\d{4}-\d{2}-\d{2}-/.test(e.name));
     if (!dirs.length) { host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`; return; }
 
-    // 2) newest first (date DESC, tie-break slug ASC)
-    dirs.sort((a, b) => {
-      const ta = new Date(a.name.slice(0,10)).getTime();
-      const tb = new Date(b.name.slice(0,10)).getTime();
-      if (ta !== tb) return tb - ta;
-      return a.name.localeCompare(b.name);
-    });
+    // NEW: prefetch index.md for each dir to read exact fm.date, and keep parsed content to avoid refetch
+    const posts = [];
+    for (const d of dirs) {
+      const slug = d.name;
+      try {
+        const { md, bust } = await fetchIndexMd(slug);
+        const { fm, body } = parseFrontMatter(md);
+        const ts = fm.date ? Date.parse(fm.date) : Date.parse(slug.slice(0,10)); // fallback just in case
+        posts.push({ slug, fm, body, bust, ts: isNaN(ts) ? 0 : ts });
+      } catch (e) {
+        console.warn('skip bad post', slug, e);
+      }
+    }
+
+    // Sort by exact timestamp DESC, tie-break by slug ASC (stable & deterministic)
+    posts.sort((a, b) => (b.ts - a.ts) || a.slug.localeCompare(b.slug));
 
     const frag = document.createDocumentFragment();
 
-    // 3) Build each article
-    for (const d of dirs) {
-      const slug = d.name;
-
-      // fetch fresh markdown & a stable bust token (blob SHA when available)
-      const { md, bust } = await fetchIndexMd(slug);
-      const { fm, body } = parseFrontMatter(md);
-
-      const title = fm.title || 'Untitled';
-      const dateISO = fm.date || '';
-      const side = fm.side === 'left' ? 'left' : 'right';
+    // Build each article from the pre-parsed posts[]
+    for (const p of posts) {
+      const { slug, fm, body, bust } = p;
+      const title   = fm.title || 'Untitled';
+      const dateISO = fm.date  || '';
+      const side    = fm.side === 'left' ? 'left' : 'right';
 
       // hero (no default — render only if provided)
       let heroHTML = '';
@@ -377,9 +381,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         heroHTML = `<img class="post-image" src="${heroSrc}" alt="">`;
       }
 
-      // gallery thumbs html (append same bust to each image)
+      // gallery thumbs (append same bust to each image)
       const galleryHTML = (() => {
-        const gallery = Array.isArray(fm.gallery) ? fm.gallery : [];
+        const gallery  = Array.isArray(fm.gallery)  ? fm.gallery  : [];
         const captions = Array.isArray(fm.captions) ? fm.captions : [];
         if (!gallery.length) return '';
         const thumbs = gallery.map((g, i) => {
@@ -405,7 +409,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       frag.appendChild(article);
     }
 
-    // 4) inject + post-init
+    // inject + post-init
     host.innerHTML = '';
     host.appendChild(frag);
 
@@ -418,6 +422,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       applyVisibility();
       updateButtons();
     }
+
   } catch (err) {
     console.error('[public] load failed', err);
     host.innerHTML = `<p class="muted">Couldn’t load posts right now. Try again later.</p>`;
