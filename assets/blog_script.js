@@ -405,17 +405,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // gallery thumbs (append same bust to each image)
       const galleryHTML = (() => {
-        const gallery  = Array.isArray(fm.gallery)  ? fm.gallery  : [];
         const captions = Array.isArray(fm.captions) ? fm.captions : [];
+
+        // NEW: support external gallery URLs (galleryUrls or single galleryUrl)
+        let urlList = null;
+        if (Array.isArray(fm.galleryUrls) && fm.galleryUrls.length) {
+          urlList = fm.galleryUrls.map(String);
+        } else if (fm.galleryUrl) {
+          urlList = [String(fm.galleryUrl)];
+        }
+
+        if (urlList && urlList.length) {
+          const thumbs = urlList.map((u, i) => {
+            const src = escapeHTML(u);
+            const cap = captions[i]
+              ? ` data-caption="${escapeHTML(String(captions[i]))}"`
+              : '';
+            return `<div class="thumb"><img src="${src}" alt=""${cap}></div>`;
+          }).join('');
+          return `<div class="post-gallery collage">${thumbs}</div>`;
+        }
+
+        // Fallback: existing local gallery files
+        const gallery = Array.isArray(fm.gallery) ? fm.gallery : [];
         if (!gallery.length) return '';
         const thumbs = gallery.map((g, i) => {
           const clean = String(g).replace(/^\.\//,'');
           const src = withBust(rawUrl(`${GH.postsPath}/${slug}/${clean}`), bust);
-          const cap = captions[i] ? ` data-caption="${escapeHTML(String(captions[i]))}"` : '';
+          const cap = captions[i]
+            ? ` data-caption="${escapeHTML(String(captions[i]))}"`
+            : '';
           return `<div class="thumb"><img src="${src}" alt=""${cap}></div>`;
         }).join('');
         return `<div class="post-gallery collage">${thumbs}</div>`;
       })();
+
 
       const article = document.createElement('article');
       article.className = `blog-post ${side}`;
