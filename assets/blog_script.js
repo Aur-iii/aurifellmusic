@@ -393,11 +393,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // hero (no default — render only if provided)
       let heroHTML = '';
-      if (fm.hero) {
+      if (fm.heroUrl) {
+        const heroSrc = escapeHTML(String(fm.heroUrl));
+        heroHTML = `<img class="post-image" src="${heroSrc}" alt="">`;
+      } else if (fm.hero) {
         const cleanHero = String(fm.hero).replace(/^\.\//,'');
         const heroSrc = withBust(rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`), bust);
         heroHTML = `<img class="post-image" src="${heroSrc}" alt="">`;
       }
+
 
       // gallery thumbs (append same bust to each image)
       const galleryHTML = (() => {
