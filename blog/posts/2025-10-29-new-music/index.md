@@ -2,12 +2,7 @@
 title: "NEW MUSIC!!!!"
 date: 2025-10-29T04:25:04.937Z
 side: right
-heroUrl: https://imgur.com/YPmixkM.jpg
-
-galleryUrls:
- - https://imgur.com/7tFjfda.jpg
- - https://imgur.com/LnYpBf7.jpg
- - https://imgur.com/3lt7P4C.jpg
+hero: ./hero.png
 ---
 
 If I Were A Ghost releases in JUST 2 days!!!!

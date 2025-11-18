@@ -2,7 +2,17 @@
 title: "TONIGHT AT 10PM EST"
 date: 2025-10-31T16:34:24.424Z
 side: left
-hero: ./hero.jpg
+hero: https://imgur.com/YPmixkM.jpg
+
+galleryUrls:
+ - https://imgur.com/7tFjfda.jpg
+ - https://imgur.com/LnYpBf7.jpg
+ - https://imgur.com/3lt7P4C.jpg
+
+captions:
+ - "ghostie with a leaf"
+ - "ghostie playing peakaboo! can you see them?"
+ - "ghostie waves byebye!"
 ---
 
 "If I Were A Ghost" drops on YouTube and BandCamp!
