@@ -2,7 +2,7 @@
 title: "TONIGHT AT 10PM EST"
 date: 2025-10-31T16:34:24.424Z
 side: left
-hero: https://imgur.com/YPmixkM.jpg
+heroUrl: https://imgur.com/YPmixkM.jpg
 
 galleryUrls:
  - https://imgur.com/7tFjfda.jpg
