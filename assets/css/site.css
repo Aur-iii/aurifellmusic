@@ -323,11 +323,6 @@ main.wrap{
 }
 @media (max-width:520px){ :root{--inner-pad-x:16px; --inner-pad-y:12px} }
 
-/* ---------------- FOOTER (static) ---------------- */
-footer{ text-align:center; color:var(--muted); font-size:14px; padding:40px 0 24px; background:transparent; }
-footer a{color:var(--blue)} footer a:hover{text-decoration:underline}
-.footer-divider{content:none}
-
 /* ---------------- SOFT / INVISIBLE DIVIDERS ---------------- */
 .soft-div {
   height: 1px; max-width: 720px; margin: 24px auto;
