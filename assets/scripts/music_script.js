@@ -1,184 +1,435 @@
-  (() => {
-    // Year stamp
-    const yEl = document.getElementById('y');
-    if (yEl) yEl.textContent = new Date().getFullYear();
+(() => {
+  // =========================
+  //  Year stamp + mobile menu
+  // =========================
+  const yEl = document.getElementById('y');
+  if (yEl) yEl.textContent = new Date().getFullYear();
 
-    // ----- Mobile menu -----
-    const btnOut = document.getElementById('menuBtn');
-    const btnIn  = document.getElementById('menuBtnIn');
-    const card   = document.getElementById('menuCard');
-    const backdrop = document.getElementById('backdrop');
-    function setOpen(on){
-      if (!card) return;
-      const willOpen = !!on;
-      card.classList.toggle('open', willOpen);
-      document.body.classList.toggle('menu-open', willOpen);
-      btnOut?.classList.toggle('is-open', willOpen);
-      btnIn?.classList.toggle('is-open', willOpen);
-      btnOut?.setAttribute('aria-expanded', String(willOpen));
-      backdrop?.classList.toggle('show', willOpen);
-      if (willOpen) setTimeout(()=> card.querySelector('.menu-list a')?.focus(), 280);
+  const btnOut   = document.getElementById('menuBtn');
+  const btnIn    = document.getElementById('menuBtnIn');
+  const card     = document.getElementById('menuCard');
+  const backdrop = document.getElementById('backdrop');
+
+  function setOpen(on){
+    if (!card) return;
+    const willOpen = !!on;
+    card.classList.toggle('open', willOpen);
+    document.body.classList.toggle('menu-open', willOpen);
+    btnOut?.classList.toggle('is-open', willOpen);
+    btnIn?.classList.toggle('is-open', willOpen);
+    btnOut?.setAttribute('aria-expanded', String(willOpen));
+    backdrop?.classList.toggle('show', willOpen);
+    if (willOpen) {
+      setTimeout(() => card.querySelector('.menu-list a')?.focus(), 280);
     }
-    btnOut?.addEventListener('click', () => setOpen(!card?.classList.contains('open')));
-    btnIn?.addEventListener('click',  () => setOpen(false));
-    backdrop?.addEventListener('click', () => setOpen(false));
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') setOpen(false); });
-    document.addEventListener('click', (e)=>{
-      const insideCard = e.target.closest('#menuCard');
-      const onBtnOut   = e.target.closest('#menuBtn');
-      const onBtnIn    = e.target.closest('#menuBtnIn');
-      if (!insideCard && !onBtnOut && !onBtnIn) setOpen(false);
-    });
+  }
+  btnOut?.addEventListener('click', () => setOpen(!card?.classList.contains('open')));
+  btnIn?.addEventListener('click',  () => setOpen(false));
+  backdrop?.addEventListener('click', () => setOpen(false));
+  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') setOpen(false); });
+  document.addEventListener('click', (e)=>{
+    const insideCard = e.target.closest('#menuCard');
+    const onBtnOut   = e.target.closest('#menuBtn');
+    const onBtnIn    = e.target.closest('#menuBtnIn');
+    if (!insideCard && !onBtnOut && !onBtnIn) setOpen(false);
+  });
 
-    // ----- Demo data for releases (front-matter analogue) -----
-    const releases = [
-      {
-        slug: 'if-i-were-a-ghost',
-        title: 'If I Were A Ghost',
-        date: '2025-10-31',
-        type: 'single',
-        cover: './assets/images/auri-anagram-color.png',
-        blurb: 'A spectral indie/alt track with lush vocal stacks and a jazz-y undertow.',
-        links: {
-          bandcamp: 'https://aurifell-music.bandcamp.com/track/if-i-were-a-ghost',
-          youtube: 'https://www.youtube.com/@AuriFellMusic'
-        }
-      },
-      {
-        slug: 'rose-bones-ep',
-        title: 'Rose Bones',
-        date: '2025-06-02',
-        type: 'ep',
-        cover: './assets/images/auri-a-color.png',
-        blurb: 'An alt-goth cottage-synth EP exploring memory, deserts, and radio ghosts.',
-        tracks: ['Thistle Static', 'Moon Quarry', 'Iris on the Rails', 'Signal / Silence'],
-        links: {
-          spotify: '#', apple: '#', bandcamp: '#', youtube: '#'
-        }
-      },
-      {
-        slug: 'marrow-creek-originals',
-        title: 'Marrow Creek (Originals)',
-        date: '2024-11-01',
-        type: 'album',
-        cover: './assets/images/auri-a-color_light.png',
-        blurb: 'Soundtrack sketches and themes from the Marrow Creek universe.',
-        tracks: ['Gravel Choir', 'Plateau Lights', 'Sandstorm Memory', 'The Silence'],
-        links: {
-          spotify: '#', apple: '#', bandcamp: '#'
-        }
-      }
-    ].sort((a,b)=> new Date(b.date) - new Date(a.date));
+  // =========================
+  //  GitHub config (music)
+  // =========================
+  const GH = {
+    owner: 'Aur-iii',
+    repo:  'aurifellmusic',
+    branch: 'main',
+    releasesPath: 'music/releases'
+  };
 
-    // Helpers for link selection / labels
-    function primaryLink(links) {
-      return links?.bandcamp || links?.spotify || links?.apple || links?.youtube || '#';
-    }
-    function secondaryLink(links, primaryHref) {
-      const order = ['spotify','apple','bandcamp','youtube'];
-      for (const k of order) {
-        if (links?.[k] && links[k] !== primaryHref) {
-          return {
-            label: `Listen on ${k[0].toUpperCase() + k.slice(1)}`,
-            href: links[k]
-          };
+  const rawUrl = (rel) =>
+    `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/${GH.branch}/${String(rel).replace(/^\/+/, '')}`;
+
+  function withBust(url, token) {
+    return url + (url.includes('?') ? '&' : '?') + 't=' + token;
+  }
+
+  // Minimal front-matter parser (copied from blog_script.js)
+  function parseFrontMatter(md) {
+    let fm = {}, body = md;
+    if (md.startsWith('---')) {
+      const end = md.indexOf('\n---', 3);
+      if (end !== -1) {
+        const block = md.slice(3, end).trim();
+        body = md.slice(end + 4).replace(/^\s+/, '');
+        const lines = block.split(/\r?\n/);
+        let key = null;
+        for (const ln of lines) {
+          const li = ln.match(/^\s*-\s+(.*)$/);
+          if (li && key) {
+            (fm[key] ||= []).push(li[1].replace(/^"(.*)"$/, '$1'));
+            continue;
+          }
+          const kv = ln.match(/^([A-Za-z0-9_]+)\s*:\s*(.*)$/);
+          if (kv) {
+            key = kv[1];
+            let v = kv[2].trim();
+            if (v === '') {
+              fm[key] = [];
+              continue;
+            }
+            fm[key] = v.replace(/^"(.*)"$/, '$1');
+          } else {
+            key = null;
+          }
         }
       }
-      return null;
     }
-    function labelFromHref(href) {
-      if (!href) return 'Listen';
-      if (href.includes('bandcamp')) return 'Listen on Bandcamp';
-      if (href.includes('open.spotify')) return 'Listen on Spotify';
-      if (href.includes('music.apple')) return 'Listen on Apple Music';
-      if (href.includes('youtube')) return 'Listen on YouTube';
-      return 'Listen';
+    return { fm, body };
+  }
+
+  async function fetchReleaseIndex(slug) {
+    const apiUrl =
+      `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/` +
+      `${encodeURIComponent(GH.releasesPath)}/${encodeURIComponent(slug)}/index.md?ref=${GH.branch}`;
+
+    try {
+      const r = await fetch(apiUrl, { cache: 'no-store' });
+      if (r.ok) {
+        const j = await r.json();
+        const content = atob(String(j.content || '').replace(/\n/g, ''));
+        return { md: content, bust: j.sha || String(Date.now()) };
+      }
+      console.warn('[music] contents API not OK for', slug, r.status);
+    } catch (e) {
+      console.warn('[music] contents API failed for', slug, e);
     }
 
-    // ----- Populate Latest Release -----
-    const latest = releases[0];
-    if (latest){
-      document.getElementById('latestCover').src = latest.cover;
-      document.getElementById('latestTitle').textContent = latest.title;
-      const pretty = new Date(latest.date).toLocaleDateString(
-        undefined,{year:'numeric', month:'short', day:'numeric'}
-      );
-      document.getElementById('latestMeta').textContent =
-        `${latest.type.charAt(0).toUpperCase()+latest.type.slice(1)} • ${pretty}`;
-      document.getElementById('latestBlurb').textContent = latest.blurb || '';
+    const raw = rawUrl(`${GH.releasesPath}/${slug}/index.md`);
+    const r2 = await fetch(withBust(raw, Date.now()), { cache: 'no-store' });
+    if (!r2.ok) throw new Error('md 404: ' + slug);
+    return { md: await r2.text(), bust: String(Date.now()) };
+  }
 
-      const primary = primaryLink(latest.links);
-      const btn1 = document.getElementById('latestPlay');
-      btn1.href = primary;
-      btn1.textContent = labelFromHref(primary);
+  // =========================
+  //  Normalizing release data
+  // =========================
 
-      const btn2 = document.getElementById('latestAlt');
-      const alt = secondaryLink(latest.links, primary);
+  // Parse fm.links (array of strings like `{ label: "Bandcamp", url: "https://..." }`)
+  function parseLinksFromFrontMatter(rawLinks) {
+    const arr = Array.isArray(rawLinks) ? rawLinks : rawLinks ? [rawLinks] : [];
+    const out = [];
+    for (const item of arr) {
+      const s = String(item);
+      // { label: "Bandcamp", url: "https://..." }
+      let m = s.match(/label:\s*"([^"]*)".*url:\s*"([^"]*)"/i);
+      if (m) {
+        out.push({ label: m[1], url: m[2] });
+        continue;
+      }
+      // fallback: label:url
+      m = s.match(/^([^:]+):(https?:\/\/.+)$/i);
+      if (m) {
+        out.push({ label: m[1], url: m[2] });
+        continue;
+      }
+      // bare URL
+      if (/^https?:\/\//i.test(s)) {
+        out.push({ label: '', url: s });
+      }
+    }
+    return out;
+  }
+
+  // Turn link list into map { bandcamp, spotify, apple, youtube, other }
+  function toLinkMap(list) {
+    const map = {};
+    for (const l of list) {
+      const label = (l.label || '').toLowerCase();
+      const url = (l.url || '').toLowerCase();
+      let key = 'other';
+      if (label.includes('bandcamp') || url.includes('bandcamp')) key = 'bandcamp';
+      else if (label.includes('spotify') || url.includes('spotify')) key = 'spotify';
+      else if (label.includes('apple') || url.includes('apple')) key = 'apple';
+      else if (label.includes('youtube') || url.includes('youtube')) key = 'youtube';
+      if (!map[key]) map[key] = l.url;
+    }
+    return map;
+  }
+
+  function primaryLink(links) {
+    return (
+      links?.bandcamp ||
+      links?.spotify ||
+      links?.apple   ||
+      links?.youtube ||
+      links?.other   ||
+      '#'
+    );
+  }
+
+  function secondaryLink(links, primaryHref) {
+    const order = ['spotify', 'apple', 'bandcamp', 'youtube', 'other'];
+    for (const k of order) {
+      if (links?.[k] && links[k] !== primaryHref) {
+        const base = k === 'other' ? 'another platform' : (k[0].toUpperCase() + k.slice(1));
+        return { label: `Listen on ${base}`, href: links[k] };
+      }
+    }
+    return null;
+  }
+
+  function labelFromHref(href) {
+    if (!href) return 'Listen';
+    const u = href.toLowerCase();
+    if (u.includes('bandcamp'))     return 'Listen on Bandcamp';
+    if (u.includes('open.spotify')) return 'Listen on Spotify';
+    if (u.includes('music.apple'))  return 'Listen on Apple Music';
+    if (u.includes('youtube'))      return 'Listen on YouTube';
+    return 'Listen';
+  }
+
+  async function loadReleasesFromGitHub() {
+    const api =
+      `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/` +
+      `${encodeURIComponent(GH.releasesPath)}?ref=${GH.branch}`;
+
+    const out = [];
+    try {
+      const res = await fetch(api, { cache: 'no-store' });
+      if (res.status === 404) {
+        console.warn('[music] No releases folder yet');
+        return [];
+      }
+      if (!res.ok) throw new Error(`GitHub list failed: ${res.status}`);
+      const listing = await res.json();
+      const dirs = (Array.isArray(listing) ? listing : []).filter(e => e.type === 'dir');
+
+      for (const d of dirs) {
+        const slug = d.name;
+        try {
+          const { md, bust } = await fetchReleaseIndex(slug);
+          const { fm } = parseFrontMatter(md);
+          const linksList = parseLinksFromFrontMatter(fm.links);
+          const linksMap = toLinkMap(linksList);
+          const ts = fm.date ? Date.parse(fm.date) : 0;
+
+          out.push({
+            slug,
+            title: fm.title || slug,
+            date: fm.date  || '',
+            ts: isNaN(ts) ? 0 : ts,
+            type: fm.type || 'single',
+            cover: fm.coverUrl
+              ? fm.coverUrl
+              : withBust(rawUrl(`${GH.releasesPath}/${slug}/cover.png`), bust),
+            blurb: fm.blurb || '',
+            tracks: Array.isArray(fm.tracks) ? fm.tracks : [],
+            links: linksMap
+          });
+        } catch (e) {
+          console.warn('[music] skip bad release', slug, e);
+        }
+      }
+
+      out.sort((a,b) => (b.ts - a.ts) || a.slug.localeCompare(b.slug));
+      return out;
+    } catch (err) {
+      console.error('[music] load releases failed', err);
+      return [];
+    }
+  }
+
+  // =========================
+  //  Rendering
+  // =========================
+  const latestCover = document.getElementById('latestCover');
+  const latestTitle = document.getElementById('latestTitle');
+  const latestMeta  = document.getElementById('latestMeta');
+  const latestBlurb = document.getElementById('latestBlurb');
+  const latestPlay  = document.getElementById('latestPlay');
+  const latestAlt   = document.getElementById('latestAlt');
+
+  const grid       = document.getElementById('discographyGrid');
+  const moreBtn    = document.querySelector('.discography-controls .show-more');
+  const lessBtn    = document.querySelector('.discography-controls .show-less');
+
+  const lb      = document.getElementById('lb');
+  const lbClose = document.getElementById('lbClose');
+
+  let releases = [];
+  const GRID_STEP      = 4;   // one row of 4 per step
+  const GRID_BASE_ROWS = 3;   // 3 rows visible by default
+  const GRID_BASE      = GRID_STEP * GRID_BASE_ROWS; // 12
+  let visible = 0;
+  let lastDelta = GRID_STEP;
+
+  function setBtnShown(el, show) {
+    if (!el) return;
+    el.hidden = !show;
+    el.style.display = show ? '' : 'none';
+  }
+
+  function renderLatest(r) {
+    if (!r) return;
+    if (latestCover) latestCover.src = r.cover;
+    if (latestTitle) latestTitle.textContent = r.title;
+
+    const pretty = r.date
+      ? new Date(r.date).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' })
+      : '';
+    if (latestMeta) {
+      const typeLabel = r.type.charAt(0).toUpperCase() + r.type.slice(1);
+      latestMeta.textContent = pretty ? `${typeLabel} • ${pretty}` : typeLabel;
+    }
+    if (latestBlurb) latestBlurb.textContent = r.blurb || '';
+
+    const primary = primaryLink(r.links);
+    if (latestPlay) {
+      latestPlay.href = primary;
+      latestPlay.textContent = labelFromHref(primary);
+    }
+
+    if (latestAlt) {
+      const alt = secondaryLink(r.links, primary);
       if (alt) {
-        btn2.style.display = '';
-        btn2.href = alt.href;
-        btn2.textContent = alt.label;
+        latestAlt.style.display = '';
+        latestAlt.href = alt.href;
+        latestAlt.textContent = alt.label;
       } else {
-        btn2.style.display = 'none';
+        latestAlt.style.display = 'none';
       }
     }
+  }
 
-    // ----- Build Discography Grid -----
-    const grid = document.getElementById('discographyGrid');
-    releases.forEach((r, idx) => {
+  function buildGrid(gridReleases) {
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    gridReleases.forEach((r, idxOffset) => {
+      const globalIndex = releases.indexOf(r); // use full array index so lightbox matches
       const card = document.createElement('article');
       card.className = 'release';
-      card.setAttribute('tabindex','0');
-      card.setAttribute('role','button');
-      card.dataset.index = idx;
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'button');
+      card.dataset.index = String(globalIndex);
+
       card.innerHTML = `
         <span class="label">${r.type.toUpperCase()}</span>
         <img src="${r.cover}" alt="${r.title} cover" loading="lazy"/>
       `;
-      card.addEventListener('click', ()=> openLB(idx));
-      card.addEventListener('keydown', (e)=>{
-        if(e.key==='Enter' || e.key===' ') {
+
+      card.addEventListener('click', () => openLB(globalIndex));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          openLB(idx);
+          openLB(globalIndex);
         }
       });
+
       grid.appendChild(card);
     });
+  }
 
-    // ----- Lightbox -----
-    const lb = document.getElementById('lb');
-    const lbClose = document.getElementById('lbClose');
-    function openLB(i){
-      const r = releases[i];
-      document.getElementById('lbCover').src = r.cover;
-      document.getElementById('lbTitle').textContent = r.title;
-      const pretty = new Date(r.date).toLocaleDateString(
-        undefined,{year:'numeric', month:'short', day:'numeric'}
-      );
-      document.getElementById('lbMeta').textContent =
-        `${r.type.charAt(0).toUpperCase()+r.type.slice(1)} • ${pretty}`;
-      document.getElementById('lbBlurb').textContent = r.blurb || '';
+  function applyGridVisibility() {
+    if (!grid) return;
+    const cards = grid.querySelectorAll('.release');
+    const total = cards.length;
 
-      const links = document.getElementById('lbLinks');
-      links.innerHTML = '';
-      const order = ['spotify','apple','bandcamp','youtube'];
-      order.forEach(k=>{
-        if (r.links && r.links[k]){
+    if (!total) {
+      setBtnShown(moreBtn, false);
+      setBtnShown(lessBtn, false);
+      return;
+    }
+
+    const baseVisible = Math.min(GRID_BASE, total);
+    if (visible < baseVisible) visible = baseVisible;
+    if (visible > total) visible = total;
+
+    cards.forEach((card, idx) => {
+      card.style.display = (idx < visible) ? '' : 'none';
+    });
+
+    if (total <= GRID_BASE) {
+      setBtnShown(moreBtn, false);
+      setBtnShown(lessBtn, false);
+      return;
+    }
+
+    setBtnShown(moreBtn, visible < total);
+    setBtnShown(lessBtn, visible > GRID_BASE);
+  }
+
+  function setupShowMoreLess() {
+    if (!moreBtn || !lessBtn) return;
+
+    moreBtn.addEventListener('click', () => {
+      if (!grid) return;
+      const total = grid.querySelectorAll('.release').length;
+      const remaining = total - visible;
+      const delta = Math.min(GRID_STEP, remaining);
+      visible += delta;
+      lastDelta = delta;
+      applyGridVisibility();
+    });
+
+    lessBtn.addEventListener('click', () => {
+      if (!grid) return;
+      const total = grid.querySelectorAll('.release').length;
+      const baseVisible = Math.min(GRID_BASE, total);
+      visible = Math.max(baseVisible, visible - lastDelta);
+      lastDelta = GRID_STEP;
+      applyGridVisibility();
+    });
+  }
+
+  // =========================
+  //  Lightbox
+  // =========================
+  function openLB(i) {
+    const r = releases[i];
+    if (!r || !lb) return;
+
+    const coverEl = document.getElementById('lbCover');
+    const titleEl = document.getElementById('lbTitle');
+    const metaEl  = document.getElementById('lbMeta');
+    const blurbEl = document.getElementById('lbBlurb');
+    const linksEl = document.getElementById('lbLinks');
+    const wrap    = document.getElementById('lbTracksWrap');
+    const list    = document.getElementById('lbTracks');
+
+    if (coverEl) coverEl.src = r.cover;
+    if (titleEl) titleEl.textContent = r.title;
+
+    const pretty = r.date
+      ? new Date(r.date).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' })
+      : '';
+    if (metaEl) {
+      const typeLabel = r.type.charAt(0).toUpperCase() + r.type.slice(1);
+      metaEl.textContent = pretty ? `${typeLabel} • ${pretty}` : typeLabel;
+    }
+    if (blurbEl) blurbEl.textContent = r.blurb || '';
+
+    if (linksEl) {
+      linksEl.innerHTML = '';
+      const order = ['spotify','apple','bandcamp','youtube','other'];
+      order.forEach(k => {
+        if (r.links && r.links[k]) {
           const a = document.createElement('a');
           a.href = r.links[k];
           a.target = '_blank';
-          a.rel='noopener';
-          a.textContent = `Listen on ${k[0].toUpperCase()+k.slice(1)}`;
-          links.appendChild(a);
+          a.rel   = 'noopener';
+          a.textContent =
+            k === 'other'
+              ? 'Listen'
+              : `Listen on ${k[0].toUpperCase() + k.slice(1)}`;
+          linksEl.appendChild(a);
         }
       });
+    }
 
-      const wrap = document.getElementById('lbTracksWrap');
-      const list = document.getElementById('lbTracks');
-      if (r.type !== 'single' && Array.isArray(r.tracks)){
+    if (wrap && list) {
+      if (r.type !== 'single' && Array.isArray(r.tracks) && r.tracks.length) {
         wrap.style.display = '';
         list.innerHTML = '';
-        r.tracks.forEach(t=>{
+        r.tracks.forEach(t => {
           const li = document.createElement('li');
           li.textContent = t;
           list.appendChild(li);
@@ -186,16 +437,47 @@
       } else {
         wrap.style.display = 'none';
       }
+    }
 
-      lb.classList.add('open');
-      document.body.style.overflow = 'hidden';
-      lb.querySelector('.lb-close').focus();
-    }
-    function closeLB(){
-      lb.classList.remove('open');
-      document.body.style.overflow = '';
-    }
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    lb.querySelector('.lb-close')?.focus();
+  }
+
+  function closeLB() {
+    if (!lb) return;
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  if (lb && lbClose) {
     lbClose.addEventListener('click', closeLB);
-    lb.addEventListener('click', (e)=>{ if(e.target===lb) closeLB(); });
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeLB(); });
-  })();
+    lb.addEventListener('click', (e) => { if (e.target === lb) closeLB(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLB(); });
+  }
+
+  // =========================
+  //  Boot: load + render
+  // =========================
+  document.addEventListener('DOMContentLoaded', async () => {
+    releases = await loadReleasesFromGitHub();
+    if (!releases.length) {
+      console.warn('[music] No releases found');
+      if (grid) grid.innerHTML = `<p class="muted">No releases yet — check back soon!</p>`;
+      return;
+    }
+
+    // Latest is first
+    renderLatest(releases[0]);
+
+    // Grid uses the rest (older releases)
+    const gridReleases = releases.slice(1);
+    buildGrid(gridReleases);
+
+    const total = gridReleases.length;
+    visible = Math.min(total, GRID_BASE);
+    lastDelta = GRID_STEP;
+    setupShowMoreLess();
+    applyGridVisibility();
+  });
+})();

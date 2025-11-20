@@ -3,23 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Auri Fell Music — Music</title>
+  <title>Auri Fell — Music</title>
   <meta name="theme-color" content="#0b0920" />
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/imagesauri-a-color.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/auri-a-color.png" />
   <link rel="stylesheet" href="./assets/css/site.css" />
-</head>
+  <link rel="stylesheet" href="./assets/css/music.css" />
 
-<body>
+</head>
+<body class="music">
   <a class="visually-hidden" href="#main">Skip to content</a>
 
-  <!-- HEADER -->
+  <!-- HEADER (identical to your shell) -->
   <header>
     <div class="wrap brand-row">
       <div class="brand">
-        <img class="logo" src="./assets/images/auri-a-color.png" alt="Auri A logo" width="58" height="58" />
+        <img class="logo" src="./assets/images/auri-a-color.png" alt="Auri A logo" width="48" height="48" />
         <span class="title">Auri Fell Music</span>
       </div>
-
       <nav aria-label="Primary" id="site-nav">
         <a class="nav-link" href="index.html">Home</a>
         <a class="nav-link" href="about.html">About</a>
@@ -27,97 +27,127 @@
         <a class="nav-link" href="contact.html">Contact</a>
         <a class="nav-link" href="blog.html">Blog</a>
       </nav>
-
-      <!-- Header kebab that morphs to hamburger -->
       <button class="hamburger" id="menuBtn" aria-controls="menuCard" aria-expanded="false" aria-label="Open menu">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <!-- Dots (kebab) -->
           <g class="dots">
-            <circle cx="12" cy="5" r="2"/>
-            <circle cx="12" cy="12" r="2"/>
-            <circle cx="12" cy="19" r="2"/>
+            <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
           </g>
-          <!-- Lines (hamburger) — rounded ends, square footprint -->
           <g class="lines">
-            <rect x="3"  y="5"  width="18" height="2" rx="1"/>
-            <rect x="3"  y="11" width="18" height="2" rx="1"/>
-            <rect x="3"  y="17" width="18" height="2" rx="1"/>
+            <rect x="3" y="5" width="18" height="2" rx="1"/>
+            <rect x="3" y="11" width="18" height="2" rx="1"/>
+            <rect x="3" y="17" width="18" height="2" rx="1"/>
           </g>
         </svg>
       </button>
-
-      <!-- Mobile menu drawer -->
-      <div class="menu-card" id="menuCard" role="dialog" aria-modal="true" aria-label="Menu">
-        <!-- Centered close button that rides the drawer -->
-        <button class="hamburger inside" id="menuBtnIn" aria-label="Close menu">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <g class="dots">
-              <circle cx="12" cy="5" r="2"/>
-              <circle cx="12" cy="12" r="2"/>
-              <circle cx="12" cy="19" r="2"/>
-            </g>
-            <g class="lines">
-              <rect x="3"  y="5"  width="18" height="2" rx="1"/>
-              <rect x="3"  y="11" width="18" height="2" rx="1"/>
-              <rect x="3"  y="17" width="18" height="2" rx="1"/>
-            </g>
-          </svg>
-        </button>
-
-        <nav class="menu-list" aria-label="Mobile">
-          <a class="nav-link" href="index.html">Home</a>
-          <a class="nav-link" href="about.html">About</a>
-          <a class="nav-link active" href="music.html">Music</a>
-          <a class="nav-link" href="contact.html">Contact</a>
-          <a class="nav-link" href="blog.html">Blog</a>
-        </nav>
-      </div>
     </div>
   </header>
 
-  <main id="main" class="wrap">
-    <div>
-        <p>MUSIC PAGE COMING SOON!!!!!!!!</p>
+  <!-- Mobile menu drawer -->
+  <div class="menu-card" id="menuCard" role="dialog" aria-modal="true" aria-label="Menu">
+    <button class="hamburger inside" id="menuBtnIn" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <g class="dots">
+          <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
+        </g>
+        <g class="lines">
+          <rect x="3" y="5" width="18" height="2" rx="1"/>
+          <rect x="3" y="11" width="18" height="2" rx="1"/>
+          <rect x="3" y="17" width="18" height="2" rx="1"/>
+        </g>
+      </svg>
+    </button>
+    <nav class="menu-list" aria-label="Mobile">
+      <a class="nav-link" href="index.html">Home</a>
+      <a class="nav-link" href="about.html">About</a>
+      <a class="nav-link active" href="music.html">Music</a>
+      <a class="nav-link" href="contact.html">Contact</a>
+      <a class="nav-link" href="blog.html">Blog</a>
+    </nav>
+  </div>
+
+  <!-- veil & backdrop -->
+  <div class="page-veil" aria-hidden="true"></div>
+  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+<main id="main" class="wrap">
+
+  <!-- HERO / LATEST RELEASE -->
+  <section class="card" aria-label="Latest Release">
+    <div class="music-hero">
+      <h1 class="title-gradient" style="margin:6px 0 14px">Latest Release</h1>
+
+      <div class="hero-row">
+        <img class="cover" id="latestCover"
+             src="./assets/images/auri-a-color.png"
+             alt="Latest cover" />
+
+        <div class="hero-body">
+          <h2 class="title" id="latestTitle">Loading…</h2>
+          <p class="meta" id="latestMeta"></p>
+          <p class="blurb" id="latestBlurb"></p>
+
+          <div class="actions">
+            <a class="btn" id="latestPlay" href="#" target="_blank" rel="noopener">
+              Listen
+            </a>
+            <a class="btn" id="latestAlt" href="#" target="_blank" rel="noopener" style="display:none">
+              Listen
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
+
+
+    <div class="soft-div"></div>
+
+    <!-- DISCOGRAPHY GRID -->
+    <section aria-label="Discography">
+      <h2 class="title-gradient" id="discography" style="margin:0 0 12px">Discography</h2>
+
+      <div class="discography" id="discographyGrid" aria-live="polite"></div>
+
+      <div class="i-div tight"></div>
+
+      <!-- Show more / less control -->
+      <div class="discography-controls">
+        <button class="show-more">⬇Show More⬇</button>
+        <button class="show-less">⬆Show Less⬆</button>
+      </div>
+
+    </section>
+
+
+    <div class="i-div"></div>
   </main>
 
   <footer class="floating">
-      <p class="credits">© <span id="y"></span> Auri Fell • <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a></p>
+    <p class="credits">
+      © <span id="y"></span> Auri Fell • <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a>
+    </p>
   </footer>
 
-  <script>
-    // Year stamp
-    document.getElementById('y').textContent = new Date().getFullYear();
+  <!-- Lightbox modal -->
+  <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Release details">
+    <div class="lb-card">
+      <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
+      <div class="lb-head">
+        <img class="lb-cover" id="lbCover" alt="Release cover" />
+        <div>
+          <h3 class="lb-title" id="lbTitle">Title</h3>
+          <p class="lb-meta" id="lbMeta">Type • Date</p>
+          <div id="lbBlurb" style="color:var(--text)"></div>
+          <div class="lb-links" id="lbLinks"></div>
+        </div>
+      </div>
+      <div id="lbTracksWrap" style="display:none">
+        <h4 style="margin:16px 0 6px">Tracklist</h4>
+        <ol class="lb-tracklist" id="lbTracks"></ol>
+      </div>
+    </div>
+  </div>
 
-    // Mobile menu toggle + ESC/outside close
-    const btnOut = document.getElementById('menuBtn');     // header dots→lines
-    const btnIn  = document.getElementById('menuBtnIn');   // centered drawer button
-    const card   = document.getElementById('menuCard');
-
-    function setOpen(on){
-      card.classList.toggle('open', on);
-      document.body.classList.toggle('menu-open', on);
-      btnOut.classList.toggle('is-open', on);
-      btnIn.classList.toggle('is-open', on);
-      btnOut.setAttribute('aria-expanded', String(on));
-      if (on) {
-        // focus first link for a11y after the slide
-        setTimeout(() => {
-          const first = card.querySelector('.menu-list a');
-          first && first.focus();
-        }, 300);
-      }
-    }
-
-    btnOut.addEventListener('click', () => setOpen(!card.classList.contains('open')));
-    btnIn.addEventListener('click',  () => setOpen(false));
-
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') setOpen(false); });
-    document.addEventListener('click', (e)=>{
-      const inside = e.target.closest('#menuCard, #menuBtn');
-      if(!inside) setOpen(false);
-    });
-  </script>
-
+  <script src="./assets/scripts/music_script.js" defer></script>
 </body>
 </html>
