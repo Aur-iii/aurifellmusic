@@ -37,7 +37,7 @@
         title: 'If I Were A Ghost',
         date: '2025-10-31',
         type: 'single',
-        cover: './assets/auri-anagram-color.png',
+        cover: './assets/images/auri-anagram-color.png',
         blurb: 'A spectral indie/alt track with lush vocal stacks and a jazz-y undertow.',
         links: {
           bandcamp: 'https://aurifell-music.bandcamp.com/track/if-i-were-a-ghost',
@@ -49,7 +49,7 @@
         title: 'Rose Bones',
         date: '2025-06-02',
         type: 'ep',
-        cover: './assets/auri-a-color.png',
+        cover: './assets/images/auri-a-color.png',
         blurb: 'An alt-goth cottage-synth EP exploring memory, deserts, and radio ghosts.',
         tracks: ['Thistle Static', 'Moon Quarry', 'Iris on the Rails', 'Signal / Silence'],
         links: {
@@ -61,7 +61,7 @@
         title: 'Marrow Creek (Originals)',
         date: '2024-11-01',
         type: 'album',
-        cover: './assets/auri-a-color_light.png',
+        cover: './assets/images/auri-a-color_light.png',
         blurb: 'Soundtrack sketches and themes from the Marrow Creek universe.',
         tracks: ['Gravel Choir', 'Plateau Lights', 'Sandstorm Memory', 'The Silence'],
         links: {
