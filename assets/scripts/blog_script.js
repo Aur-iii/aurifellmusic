@@ -216,6 +216,7 @@ function openDrawer(which) {
   followCard?.classList.toggle('open', openFollow);
   document.body.classList.toggle('menu-open', anyOpen);
   backdrop?.classList.toggle('show', anyOpen);
+  btnOut?.setAttribute('aria-expanded', String(openMenu));
 
   // if we just closed the follow drawer, clear the UI
   if (!anyOpen && wasFollowOpen) {
