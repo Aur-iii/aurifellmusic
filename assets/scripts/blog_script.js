@@ -38,6 +38,9 @@ const unfollowBtn  = document.getElementById('unfollowBtn');
 const postsHost   = document.querySelector('.blog-posts');
 const showMoreBtn = document.querySelector('.show-more');
 const showLessBtn = document.querySelector('.show-less');
+const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+let lastDrawerFocus = null;
+let lastGalleryFocus = null;
 
 /* ---------- HELPERS ---------- */
 const escapeHTML = (s='') => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -71,6 +74,16 @@ const bodyToParagraphs = (txt = '') => {
     return `<p>${lines}</p>`;
   }).join('\n');
 };
+
+function trapFocus(e, root){
+  if (!root) return;
+  const nodes = Array.from(root.querySelectorAll(FOCUSABLE)).filter(el => !el.hasAttribute('disabled'));
+  if (!nodes.length) { e.preventDefault(); return; }
+  const first = nodes[0];
+  const last = nodes[nodes.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
 
 function parseFrontMatter(md) {
   let fm = {}, body = md;
@@ -211,6 +224,7 @@ function openDrawer(which) {
   const openMenu   = which === 'menu';
   const openFollow = which === 'follow';
   const anyOpen    = !!which;
+  if (anyOpen) lastDrawerFocus = document.activeElement;
 
   menuCard?.classList.toggle('open', openMenu);
   followCard?.classList.toggle('open', openFollow);
@@ -221,6 +235,9 @@ function openDrawer(which) {
   // if we just closed the follow drawer, clear the UI
   if (!anyOpen && wasFollowOpen) {
     resetFollowUI();
+  }
+  if (!anyOpen && lastDrawerFocus && typeof lastDrawerFocus.focus === 'function') {
+    lastDrawerFocus.focus();
   }
 
   if (anyOpen) {
@@ -243,6 +260,11 @@ followBtn?.addEventListener('click', () => {
 });
 followCancel?.addEventListener('click', () => openDrawer(null));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') openDrawer(null); });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Tab') return;
+  if (menuCard?.classList.contains('open')) trapFocus(e, menuCard);
+  if (followCard?.classList.contains('open')) trapFocus(e, followCard);
+});
 backdrop?.addEventListener('click', () => openDrawer(null));
 document.addEventListener('click', e => {
   const inside = e.target.closest('#menuCard, #menuBtn, #menuBtnIn, #followCard, .blog-header .follow-btn');
@@ -510,6 +532,7 @@ function ensureLightbox(){
     if (e.key === 'Escape')     closeGalleryLightbox();
     if (e.key === 'ArrowLeft')  navGallery(-1);
     if (e.key === 'ArrowRight') navGallery(1);
+    if (e.key === 'Tab')        trapFocus(e, lb.querySelector('.gallery-modal__frame'));
   });
 }
 function openGalleryLightbox(gallery,start=0){
@@ -517,10 +540,17 @@ function openGalleryLightbox(gallery,start=0){
   try{lbList=JSON.parse(gallery.dataset.images||'[]');}catch{lbList=[];}
   if(!lbList.length)return;
   lbIndex=Math.max(0,Math.min(start,lbList.length-1));
+  lastGalleryFocus = document.activeElement;
   renderGalleryImage();
   lb.classList.add('is-open');
+  lbClose?.focus();
 }
-function closeGalleryLightbox(){lb?.classList.remove('is-open');}
+function closeGalleryLightbox(){
+  lb?.classList.remove('is-open');
+  if (lastGalleryFocus && typeof lastGalleryFocus.focus === 'function') {
+    lastGalleryFocus.focus();
+  }
+}
 function navGallery(d){ if(!lbList.length)return; lbIndex=(lbIndex+d+lbList.length)%lbList.length; renderGalleryImage(); }
 function renderGalleryImage(){
   const item = lbList[lbIndex];

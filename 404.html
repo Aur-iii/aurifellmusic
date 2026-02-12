@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-aurora">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Page Not Found — Auri Fell Music</title>
+  <meta name="theme-color" content="#0b0920" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/auri-a-color.png" />
+  <link rel="stylesheet" href="./assets/css/site.css" />
+</head>
+<body>
+  <main id="main" class="wrap" style="min-height:100dvh; display:grid; place-items:center; padding-top:40px; padding-bottom:80px;">
+    <section class="card" style="max-width:760px; width:100%; text-align:center;">
+      <p style="margin:0 0 10px 0; color:var(--muted); font-weight:800; letter-spacing:.08em;">404</p>
+      <h1 class="title-gradient" style="margin:0 0 14px 0; font-size:clamp(28px,5vw,46px);">Page Not Found</h1>
+      <p style="margin:0 0 22px 0; color:var(--text);">
+        The page you requested does not exist or may have moved.
+      </p>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+        <a class="mini-btn" href="./index.html">Go Home</a>
+        <a class="mini-btn" href="./music.html">Open Music</a>
+        <a class="mini-btn" href="./contact.html">Contact</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="floating">
+    <p class="credits">© <span id="y"></span> Auri Fell • <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a></p>
+  </footer>
+
+  <script>
+    const y = document.getElementById('y');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

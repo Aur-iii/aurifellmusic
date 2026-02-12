@@ -9,10 +9,24 @@
   const btnIn    = document.getElementById('menuBtnIn');
   const card     = document.getElementById('menuCard');
   const backdrop = document.getElementById('backdrop');
+  const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  let lastMenuFocus = null;
+  let lastLightboxFocus = null;
+
+  function trapFocus(e, root) {
+    if (!root) return;
+    const nodes = Array.from(root.querySelectorAll(FOCUSABLE)).filter(el => !el.hasAttribute('disabled'));
+    if (!nodes.length) { e.preventDefault(); return; }
+    const first = nodes[0];
+    const last = nodes[nodes.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
 
   function setOpen(on){
     if (!card) return;
     const willOpen = !!on;
+    if (willOpen) lastMenuFocus = document.activeElement;
     card.classList.toggle('open', willOpen);
     document.body.classList.toggle('menu-open', willOpen);
     btnOut?.classList.toggle('is-open', willOpen);
@@ -21,12 +35,17 @@
     backdrop?.classList.toggle('show', willOpen);
     if (willOpen) {
       setTimeout(() => card.querySelector('.menu-list a')?.focus(), 280);
+    } else if (lastMenuFocus && typeof lastMenuFocus.focus === 'function') {
+      lastMenuFocus.focus();
     }
   }
   btnOut?.addEventListener('click', () => setOpen(!card?.classList.contains('open')));
   btnIn?.addEventListener('click',  () => setOpen(false));
   backdrop?.addEventListener('click', () => setOpen(false));
-  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') setOpen(false); });
+  document.addEventListener('keydown', (e)=>{
+    if (e.key === 'Escape') setOpen(false);
+    if (e.key === 'Tab' && card?.classList.contains('open')) trapFocus(e, card);
+  });
   document.addEventListener('click', (e)=>{
     const insideCard = e.target.closest('#menuCard');
     const onBtnOut   = e.target.closest('#menuBtn');
@@ -441,6 +460,7 @@
 
     lb.classList.add('open');
     document.body.style.overflow = 'hidden';
+    lastLightboxFocus = document.activeElement;
     lb.querySelector('.lb-close')?.focus();
   }
 
@@ -448,12 +468,19 @@
     if (!lb) return;
     lb.classList.remove('open');
     document.body.style.overflow = '';
+    if (lastLightboxFocus && typeof lastLightboxFocus.focus === 'function') {
+      lastLightboxFocus.focus();
+    }
   }
 
   if (lb && lbClose) {
     lbClose.addEventListener('click', closeLB);
     lb.addEventListener('click', (e) => { if (e.target === lb) closeLB(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLB(); });
+    document.addEventListener('keydown', (e) => {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLB();
+      if (e.key === 'Tab') trapFocus(e, lb);
+    });
   }
 
   // =========================

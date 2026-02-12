@@ -222,10 +222,22 @@
     const btnIn    = document.getElementById('menuBtnIn');  // centered drawer button (inside the drawer)
     const card     = document.getElementById('menuCard');   // the drawer
     const backdrop = document.getElementById('backdrop');   // the dim/blur layer
+    const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+    let lastFocus = null;
+
+    function trapFocus(e, root){
+      const nodes = Array.from(root.querySelectorAll(FOCUSABLE)).filter(el => !el.hasAttribute('disabled'));
+      if (!nodes.length) { e.preventDefault(); return; }
+      const first = nodes[0];
+      const last  = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
 
     function setOpen(on){
       if (!card) return;
       const willOpen = !!on;
+      if (willOpen) lastFocus = document.activeElement;
 
       card.classList.toggle('open', willOpen);
       document.body.classList.toggle('menu-open', willOpen);
@@ -242,6 +254,8 @@
           const first = card.querySelector('.menu-list a');
           first?.focus();
         }, 280);
+      } else if (lastFocus && typeof lastFocus.focus === 'function') {
+        lastFocus.focus();
       }
     }
 
@@ -255,7 +269,10 @@
     backdrop?.addEventListener('click', () => setOpen(false));
 
     // ESC: close
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') setOpen(false); });
+    document.addEventListener('keydown', (e)=>{
+      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Tab' && card?.classList.contains('open')) trapFocus(e, card);
+    });
 
     // Click outside drawer & buttons: close
     document.addEventListener('click', (e)=>{
