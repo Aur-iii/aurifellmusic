@@ -10,17 +10,18 @@
   <link rel="stylesheet" href="./offline.css" />
 </head>
 <body>
+  <a class="visually-hidden" href="#offlineView">Skip to content</a>
   <main class="app">
     <section id="pageStage" aria-labelledby="offlineTitle">
       <div id="debugPageFrame" aria-hidden="true"></div>
       <div class="content">
-        <p class="kicker">Chess Tic-Tac-Toe</p>
+        <h1>Chess Tic-Tac-Toe</h1>
         <p class="rule">=-=-=-=-=-=-=-=</p>
 
-        <section class="offline-card">
-          <h1 id="offlineTitle">Server Is Offline</h1>
+        <section id="offlineView" class="panel offline-card">
+          <h2 id="offlineTitle">Server Is Offline</h2>
 
-          <p class="lead">
+          <p class="status lead">
             The game host is not currently running.
           </p>
 
@@ -38,13 +39,14 @@
             <a class="pill pill-muted" href="https://aurifellmusic.com">Main Site</a>
           </div>
 
-          <p class="note">Tip: if the host just started it, give DNS/tunnel 10-30 seconds.</p>
+          <p class="status note">Tip: if the host just started it, give DNS/tunnel 10-30 seconds.</p>
         </section>
       </div>
     </section>
   </main>
   <script>
     (() => {
+      document.body.dataset.page = "offline";
       const stage = document.getElementById("pageStage");
       if (!stage) return;
       function updateStageScale() {
