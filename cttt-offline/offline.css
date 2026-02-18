@@ -3,10 +3,12 @@
   --bg-2: #1a2b42;
   --wrap-bg-1: #253a54;
   --wrap-bg-2: #1f3148;
-  --panel: #435a76;
   --text: #ecf0f8;
   --muted: #c5cedb;
   --shadow: rgba(13, 24, 39, 0.5);
+  --stage-width: 660px;
+  --stage-height: 760px;
+  --stage-scale: 1;
 }
 
 * {
@@ -15,7 +17,7 @@
 
 html,
 body {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
@@ -27,54 +29,80 @@ body {
     linear-gradient(180deg, var(--bg-2) 0%, var(--bg-1) 100%);
 }
 
-.offline-wrap {
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
+.app {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+#pageStage {
+  position: fixed;
+  left: 50%;
+  top: 8px;
+  transform-origin: top center;
+  transform: translateX(-50%) scale(var(--stage-scale, 1));
+  width: var(--stage-width, 660px);
+  height: var(--stage-height, 760px);
+  z-index: 2;
+}
+
+#debugPageFrame {
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  background: radial-gradient(900px 520px at 50% -180px, #3a5473 0%, #2b415d 60%), linear-gradient(180deg, var(--wrap-bg-1) 0%, var(--wrap-bg-2) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  padding: 10px 20px 18px;
 }
 
 .offline-card {
-  width: min(760px, 100%);
+  width: 560px;
+  margin: 0 auto;
   border-radius: 28px;
-  padding: 34px 28px;
+  padding: 24px 24px 22px;
   text-align: center;
-  background:
-    radial-gradient(900px 520px at 50% -180px, #3a5473 0%, #2b415d 60%),
-    linear-gradient(180deg, var(--wrap-bg-1) 0%, var(--wrap-bg-2) 100%);
+  background: linear-gradient(180deg, rgba(81, 104, 132, 0.94), rgba(65, 87, 114, 0.94));
   box-shadow: 0 22px 48px var(--shadow), inset 0 1px 0 rgba(235, 245, 255, 0.2);
 }
 
 .kicker {
   margin: 0;
-  font-size: clamp(28px, 6vw, 66px);
+  font-size: 72px;
   font-weight: 600;
-  letter-spacing: 0.4px;
+  letter-spacing: 1px;
 }
 
 h1 {
-  margin: 8px 0 2px;
-  font-size: clamp(36px, 7vw, 70px);
+  margin: 0 0 10px;
+  font-size: 58px;
   font-weight: 600;
 }
 
 .rule {
-  margin: 0 0 14px;
-  font-size: clamp(20px, 4vw, 40px);
+  margin: -2px 0 18px;
+  font-size: 36px;
   letter-spacing: 3px;
   color: var(--muted);
 }
 
 .lead {
-  margin: 0 0 16px;
-  font-size: clamp(24px, 4.5vw, 38px);
+  margin: 0 0 14px;
+  font-size: 36px;
 }
 
 .steps {
   margin: 0 auto 24px;
-  width: min(560px, 100%);
+  width: 470px;
   text-align: left;
-  font-size: clamp(19px, 3.5vw, 28px);
+  font-size: 28px;
   color: var(--text);
 }
 
@@ -93,7 +121,7 @@ h1 {
 
 code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  font-size: 0.9em;
+  font-size: 0.7em;
 }
 
 .actions {
@@ -107,10 +135,10 @@ code {
   min-width: 176px;
   border: 0;
   border-radius: 44px;
-  padding: 13px 20px;
+  padding: 14px 20px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(26px, 3.8vw, 34px);
-  line-height: 1;
+  font-size: 28px;
+  line-height: 1.1;
   color: var(--text);
   text-decoration: none;
   text-align: center;
@@ -129,16 +157,5 @@ code {
 .note {
   margin: 18px 0 0;
   color: var(--muted);
-  font-size: clamp(16px, 2.6vw, 22px);
-}
-
-@media (max-width: 620px) {
-  .offline-card {
-    border-radius: 22px;
-    padding: 28px 18px;
-  }
-
-  .steps {
-    padding-left: 6px;
-  }
+  font-size: 20px;
 }

@@ -10,32 +10,58 @@
   <link rel="stylesheet" href="./offline.css" />
 </head>
 <body>
-  <main class="offline-wrap" aria-labelledby="offlineTitle">
-    <section class="offline-card">
-      <p class="kicker">Chess Tic-Tac-Toe</p>
-      <h1 id="offlineTitle">Server Is Offline</h1>
-      <p class="rule">=-=-=-=-=-=-=-=</p>
+  <main class="app">
+    <section id="pageStage" aria-labelledby="offlineTitle">
+      <div id="debugPageFrame" aria-hidden="true"></div>
+      <div class="content">
+        <p class="kicker">Chess Tic-Tac-Toe</p>
+        <p class="rule">=-=-=-=-=-=-=-=</p>
 
-      <p class="lead">
-        The game host is not currently running.
-      </p>
+        <section class="offline-card">
+          <h1 id="offlineTitle">Server Is Offline</h1>
 
-      <div class="steps">
-        <p>To bring it online:</p>
-        <ul>
-          <li>Start the local Chess server on the host laptop.</li>
-          <li>Start the Cloudflare tunnel for <code>cttt.aurifellmusic.com</code>.</li>
-          <li>Refresh this page and join your room.</li>
-        </ul>
+          <p class="lead">
+            The game host is not currently running.
+          </p>
+
+          <div class="steps">
+            <p>To bring it online:</p>
+            <ul>
+              <li>Start the local Chess server on the host laptop.</li>
+              <li>Start the Cloudflare tunnel for <code>cttt.aurifellmusic.com</code>.</li>
+              <li>Refresh this page and join your room.</li>
+            </ul>
+          </div>
+
+          <div class="actions">
+            <a class="pill" href="https://cttt.aurifellmusic.com">Try Again</a>
+            <a class="pill pill-muted" href="https://aurifellmusic.com">Main Site</a>
+          </div>
+
+          <p class="note">Tip: if the host just started it, give DNS/tunnel 10-30 seconds.</p>
+        </section>
       </div>
-
-      <div class="actions">
-        <a class="pill" href="https://cttt.aurifellmusic.com">Try Again</a>
-        <a class="pill pill-muted" href="https://aurifellmusic.com">Main Site</a>
-      </div>
-
-      <p class="note">Tip: if the host just started it, give DNS/tunnel 10-30 seconds.</p>
     </section>
   </main>
+  <script>
+    (() => {
+      const stage = document.getElementById("pageStage");
+      if (!stage) return;
+      function updateStageScale() {
+        const stageStyles = getComputedStyle(stage);
+        const baseW = parseFloat(stageStyles.width) || 1;
+        const baseH = parseFloat(stageStyles.height) || 1;
+        const viewportPaddingX = 16;
+        const viewportPaddingY = 16;
+        const availW = Math.max(1, window.innerWidth - viewportPaddingX);
+        const availH = Math.max(1, window.innerHeight - viewportPaddingY);
+        const scale = Math.max(0.1, Math.min(availW / baseW, availH / baseH));
+        document.body.style.setProperty("--stage-scale", String(scale));
+      }
+      updateStageScale();
+      window.addEventListener("resize", updateStageScale);
+      window.addEventListener("orientationchange", updateStageScale);
+    })();
+  </script>
 </body>
 </html>
