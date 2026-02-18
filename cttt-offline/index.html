@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chess Tic-Tac-Toe Offline</title>
+  <meta name="description" content="Chess Tic-Tac-Toe server is currently offline. Start the local host and tunnel to play." />
+  <meta name="theme-color" content="#131f30" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/auri-a-color.png" />
+  <link rel="stylesheet" href="./offline.css" />
+</head>
+<body>
+  <main class="offline-wrap" aria-labelledby="offlineTitle">
+    <section class="offline-card">
+      <p class="kicker">Chess Tic-Tac-Toe</p>
+      <h1 id="offlineTitle">Server Is Offline</h1>
+      <p class="rule">=-=-=-=-=-=-=-=</p>
+
+      <p class="lead">
+        The game host is not currently running.
+      </p>
+
+      <div class="steps">
+        <p>To bring it online:</p>
+        <ul>
+          <li>Start the local Chess server on the host laptop.</li>
+          <li>Start the Cloudflare tunnel for <code>cttt.aurifellmusic.com</code>.</li>
+          <li>Refresh this page and join your room.</li>
+        </ul>
+      </div>
+
+      <div class="actions">
+        <a class="pill" href="https://cttt.aurifellmusic.com">Try Again</a>
+        <a class="pill pill-muted" href="https://aurifellmusic.com">Main Site</a>
+      </div>
+
+      <p class="note">Tip: if the host just started it, give DNS/tunnel 10-30 seconds.</p>
+    </section>
+  </main>
+</body>
+</html>
