@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="./offline.css" />
 </head>
 <body>
-  <a class="visually-hidden" href="#offlineView">Skip to content</a>
   <main class="app">
     <section id="pageStage" aria-labelledby="offlineTitle">
       <div id="debugPageFrame" aria-hidden="true"></div>
@@ -57,7 +56,7 @@
         const viewportPaddingY = 16;
         const availW = Math.max(1, window.innerWidth - viewportPaddingX);
         const availH = Math.max(1, window.innerHeight - viewportPaddingY);
-        const scale = Math.max(0.1, Math.min(availW / baseW, availH / baseH));
+        const scale = Math.max(0.1, Math.min(1, availW / baseW, availH / baseH));
         document.body.style.setProperty("--stage-scale", String(scale));
       }
       updateStageScale();
