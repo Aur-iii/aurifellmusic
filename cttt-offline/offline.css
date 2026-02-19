@@ -6,7 +6,7 @@
   --text: #ecf0f8;
   --muted: #c5cedb;
   --shadow: rgba(13, 24, 39, 0.48);
-  --stage-width: 660px;
+  --stage-width: 920px;
   --stage-height: 700px;
   --stage-scale: 1;
 }
@@ -55,9 +55,9 @@ body {
 
 h1 {
   margin: 16px 0 0;
-  font-size: 74px;
+  font-size: 68px;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .rule {
