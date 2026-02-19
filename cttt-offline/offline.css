@@ -18,6 +18,7 @@
 html,
 body {
   min-height: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -64,8 +65,7 @@ body[data-page="offline"] {
 }
 
 .content {
-  position: relative;
-  z-index: 2;
+  display: contents;
 }
 
 h1 {
@@ -113,6 +113,7 @@ h1 {
   width: 450px;
   text-align: left;
   font-size: 28px;
+  line-height: 1.2;
 }
 
 .steps p {
@@ -132,7 +133,7 @@ h1 {
   display: flex;
   justify-content: center;
   gap: 26px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-top: 8px;
 }
 

@@ -10,39 +10,37 @@
   <link rel="stylesheet" href="./offline.css" />
 </head>
 <body>
-  <main class="app">
-    <section id="pageStage" aria-labelledby="offlineTitle">
-      <div id="debugPageFrame" aria-hidden="true"></div>
-      <div class="content">
-        <h1>Chess Tic-Tac-Toe</h1>
-        <p class="rule">=-=-=-=-=-=-=-=</p>
+  <div id="pageStage" aria-labelledby="offlineTitle">
+    <div id="debugPageFrame" aria-hidden="true"></div>
+    <main class="app">
+      <h1>Chess Tic-Tac-Toe</h1>
+      <p class="rule">=-=-=-=-=-=-=-=</p>
 
-        <section id="offlineView" class="panel offline-card">
-          <h2 id="offlineTitle">Server Is Offline</h2>
+      <section id="offlineView" class="panel offline-card">
+        <h2 id="offlineTitle">Server Is Offline</h2>
 
-          <p class="status lead">
-            The game host is not currently running.
-          </p>
+        <p class="status lead">
+          The game host is not currently running.
+        </p>
 
-          <div class="steps">
-            <p>To bring it online:</p>
-            <ul>
-              <li>Start the local Chess server on the host laptop.</li>
-              <li>Start the Cloudflare tunnel for <code>cttt.aurifellmusic.com</code>.</li>
-              <li>Refresh this page and join your room.</li>
-            </ul>
-          </div>
+        <div class="steps">
+          <p>To bring it online:</p>
+          <ul>
+            <li>Start the local Chess server on the host laptop.</li>
+            <li>Start the Cloudflare tunnel for <code>cttt.aurifellmusic.com</code>.</li>
+            <li>Refresh this page and join your room.</li>
+          </ul>
+        </div>
 
-          <div class="actions">
-            <a class="pill" href="https://cttt.aurifellmusic.com">Try Again</a>
-            <a class="pill pill-muted" href="https://aurifellmusic.com">Main Site</a>
-          </div>
+        <div class="actions">
+          <a class="pill" href="https://cttt.aurifellmusic.com">Try Again</a>
+          <a class="pill pill-muted" href="https://aurifellmusic.com">Main Site</a>
+        </div>
 
-          <p class="status note">Tip: if the host just started it, give DNS/tunnel 10-30 seconds.</p>
-        </section>
-      </div>
-    </section>
-  </main>
+        <p class="status note">Tip: if the host just started it, give DNS/tunnel 10-30 seconds.</p>
+      </section>
+    </main>
+  </div>
   <script>
     (() => {
       document.body.dataset.page = "offline";
