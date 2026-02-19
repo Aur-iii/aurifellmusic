@@ -3,14 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CTTT Server Offline</title>
+  <title>Chess Tic-Tac-Toe Offline</title>
   <meta name="theme-color" content="#131f30" />
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/auri-a-color.png" />
-  <link rel="stylesheet" href="./offline.css" />
+  <link rel="stylesheet" href="./offline.css?v=2" />
 </head>
 <body>
-  <main class="offline-root" aria-label="Offline">
-    <h1>cttt server is offline</h1>
-  </main>
+  <div id="pageStage" aria-label="CTTT Offline">
+    <div id="debugPageFrame" aria-hidden="true"></div>
+
+    <main class="app">
+      <h1>Chess Tic-Tac-Toe</h1>
+      <p class="rule">=-=-=-=-=-=-=-=</p>
+
+      <section class="panel" aria-labelledby="offlineTitle">
+        <h2 id="offlineTitle">Server Is Down</h2>
+        <p>Contact <strong>auriluve</strong> on Discord to play.</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const stage = document.getElementById("pageStage");
+      if (!stage) return;
+
+      function updateStageScale() {
+        const stageStyles = getComputedStyle(stage);
+        const baseW = parseFloat(stageStyles.width) || 1;
+        const baseH = parseFloat(stageStyles.height) || 1;
+        const padX = 16;
+        const padY = 16;
+        const availW = Math.max(1, window.innerWidth - padX);
+        const availH = Math.max(1, window.innerHeight - padY);
+        const scale = Math.max(0.1, Math.min(1, availW / baseW, availH / baseH));
+        document.body.style.setProperty("--stage-scale", String(scale));
+      }
+
+      updateStageScale();
+      window.addEventListener("resize", updateStageScale);
+      window.addEventListener("orientationchange", updateStageScale);
+    })();
+  </script>
 </body>
 </html>
