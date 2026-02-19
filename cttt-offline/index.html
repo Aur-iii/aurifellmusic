@@ -3,64 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chess Tic-Tac-Toe Offline</title>
-  <meta name="description" content="Chess Tic-Tac-Toe server is currently offline. Start the local host and tunnel to play." />
+  <title>CTTT Server Offline</title>
   <meta name="theme-color" content="#131f30" />
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/auri-a-color.png" />
   <link rel="stylesheet" href="./offline.css" />
 </head>
 <body>
-  <div id="pageStage" aria-labelledby="offlineTitle">
-    <div id="debugPageFrame" aria-hidden="true"></div>
-    <main class="app">
-      <h1>Chess Tic-Tac-Toe</h1>
-      <p class="rule">=-=-=-=-=-=-=-=</p>
-
-      <section id="offlineView" class="panel offline-card">
-        <h2 id="offlineTitle">Server Is Offline</h2>
-
-        <p class="status lead">
-          The game host is not currently running.
-        </p>
-
-        <div class="steps">
-          <p>To bring it online:</p>
-          <ul>
-            <li>Start the local Chess server on the host laptop.</li>
-            <li>Start the Cloudflare tunnel for <code>cttt.aurifellmusic.com</code>.</li>
-            <li>Refresh this page and join your room.</li>
-          </ul>
-        </div>
-
-        <div class="actions">
-          <a class="pill" href="https://cttt.aurifellmusic.com">Try Again</a>
-          <a class="pill pill-muted" href="https://aurifellmusic.com">Main Site</a>
-        </div>
-
-        <p class="status note">Tip: if the host just started it, give DNS/tunnel 10-30 seconds.</p>
-      </section>
-    </main>
-  </div>
-  <script>
-    (() => {
-      document.body.dataset.page = "offline";
-      const stage = document.getElementById("pageStage");
-      if (!stage) return;
-      function updateStageScale() {
-        const stageStyles = getComputedStyle(stage);
-        const baseW = parseFloat(stageStyles.width) || 1;
-        const baseH = parseFloat(stageStyles.height) || 1;
-        const viewportPaddingX = 16;
-        const viewportPaddingY = 16;
-        const availW = Math.max(1, window.innerWidth - viewportPaddingX);
-        const availH = Math.max(1, window.innerHeight - viewportPaddingY);
-        const scale = Math.max(0.1, Math.min(1, availW / baseW, availH / baseH));
-        document.body.style.setProperty("--stage-scale", String(scale));
-      }
-      updateStageScale();
-      window.addEventListener("resize", updateStageScale);
-      window.addEventListener("orientationchange", updateStageScale);
-    })();
-  </script>
+  <main class="offline-root" aria-label="Offline">
+    <h1>cttt server is offline</h1>
+  </main>
 </body>
 </html>
