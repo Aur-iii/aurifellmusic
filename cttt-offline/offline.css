@@ -87,3 +87,27 @@ h1 {
   font-size: 34px;
   line-height: 1.2;
 }
+
+.actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+.pill {
+  min-width: 170px;
+  border: 0;
+  border-radius: 44px;
+  padding: 14px 20px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  color: var(--text);
+  text-decoration: none;
+  text-align: center;
+  background: linear-gradient(180deg, #5f7595 0%, #506c8e 46%, #3b5371 47%, #3f5675 100%);
+  box-shadow: inset 0 1px 0 rgba(205, 224, 242, 0.55), inset 0 -2px 0 rgba(14, 34, 56, 0.35), 0 10px 20px rgba(13, 24, 39, 0.35);
+}
+
+.pill:active {
+  transform: translateY(1px);
+}
