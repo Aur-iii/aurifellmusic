@@ -242,11 +242,11 @@ nav{display:flex; align-items:center; gap:18px}
 }
 .socials a{
   display:inline-flex; align-items:center; justify-content:center;
-  width:52px; height:52px; border-radius:12px; border:1px solid var(--border);
+  width:82px; height:72px; border-radius:12px; border:1px solid var(--border);
   background:rgba(26,20,63,.55); box-shadow:var(--shadow)
 }
 .socials a:hover{background:rgba(26,20,63,.85)}
-.socials svg{ width:30px; height:30px }
+.socials svg{ width:50px; height:50px }
 
 /* ---------------- TESTIMONIALS ---------------- */
 :root {--t-card-h:260px}
