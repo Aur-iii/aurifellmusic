@@ -1,37 +1,89 @@
-<!DOCTYPE html>
-<html lang="en" class="theme-aurora">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="robots" content="noindex" />
-  <title>Page Not Found — Auri Fell Music</title>
-  <meta name="theme-color" content="#0b0920" />
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/auri-a-color.png" />
-  <link rel="stylesheet" href="./assets/css/site.css" />
-</head>
-<body>
-  <main id="main" class="wrap" style="min-height:100dvh; display:grid; place-items:center; padding-top:40px; padding-bottom:80px;">
-    <section class="card" style="max-width:760px; width:100%; text-align:center;">
-      <p style="margin:0 0 10px 0; color:var(--muted); font-weight:800; letter-spacing:.08em;">404</p>
-      <h1 class="title-gradient" style="margin:0 0 14px 0; font-size:clamp(28px,5vw,46px);">Page Not Found</h1>
-      <p style="margin:0 0 22px 0; color:var(--text);">
-        The page you requested does not exist or may have moved.
-      </p>
-      <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
-        <a class="mini-btn" href="./index.html">Go Home</a>
-        <a class="mini-btn" href="./music.html">Open Music</a>
-        <a class="mini-btn" href="./contact.html">Contact</a>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Page Not Found - Auri Fell Music</title>
+    <meta name="theme-color" content="#070915" />
+    <link rel="icon" type="image/png" href="./assets/images/auri-a-color.png" />
+    <link rel="stylesheet" href="./assets/css/site.css" />
+  </head>
+  <body>
+    <main
+      id="main"
+      class="wrap"
+      style="min-height: 100dvh; display: grid; place-items: center; padding: 48px 0"
+    >
+      <section class="card" style="width: min(650px, 100%); padding: 42px; text-align: center">
+        <span class="eyebrow">404</span>
+        <h1
+          style="
+            margin: 12px 0;
+            font-size: clamp(2.6rem, 7vw, 5rem);
+            line-height: 0.95;
+            letter-spacing: -0.07em;
+          "
+        >
+          Lost in the universe.
+        </h1>
+        <p class="muted" style="margin: 0 auto 26px; max-width: 40ch">
+          That page doesn’t seem to be here anymore. Let’s get you somewhere that is.
+        </p>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px">
+          <a class="button" href="./index.html">Go home</a
+          ><a class="button ghost" href="./music.html">Open music</a>
+        </div>
+      </section>
+    </main>
+    <footer class="floating">
+      <div class="wrap footer-inner">
+        <p class="credits">
+          © <span id="y"></span> Auri Fell ·
+          <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a>
+        </p>
+        <div class="icon-links" aria-label="Social links">
+          <a
+            href="https://www.youtube.com/@AuriFellMusic"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="YouTube"
+            ><svg><use href="./assets/images/social-icons.svg#youtube"></use></svg></a
+          ><a
+            href="https://aurifell-music.bandcamp.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Bandcamp"
+            ><svg><use href="./assets/images/social-icons.svg#bandcamp"></use></svg></a
+          ><a
+            href="https://www.instagram.com/aurifellmusic/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            ><svg><use href="./assets/images/social-icons.svg#instagram"></use></svg></a
+          ><a
+            href="https://www.tiktok.com/@aurifellmusic"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="TikTok"
+            ><svg><use href="./assets/images/social-icons.svg#tiktok"></use></svg></a
+          ><a
+            href="https://www.facebook.com/aurifellmusic/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            ><svg><use href="./assets/images/social-icons.svg#facebook"></use></svg></a
+          ><a
+            href="https://discord.gg/yuPxHuxY4F"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Discord"
+            ><svg><use href="./assets/images/social-icons.svg#discord"></use></svg
+          ></a>
+        </div>
       </div>
-    </section>
-  </main>
-
-  <footer class="floating">
-    <p class="credits">© <span id="y"></span> Auri Fell • <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a></p>
-  </footer>
-
-  <script>
-    const y = document.getElementById('y');
-    if (y) y.textContent = new Date().getFullYear();
-  </script>
-</body>
+    </footer>
+    <script src="./assets/scripts/site.js"></script>
+    <script src="./assets/scripts/social-icons.js"></script>
+  </body>
 </html>

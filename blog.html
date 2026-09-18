@@ -1,174 +1,196 @@
-<!DOCTYPE html>
-<html lang="en" class="theme-aurora">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Read blog updates from Auri Fell about new music, projects, and creative process notes." />
-  <link rel="canonical" href="https://aurifellmusic.com/blog.html" />
-  <meta property="og:site_name" content="Auri Fell Music" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Auri Fell Music — Blog" />
-  <meta property="og:description" content="Read blog updates from Auri Fell about new music, projects, and creative process notes." />
-  <meta property="og:url" content="https://aurifellmusic.com/blog.html" />
-  <meta property="og:image" content="https://aurifellmusic.com/assets/images/auri-headshot-square.png" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Auri Fell Music — Blog" />
-  <meta name="twitter:description" content="Read blog updates from Auri Fell about new music, projects, and creative process notes." />
-  <meta name="twitter:image" content="https://aurifellmusic.com/assets/images/auri-headshot-square.png" />
-  <title>Auri Fell Music — Blog</title>
-  <meta name="theme-color" content="#0b0920" />
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/auri-a-color.png" />
-  <link rel="stylesheet" href="./assets/css/site.css" />
-  <link rel="stylesheet" href="./assets/css/blog.css" />
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Blog",
-    "name": "Auri Fell Music Blog",
-    "url": "https://aurifellmusic.com/blog.html",
-    "publisher": {
-      "@type": "Person",
-      "name": "Auri Fell",
-      "url": "https://aurifellmusic.com/"
-    }
-  }
-  </script>
-</head>
-
-<body>
-  <a class="visually-hidden" href="#main">Skip to content</a>
-
-  <!-- HEADER -->
-  <header>
-    <div class="wrap brand-row">
-      <div class="brand">
-        <img class="logo" src="./assets/images/auri-a-color.png" alt="Auri A logo" width="48" height="48" />
-        <span class="title">Auri Fell Music</span>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Read updates from Auri Fell about new music, projects, and creative process notes."
+    />
+    <link rel="canonical" href="https://aurifellmusic.com/blog.html" />
+    <meta property="og:site_name" content="Auri Fell Music" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Auri Fell Music - Blog" />
+    <meta property="og:url" content="https://aurifellmusic.com/blog.html" />
+    <meta
+      property="og:image"
+      content="https://aurifellmusic.com/assets/images/auri-headshot-square.png"
+    />
+    <title>Auri Fell Music - Blog</title>
+    <meta name="theme-color" content="#070915" />
+    <link rel="icon" type="image/png" href="./assets/images/auri-a-color.png" />
+    <link rel="stylesheet" href="./assets/css/site.css" />
+    <link rel="stylesheet" href="./assets/css/blog.css" />
+  </head>
+  <body>
+    <a class="visually-hidden" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap brand-row">
+        <a class="brand" href="index.html" aria-label="Auri Fell Music home"
+          ><img class="logo" src="./assets/images/auri-a-color.png" alt="" /><span class="title"
+            >Auri Fell Music</span
+          ></a
+        >
+        <nav aria-label="Primary" id="site-nav">
+          <a class="nav-link" href="index.html">Home</a
+          ><a class="nav-link" href="about.html">About</a
+          ><a class="nav-link" href="music.html">Music</a
+          ><a class="nav-link active" href="blog.html">Blog</a
+          ><a class="nav-link" href="contact.html">Contact</a>
+        </nav>
+        <button
+          class="hamburger"
+          id="menuBtn"
+          aria-controls="menuCard"
+          aria-expanded="false"
+          aria-label="Open menu"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <g class="dots">
+              <circle cx="12" cy="5" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="12" cy="19" r="2" />
+            </g>
+            <g class="lines">
+              <rect x="3" y="5" width="18" height="2" rx="1" />
+              <rect x="3" y="11" width="18" height="2" rx="1" />
+              <rect x="3" y="17" width="18" height="2" rx="1" />
+            </g>
+          </svg>
+        </button>
       </div>
-
-      <nav aria-label="Primary" id="site-nav">
-        <a class="nav-link" href="index.html">Home</a>
-        <a class="nav-link" href="about.html">About</a>
-        <a class="nav-link" href="music.html">Music</a>
-        <a class="nav-link" href="contact.html">Contact</a>
-        <a class="nav-link active" href="blog.html">Blog</a>
+    </header>
+    <div class="menu-card" id="menuCard" role="dialog" aria-modal="true" aria-label="Menu">
+      <nav class="menu-list" aria-label="Mobile">
+        <a href="index.html">Home</a><a href="about.html">About</a><a href="music.html">Music</a
+        ><a class="active" href="blog.html">Blog</a><a href="contact.html">Contact</a>
       </nav>
-
-      <button class="hamburger" id="menuBtn" aria-controls="menuCard" aria-expanded="false" aria-label="Open menu">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <g class="dots"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></g>
-          <g class="lines"><rect x="3" y="5" width="18" height="2" rx="1"/><rect x="3" y="11" width="18" height="2" rx="1"/><rect x="3" y="17" width="18" height="2" rx="1"/></g>
-        </svg>
-      </button>
     </div>
-  </header>
-  
-  <!-- Mobile menu drawer -->
-  <div class="menu-card" id="menuCard" role="dialog" aria-modal="true" aria-label="Menu">
-    <button class="hamburger inside" id="menuBtnIn" aria-label="Close menu">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <g class="dots"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></g>
-        <g class="lines"><rect x="3" y="5" width="18" height="2" rx="1"/><rect x="3" y="11" width="18" height="2" rx="1"/><rect x="3" y="17" width="18" height="2" rx="1"/></g>
-      </svg>
-    </button>
-
-    <nav class="menu-list" aria-label="Mobile">
-      <a class="nav-link" href="index.html">Home</a>
-      <a class="nav-link" href="about.html">About</a>
-      <a class="nav-link" href="music.html">Music</a>
-      <a class="nav-link" href="contact.html">Contact</a>
-      <a class="nav-link active" href="blog.html">Blog</a>
-    </nav>
-  </div>
-
-  <!-- FOLLOW DRAWER (unchanged) -->
-  <aside class="menu-card follow-card" id="followCard" role="dialog" aria-modal="true" aria-label="Subscribe">
-    <header class="follow-header"><h3 class="follow-title">Subscribe</h3></header>
-    <div class="follow-body">
-      <form id="followForm" class="follow-form" novalidate>
-        <div class="follow-field">
-          <label class="follow-label" for="followEmail">Email</label>
-          <input id="followEmail" class="follow-input" type="email" placeholder="Enter your email" required>
+    <aside
+      class="menu-card follow-card"
+      id="followCard"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="followTitle"
+      aria-describedby="followHint"
+    >
+      <header class="follow-header">
+        <h2 class="follow-title" id="followTitle">Stay in the loop.</h2>
+      </header>
+      <div class="follow-body">
+        <form id="followForm" class="follow-form" novalidate>
+          <div class="follow-field">
+            <label class="follow-label" for="followEmail">Email address</label
+            ><input
+              id="followEmail"
+              class="follow-input"
+              type="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+          <p class="follow-hint" id="followHint">
+            To unfollow later, enter the same email address and press Unfollow.
+          </p>
+          <div class="follow-actions">
+            <button type="submit" class="follow-btn follow-btn-primary" id="submitFollow">
+              Follow</button
+            ><button type="button" class="follow-btn follow-btn-secondary" id="unfollowBtn">
+              Unfollow</button
+            ><button type="button" class="follow-btn follow-btn-tertiary" id="followCancel">
+              Cancel
+            </button>
+          </div>
+          <div class="follow-status" id="followStatus" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </aside>
+    <div class="backdrop" id="backdrop"></div>
+    <main class="wrap blog-page" id="main">
+      <section class="blog-header blog-lead">
+        <img src="./assets/images/auri-headshot-square.png" alt="Auri Fell" class="blog-headshot" />
+        <div>
+          <span class="eyebrow">The Blog</span>
+          <h1>Behind the music, and beyond it.</h1>
+          <p>Notes from whatever I’m making, listening to, building, or thinking about.</p>
+          <div class="blog-buttons">
+            <button
+              class="follow-btn"
+              type="button"
+              aria-controls="followCard"
+              aria-expanded="false"
+            >
+              Follow updates
+            </button>
+          </div>
         </div>
-        <div class="follow-actions">
-          <button type="submit" class="follow-btn follow-btn-primary" id="submitFollow">Follow</button>
-          <button type="button" class="follow-btn follow-btn-secondary" id="unfollowBtn">Unfollow</button>
-          <button type="button" class="follow-btn follow-btn-tertiary" id="followCancel">Cancel</button>
-        </div>
-        <div class="follow-status" id="followStatus" aria-live="polite"></div>
-      </form>
-    </div>
-  </aside>
-
-  <!-- page veil + backdrop -->
-  <div class="page-veil" aria-hidden="true"></div>
-  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
-
-  <main class="wrap" id="main">
-    <div class="i-div tight"></div>
-
-    <!-- Blog Header -->
-    <section class="blog-header">
-      <div class="blog-info">
-        <img src="./assets/images/auri-headshot-square.png" alt="Auri Headshot" class="blog-headshot">
-        <div class="blog-buttons">
-          <button class="follow-btn" type="button">Follow</button>
-          <!-- no create button on public page -->
+      </section>
+      <section class="blog-posts" aria-label="Blog posts">
+        <p class="muted noscript-message">Loading posts…</p>
+      </section>
+      <noscript
+        ><p class="muted">
+          JavaScript is disabled. The blog can’t load posts dynamically.
+        </p></noscript
+      >
+      <div class="blog-controls">
+        <button class="show-more" type="button">Show more</button
+        ><button class="show-less" type="button">Show less</button>
+      </div>
+    </main>
+    <footer class="floating">
+      <div class="wrap footer-inner">
+        <p class="credits">
+          © <span id="y"></span> Auri Fell ·
+          <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a>
+        </p>
+        <div class="icon-links" aria-label="Social links">
+          <a
+            href="https://www.youtube.com/@AuriFellMusic"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="YouTube"
+            ><svg><use href="./assets/images/social-icons.svg#youtube"></use></svg></a
+          ><a
+            href="https://aurifell-music.bandcamp.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Bandcamp"
+            ><svg><use href="./assets/images/social-icons.svg#bandcamp"></use></svg></a
+          ><a
+            href="https://www.instagram.com/aurifellmusic/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            ><svg><use href="./assets/images/social-icons.svg#instagram"></use></svg></a
+          ><a
+            href="https://www.tiktok.com/@aurifellmusic"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="TikTok"
+            ><svg><use href="./assets/images/social-icons.svg#tiktok"></use></svg></a
+          ><a
+            href="https://www.facebook.com/aurifellmusic/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            ><svg><use href="./assets/images/social-icons.svg#facebook"></use></svg></a
+          ><a
+            href="https://discord.gg/yuPxHuxY4F"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Discord"
+            ><svg><use href="./assets/images/social-icons.svg#discord"></use></svg
+          ></a>
         </div>
       </div>
-
-    <!-- SOCIALS -->
-    <section class="socials" aria-label="Social links">
-      <a href="https://www.youtube.com/@AuriFellMusic" target="_blank" rel="me noopener noreferrer" aria-label="YouTube">
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><path fill="currentColor" d="M23 9.71a8.5 8.5 0 0 0-.91-4.13a2.92 2.92 0 0 0-1.72-1A78.36 78.36 0 0 0 12 4.27a78.45 78.45 0 0 0-8.34.3a2.87 2.87 0 0 0-1.46.74c-.9.83-1 2.25-1.1 3.45a48.29 48.29 0 0 0 0 6.48a9.55 9.55 0 0 0 .3 2a3.14 3.14 0 0 0 .71 1.36a2.86 2.86 0 0 0 1.49.78a45.18 45.18 0 0 0 6.5.33c3.5.05 6.57 0 10.2-.28a2.88 2.88 0 0 0 1.53-.78a2.49 2.49 0 0 0 .61-1a10.58 10.58 0 0 0 .52-3.4c.04-.56.04-3.94.04-4.54ZM9.74 14.85V8.66l5.92 3.11c-1.66.92-3.85 1.96-5.92 3.08Z"/></svg>    
-      </a>
-      <a href="https://aurifell-music.bandcamp.com/" target="_blank" rel="me noopener noreferrer" aria-label="Bandcamp">
-        <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#ffffff" fill-rule="evenodd" d="m4.5 8.5l-3.5 7h8.5L12.75 9v6.5h1.5v-.545a2.32 2.32 0 0 0 1.5.545c1.472 0 2.5-1.328 2.5-2.75c0 1.422 1.028 2.75 2.5 2.75c1.207 0 2.116-.894 2.404-2H21.55c-.199.322-.514.5-.8.5c-.461 0-1-.462-1-1.25s.539-1.25 1-1.25c.286 0 .601.178.8.5h1.604c-.288-1.106-1.197-2-2.404-2c-1.472 0-2.5 1.328-2.5 2.75c0-1.422-1.028-2.75-2.5-2.75a2.32 2.32 0 0 0-1.5.545V8.5zm10.25 4.25c0-.788.539-1.25 1-1.25s1 .462 1 1.25s-.539 1.25-1 1.25s-1-.462-1-1.25" clip-rule="evenodd"/></svg>
-      </a>
-      <a href="https://www.instagram.com/aurifellmusic/?hl=en" target="_blank" rel="me noopener noreferrer" aria-label="Instagram">
-        <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 15.5a3.53 3.53 0 0 1-2.5-1.04a3.54 3.54 0 0 1-1.04-2.5a3.53 3.53 0 0 1 1.04-2.5A3.54 3.54 0 0 1 12 8.42a3.53 3.53 0 0 1 2.5 1.04a3.54 3.54 0 0 1 1.04 2.5a3.53 3.53 0 0 1-1.04 2.5A3.54 3.54 0 0 1 12 15.5"/><path fill="currentColor" fill-rule="evenodd" d="M7.41 1.07C8.343 1.02 9.87.996 12 .996q3.195 0 4.59.074c.825.03 1.64.17 2.43.417c.803.286 1.53.748 2.14 1.35a5.8 5.8 0 0 1 1.35 2.14c.249.797.398 1.62.442 2.46q.05 1.375.049 4.57q0 3.195-.074 4.59a9.3 9.3 0 0 1-.417 2.43a5.8 5.8 0 0 1-1.35 2.14a5.8 5.8 0 0 1-2.14 1.35a9.3 9.3 0 0 1-2.43.417c-.933.05-2.46.074-4.59.074q-3.195 0-4.59-.074a8 8 0 0 1-2.43-.466a5.3 5.3 0 0 1-2.14-1.3a5.6 5.6 0 0 1-1.35-2.14a9.3 9.3 0 0 1-.417-2.43c-.05-.933-.074-2.46-.074-4.59q0-3.195.074-4.59c.03-.825.17-1.64.417-2.43c.286-.803.748-1.53 1.35-2.14s1.33-1.06 2.14-1.35a9.3 9.3 0 0 1 2.43-.417zm9.72 3.89a1.365 1.365 0 0 1 1.732.178c.257.256.403.604.408.968a1.6 1.6 0 0 1-.432.967a1.24 1.24 0 0 1-.943.408a1.32 1.32 0 0 1-.968-.408a1.37 1.37 0 0 1-.302-1.496a1.37 1.37 0 0 1 .507-.617zM9.25 7.24A5.34 5.34 0 0 1 12 6.499c.967-.006 1.92.25 2.75.741a5.5 5.5 0 0 1 2.01 2.01a5.47 5.47 0 0 1 0 5.5a5.5 5.5 0 0 1-2.01 2.01a5.47 5.47 0 0 1-5.5 0a5.5 5.5 0 0 1-2.01-2.01a5.47 5.47 0 0 1 0-5.5a5.53 5.53 0 0 1 2.01-2.01" clip-rule="evenodd"/></svg>
-      </a>
-      <a href="https://www.tiktok.com/@aurifellmusic" target="_blank" rel="me noopener noreferrer" aria-label="TikTok">
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 256 256"><path fill="currentColor" d="M232 80v40a8 8 0 0 1-8 8a103.25 103.25 0 0 1-48-11.71V156a76 76 0 0 1-152 0c0-36.9 26.91-69.52 62.6-75.88A8 8 0 0 1 96 88v42.69a8 8 0 0 1-4.57 7.23A20 20 0 1 0 120 156V24a8 8 0 0 1 8-8h40a8 8 0 0 1 8 8a48.05 48.05 0 0 0 48 48a8 8 0 0 1 8 8Z"/></svg>
-      </a>
-      <a href="https://www.facebook.com/aurifellmusic/" target="_blank" rel="me noopener noreferrer" aria-label="Facebook">
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 464 488"><path fill="currentColor" d="M462 78q0-30-23-53T386 2H78Q48 2 25 25T2 78v308q0 30 23 53t53 23h154V288h-56v-76h56v-30q0-39 25.5-68.5T318 84h62v76h-62q-5 0-9.5 6t-4.5 15v31h76v76h-76v174h82q30 0 53-23t23-53V78z"/></svg>
-      </a>
-      <a href="https://discord.gg/yuPxHuxY4F" target="_blank" rel="me noopener noreferrer" aria-label="Discord">
-        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 16 16"><path fill="currentColor" d="M13.553 3.016A13.233 13.233 0 0 0 10.253 2a9.068 9.068 0 0 0-.423.86a12.293 12.293 0 0 0-3.664 0A9.112 9.112 0 0 0 5.744 2A13.358 13.358 0 0 0 2.44 3.018C.351 6.108-.215 9.123.068 12.094a13.306 13.306 0 0 0 4.048 2.033a9.78 9.78 0 0 0 .867-1.399a8.605 8.605 0 0 1-1.365-.652c.115-.083.227-.168.335-.251a9.51 9.51 0 0 0 8.094 0c.11.09.222.175.335.251a8.648 8.648 0 0 1-1.368.654a9.7 9.7 0 0 0 .867 1.396a13.248 13.248 0 0 0 4.051-2.03c.332-3.446-.568-6.433-2.379-9.08Zm-8.21 7.25c-.79 0-1.442-.715-1.442-1.596c0-.881.63-1.603 1.439-1.603s1.456.722 1.442 1.603c-.014.88-.636 1.597-1.44 1.597Zm5.315 0c-.79 0-1.44-.715-1.44-1.596c0-.881.63-1.603 1.44-1.603c.81 0 1.452.722 1.438 1.603c-.014.88-.634 1.597-1.438 1.597Z"/></svg>
-      </a>
-    </section>
-
-    <div class="soft-div"></div>
-
-    <!-- BLOG POSTS (rendered HTML or later via JSON) -->
-    <section class="blog-posts" aria-label="Blog posts">
-        <p class="muted noscript-message">Loading posts...</p>
-      <!-- keep your example post(s) here if you like -->
-    </section>
-    <noscript>
-        <p class="muted">JavaScript is disabled - the blog can't load posts dynamically.</p>
-    </noscript>
-
-    <div class="blog-controls">
-      <button class="show-more">⬇Show More⬇</button>
-      <button class="show-less">⬆Show Less⬆</button>
-    </div>
-  </main>
-
-  <footer class="floating">
-    <p class="credits">© <span id="y"></span> Auri Fell • <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a></p>
-  </footer>
-
-  <!-- EmailJS SDK for Follow -->
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  <script>(function(){ emailjs.init("MLLlLku8J8USwTVeg"); })();</script>
-
-  <!-- Public-only script -->
-  <script src="./assets/scripts/blog_script.js" defer></script>
-
-
-
-
-</body>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+      emailjs.init('MLLlLku8J8USwTVeg');
+    </script>
+    <script src="./assets/scripts/blog_script.js" defer></script>
+    <script src="./assets/scripts/social-icons.js"></script>
+  </body>
 </html>

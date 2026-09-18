@@ -5,25 +5,37 @@
   const yEl = document.getElementById('y');
   if (yEl) yEl.textContent = new Date().getFullYear();
 
-  const btnOut   = document.getElementById('menuBtn');
-  const btnIn    = document.getElementById('menuBtnIn');
-  const card     = document.getElementById('menuCard');
+  const btnOut = document.getElementById('menuBtn');
+  const btnIn = document.getElementById('menuBtnIn');
+  const card = document.getElementById('menuCard');
   const backdrop = document.getElementById('backdrop');
-  const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  const FOCUSABLE =
+    'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
   let lastMenuFocus = null;
   let lastLightboxFocus = null;
 
   function trapFocus(e, root) {
     if (!root) return;
-    const nodes = Array.from(root.querySelectorAll(FOCUSABLE)).filter(el => !el.hasAttribute('disabled'));
-    if (!nodes.length) { e.preventDefault(); return; }
+    const nodes = Array.from(root.querySelectorAll(FOCUSABLE)).filter(
+      (el) => !el.hasAttribute('disabled'),
+    );
+    if (!nodes.length) {
+      e.preventDefault();
+      return;
+    }
     const first = nodes[0];
     const last = nodes[nodes.length - 1];
-    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-    if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    }
+    if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
   }
 
-  function setOpen(on){
+  function setOpen(on) {
     if (!card) return;
     const willOpen = !!on;
     if (willOpen) lastMenuFocus = document.activeElement;
@@ -40,16 +52,16 @@
     }
   }
   btnOut?.addEventListener('click', () => setOpen(!card?.classList.contains('open')));
-  btnIn?.addEventListener('click',  () => setOpen(false));
+  btnIn?.addEventListener('click', () => setOpen(false));
   backdrop?.addEventListener('click', () => setOpen(false));
-  document.addEventListener('keydown', (e)=>{
+  document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') setOpen(false);
     if (e.key === 'Tab' && card?.classList.contains('open')) trapFocus(e, card);
   });
-  document.addEventListener('click', (e)=>{
+  document.addEventListener('click', (e) => {
     const insideCard = e.target.closest('#menuCard');
-    const onBtnOut   = e.target.closest('#menuBtn');
-    const onBtnIn    = e.target.closest('#menuBtnIn');
+    const onBtnOut = e.target.closest('#menuBtn');
+    const onBtnIn = e.target.closest('#menuBtnIn');
     if (!insideCard && !onBtnOut && !onBtnIn) setOpen(false);
   });
 
@@ -58,9 +70,9 @@
   // =========================
   const GH = {
     owner: 'Aur-iii',
-    repo:  'aurifellmusic',
+    repo: 'aurifellmusic',
     branch: 'main',
-    releasesPath: 'music/releases'
+    releasesPath: 'music/releases',
   };
 
   const rawUrl = (rel) =>
@@ -72,7 +84,8 @@
 
   // Minimal front-matter parser (copied from blog_script.js)
   function parseFrontMatter(md) {
-    let fm = {}, body = md;
+    let fm = {},
+      body = md;
     if (md.startsWith('---')) {
       const end = md.indexOf('\n---', 3);
       if (end !== -1) {
@@ -175,12 +188,7 @@
 
   function primaryLink(links) {
     return (
-      links?.bandcamp ||
-      links?.spotify ||
-      links?.apple   ||
-      links?.youtube ||
-      links?.other   ||
-      '#'
+      links?.bandcamp || links?.spotify || links?.apple || links?.youtube || links?.other || '#'
     );
   }
 
@@ -188,7 +196,7 @@
     const order = ['spotify', 'apple', 'bandcamp', 'youtube', 'other'];
     for (const k of order) {
       if (links?.[k] && links[k] !== primaryHref) {
-        const base = k === 'other' ? 'another platform' : (k[0].toUpperCase() + k.slice(1));
+        const base = k === 'other' ? 'another platform' : k[0].toUpperCase() + k.slice(1);
         return { label: `Listen on ${base}`, href: links[k] };
       }
     }
@@ -198,10 +206,10 @@
   function labelFromHref(href) {
     if (!href) return 'Listen';
     const u = href.toLowerCase();
-    if (u.includes('bandcamp'))     return 'Listen on Bandcamp';
+    if (u.includes('bandcamp')) return 'Listen on Bandcamp';
     if (u.includes('open.spotify')) return 'Listen on Spotify';
-    if (u.includes('music.apple'))  return 'Listen on Apple Music';
-    if (u.includes('youtube'))      return 'Listen on YouTube';
+    if (u.includes('music.apple')) return 'Listen on Apple Music';
+    if (u.includes('youtube')) return 'Listen on YouTube';
     return 'Listen';
   }
 
@@ -219,7 +227,9 @@
       }
       if (!res.ok) throw new Error(`GitHub list failed: ${res.status}`);
       const listing = await res.json();
-      const dirs = (Array.isArray(listing) ? listing : []).filter(e => e.type === 'dir');
+      const dirs = (Array.isArray(listing) ? listing : []).filter(
+        (e) => e.type === 'dir' && !e.name.startsWith('_preview-'),
+      );
 
       for (const d of dirs) {
         const slug = d.name;
@@ -233,7 +243,7 @@
           out.push({
             slug,
             title: fm.title || slug,
-            date: fm.date  || '',
+            date: fm.date || '',
             ts: isNaN(ts) ? 0 : ts,
             type: fm.type || 'single',
             cover: fm.coverUrl
@@ -241,14 +251,14 @@
               : withBust(rawUrl(`${GH.releasesPath}/${slug}/cover.png`), bust),
             blurb: fm.blurb || '',
             tracks: Array.isArray(fm.tracks) ? fm.tracks : [],
-            links: linksMap
+            links: linksMap,
           });
         } catch (e) {
           console.warn('[music] skip bad release', slug, e);
         }
       }
 
-      out.sort((a,b) => (b.ts - a.ts) || a.slug.localeCompare(b.slug));
+      out.sort((a, b) => b.ts - a.ts || a.slug.localeCompare(b.slug));
       return out;
     } catch (err) {
       console.error('[music] load releases failed', err);
@@ -261,22 +271,22 @@
   // =========================
   const latestCover = document.getElementById('latestCover');
   const latestTitle = document.getElementById('latestTitle');
-  const latestMeta  = document.getElementById('latestMeta');
+  const latestMeta = document.getElementById('latestMeta');
   const latestBlurb = document.getElementById('latestBlurb');
-  const latestPlay  = document.getElementById('latestPlay');
-  const latestAlt   = document.getElementById('latestAlt');
+  const latestPlay = document.getElementById('latestPlay');
+  const latestAlt = document.getElementById('latestAlt');
 
-  const grid       = document.getElementById('discographyGrid');
-  const moreBtn    = document.querySelector('.discography-controls .show-more');
-  const lessBtn    = document.querySelector('.discography-controls .show-less');
+  const grid = document.getElementById('discographyGrid');
+  const moreBtn = document.querySelector('.discography-controls .show-more');
+  const lessBtn = document.querySelector('.discography-controls .show-less');
 
-  const lb      = document.getElementById('lb');
+  const lb = document.getElementById('lb');
   const lbClose = document.getElementById('lbClose');
 
   let releases = [];
-  const GRID_STEP      = 4;   // one row of 4 per step
-  const GRID_BASE_ROWS = 3;   // 3 rows visible by default
-  const GRID_BASE      = GRID_STEP * GRID_BASE_ROWS; // 12
+  const GRID_STEP = 4; // one row of 4 per step
+  const GRID_BASE_ROWS = 3; // 3 rows visible by default
+  const GRID_BASE = GRID_STEP * GRID_BASE_ROWS; // 12
   let visible = 0;
   let lastDelta = GRID_STEP;
 
@@ -288,11 +298,17 @@
 
   function renderLatest(r) {
     if (!r) return;
+    const latestCard = latestCover && latestCover.closest('.latest-release');
+    if (latestCard && r.cover) latestCard.style.setProperty('--release-cover', `url("${r.cover}")`);
     if (latestCover) latestCover.src = r.cover;
     if (latestTitle) latestTitle.textContent = r.title;
 
     const pretty = r.date
-      ? new Date(r.date).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' })
+      ? new Date(r.date).toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        })
       : '';
     if (latestMeta) {
       const typeLabel = r.type.charAt(0).toUpperCase() + r.type.slice(1);
@@ -322,18 +338,28 @@
     if (!grid) return;
     grid.innerHTML = '';
 
-    gridReleases.forEach((r, idxOffset) => {
+    gridReleases.forEach((r) => {
       const globalIndex = releases.indexOf(r); // use full array index so lightbox matches
       const card = document.createElement('article');
       card.className = 'release';
       card.setAttribute('tabindex', '0');
       card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', `Open ${r.title} release details`);
       card.dataset.index = String(globalIndex);
 
-      card.innerHTML = `
-        <span class="label">${r.type.toUpperCase()}</span>
-        <img src="${r.cover}" alt="${r.title} cover" loading="lazy"/>
-      `;
+      const typeLabel = document.createElement('span');
+      typeLabel.className = 'label';
+      typeLabel.textContent = r.type.toUpperCase();
+
+      const cover = document.createElement('img');
+      cover.src = r.cover;
+      cover.alt = '';
+      cover.loading = 'lazy';
+
+      const title = document.createElement('span');
+      title.className = 'release-title';
+      title.textContent = r.title;
+      card.append(typeLabel, cover, title);
 
       card.addEventListener('click', () => openLB(globalIndex));
       card.addEventListener('keydown', (e) => {
@@ -363,7 +389,7 @@
     if (visible > total) visible = total;
 
     cards.forEach((card, idx) => {
-      card.style.display = (idx < visible) ? '' : 'none';
+      card.style.display = idx < visible ? '' : 'none';
     });
 
     if (total <= GRID_BASE) {
@@ -384,6 +410,7 @@
       const total = grid.querySelectorAll('.release').length;
       const remaining = total - visible;
       const delta = Math.min(GRID_STEP, remaining);
+      if (delta <= 0) return;
       visible += delta;
       lastDelta = delta;
       applyGridVisibility();
@@ -408,17 +435,22 @@
 
     const coverEl = document.getElementById('lbCover');
     const titleEl = document.getElementById('lbTitle');
-    const metaEl  = document.getElementById('lbMeta');
+    const metaEl = document.getElementById('lbMeta');
     const blurbEl = document.getElementById('lbBlurb');
     const linksEl = document.getElementById('lbLinks');
-    const wrap    = document.getElementById('lbTracksWrap');
-    const list    = document.getElementById('lbTracks');
+    const wrap = document.getElementById('lbTracksWrap');
+    const list = document.getElementById('lbTracks');
 
     if (coverEl) coverEl.src = r.cover;
+    lb.querySelector('.lb-card')?.style.setProperty('--release-cover', `url("${r.cover}")`);
     if (titleEl) titleEl.textContent = r.title;
 
     const pretty = r.date
-      ? new Date(r.date).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' })
+      ? new Date(r.date).toLocaleDateString(undefined, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        })
       : '';
     if (metaEl) {
       const typeLabel = r.type.charAt(0).toUpperCase() + r.type.slice(1);
@@ -428,17 +460,15 @@
 
     if (linksEl) {
       linksEl.innerHTML = '';
-      const order = ['spotify','apple','bandcamp','youtube','other'];
-      order.forEach(k => {
+      const order = ['spotify', 'apple', 'bandcamp', 'youtube', 'other'];
+      order.forEach((k) => {
         if (r.links && r.links[k]) {
           const a = document.createElement('a');
+          a.className = 'btn';
           a.href = r.links[k];
           a.target = '_blank';
-          a.rel   = 'noopener';
-          a.textContent =
-            k === 'other'
-              ? 'Listen'
-              : `Listen on ${k[0].toUpperCase() + k.slice(1)}`;
+          a.rel = 'noopener';
+          a.textContent = k === 'other' ? 'Listen' : `Listen on ${k[0].toUpperCase() + k.slice(1)}`;
           linksEl.appendChild(a);
         }
       });
@@ -448,7 +478,7 @@
       if (r.type !== 'single' && Array.isArray(r.tracks) && r.tracks.length) {
         wrap.style.display = '';
         list.innerHTML = '';
-        r.tracks.forEach(t => {
+        r.tracks.forEach((t) => {
           const li = document.createElement('li');
           li.textContent = t;
           list.appendChild(li);
@@ -475,7 +505,9 @@
 
   if (lb && lbClose) {
     lbClose.addEventListener('click', closeLB);
-    lb.addEventListener('click', (e) => { if (e.target === lb) closeLB(); });
+    lb.addEventListener('click', (e) => {
+      if (e.target === lb) closeLB();
+    });
     document.addEventListener('keydown', (e) => {
       if (!lb.classList.contains('open')) return;
       if (e.key === 'Escape') closeLB();
@@ -490,7 +522,7 @@
     releases = await loadReleasesFromGitHub();
     if (!releases.length) {
       console.warn('[music] No releases found');
-      if (grid) grid.innerHTML = `<p class="muted">No releases yet — check back soon!</p>`;
+      if (grid) grid.innerHTML = `<p class="muted">No releases yet. Check back soon!</p>`;
       return;
     }
 

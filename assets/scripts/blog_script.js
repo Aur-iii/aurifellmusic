@@ -1,9 +1,9 @@
 /* =========================
-   BLOG — public script
+   BLOG public script
    ========================= */
 
 /* ---------- GLOBAL SETUP ---------- */
-(function(){
+(function () {
   const y = document.getElementById('y');
   if (y) y.textContent = new Date().getFullYear();
 })();
@@ -12,81 +12,108 @@ const backdrop = document.getElementById('backdrop');
 /* ---------- REPO CONFIG ---------- */
 const GH = {
   owner: 'Aur-iii',
-  repo:  'aurifellmusic',
+  repo: 'aurifellmusic',
   branch: 'main',
-  postsPath: 'blog/posts'
+  postsPath: 'blog/posts',
 };
 const rawUrl = (rel) =>
   `https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/${GH.branch}/${String(rel).replace(/^\/+/, '')}`;
 
 /* ---------- ELEMENTS ---------- */
-const btnOut   = document.getElementById('menuBtn');
-const btnIn    = document.getElementById('menuBtnIn');
+const btnOut = document.getElementById('menuBtn');
+const btnIn = document.getElementById('menuBtnIn');
 const menuCard = document.getElementById('menuCard');
 
 // Follow drawer
-const followBtn    = document.querySelector('.blog-header .follow-btn');
-const followCard   = document.getElementById('followCard');
+const followBtn = document.querySelector('.blog-header .follow-btn');
+const followCard = document.getElementById('followCard');
 const followCancel = document.getElementById('followCancel');
-const followForm   = document.getElementById('followForm');
-const followEmail  = document.getElementById('followEmail');
+const followForm = document.getElementById('followForm');
+const followEmail = document.getElementById('followEmail');
 const followStatus = document.getElementById('followStatus');
 const submitFollow = document.getElementById('submitFollow');
-const unfollowBtn  = document.getElementById('unfollowBtn');
+const unfollowBtn = document.getElementById('unfollowBtn');
 
 // Posts + controls
-const postsHost   = document.querySelector('.blog-posts');
+const postsHost = document.querySelector('.blog-posts');
 const showMoreBtn = document.querySelector('.show-more');
 const showLessBtn = document.querySelector('.show-less');
-const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+const FOCUSABLE =
+  'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 let lastDrawerFocus = null;
 let lastGalleryFocus = null;
 
 /* ---------- HELPERS ---------- */
-const escapeHTML = (s='') => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const escapeHTML = (s = '') =>
+  s.replace(
+    /[&<>"']/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+  );
 const toDateText = (iso) =>
-  iso ? new Date(iso).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' }) : '';
+  iso
+    ? new Date(iso).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : '';
 
 const bodyToParagraphs = (txt = '') => {
-  const norm = String(txt || '').replace(/\r\n?/g, '\n').trim();
+  const norm = String(txt || '')
+    .replace(/\r\n?/g, '\n')
+    .trim();
   if (!norm) return '';
   const paras = norm.split(/\n{2,}/); // blank lines = new paragraph
 
-  return paras.map(p => {
-    // Escape HTML but then restore allowed tags
-    let safe = escapeHTML(p);
+  return paras
+    .map((p) => {
+      // Escape HTML but then restore allowed tags
+      let safe = escapeHTML(p);
 
-    // Convert URLs or Markdown-style links to clickable <a> tags
-    // Match raw URLs
-    safe = safe.replace(
-      /https?:\/\/[^\s<>"']+/g,
-      url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
-    );
+      // Convert URLs or Markdown-style links to clickable <a> tags
+      // Match raw URLs
+      safe = safe.replace(
+        /https?:\/\/[^\s<>"']+/g,
+        (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`,
+      );
 
-    // Optionally: also support markdown-style [text](url)
-    safe = safe.replace(
-      /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-      (m, text, href) =>
-        `<a href="${href}" target="_blank" rel="noopener noreferrer">${escapeHTML(text)}</a>`
-    );
+      // Optionally: also support markdown-style [text](url)
+      safe = safe.replace(
+        /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+        (m, text, href) =>
+          `<a href="${href}" target="_blank" rel="noopener noreferrer">${escapeHTML(text)}</a>`,
+      );
 
-    const lines = safe.split('\n').join('<br>');
-    return `<p>${lines}</p>`;
-  }).join('\n');
+      const lines = safe.split('\n').join('<br>');
+      return `<p>${lines}</p>`;
+    })
+    .join('\n');
 };
 
-function trapFocus(e, root){
+function trapFocus(e, root) {
   if (!root) return;
-  const nodes = Array.from(root.querySelectorAll(FOCUSABLE)).filter(el => !el.hasAttribute('disabled'));
-  if (!nodes.length) { e.preventDefault(); return; }
+  const nodes = Array.from(root.querySelectorAll(FOCUSABLE)).filter(
+    (el) => !el.hasAttribute('disabled'),
+  );
+  if (!nodes.length) {
+    e.preventDefault();
+    return;
+  }
   const first = nodes[0];
   const last = nodes[nodes.length - 1];
-  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-  if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  }
+  if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
 }
 
 function parseFrontMatter(md) {
-  let fm = {}, body = md;
+  let fm = {},
+    body = md;
   if (md.startsWith('---')) {
     const end = md.indexOf('\n---', 3);
     if (end !== -1) {
@@ -96,12 +123,18 @@ function parseFrontMatter(md) {
       let key = null;
       for (const ln of lines) {
         const li = ln.match(/^\s*-\s+(.*)$/);
-        if (li && key) { (fm[key] ||= []).push(li[1].replace(/^"(.*)"$/, '$1')); continue; }
+        if (li && key) {
+          (fm[key] ||= []).push(li[1].replace(/^"(.*)"$/, '$1'));
+          continue;
+        }
         const kv = ln.match(/^([A-Za-z0-9_]+)\s*:\s*(.*)$/);
         if (kv) {
           key = kv[1];
           let v = kv[2].trim();
-          if (v === '') { fm[key] = []; continue; }
+          if (v === '') {
+            fm[key] = [];
+            continue;
+          }
           fm[key] = v.replace(/^"(.*)"$/, '$1');
         } else key = null;
       }
@@ -111,20 +144,17 @@ function parseFrontMatter(md) {
 }
 
 /* ---------- SUBSCRIPTIONS WORKER ---------- */
-const WORKER_URL = "https://auri-subs.auri-e60.workers.dev"; // e.g., https://auri-subs.yourname.workers.dev
+const WORKER_URL = 'https://auri-subs.auri-e60.workers.dev'; // e.g., https://auri-subs.yourname.workers.dev
 
 async function postSubs(action, email) {
-  try {
-    const r = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json' },
-      body: JSON.stringify({ action, email })
-    });
-    // ignore body; best-effort write
-    await r.json().catch(()=>{});
-  } catch (e) {
-    console.warn('Subscription worker call failed:', e);
-  }
+  const r = await fetch(WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, email }),
+  });
+  const result = await r.json().catch(() => null);
+  if (!r.ok || !result?.ok) throw new Error(`Subscription worker failed: ${r.status}`);
+  return result;
 }
 
 // Cache-bust helper
@@ -158,62 +188,106 @@ async function fetchIndexMd(slug) {
 }
 
 /* ---------- FOLLOW: EmailJS (optional) ---------- */
-const EJS_SERVICE  = "service_aurifellmusic";
-const EJS_TEMPLATE = "send_to_follower";
-const SITE_NAME    = "Auri Fell — Blog";
+const EJS_SERVICE = 'service_aurifellmusic';
+const EJS_TEMPLATE = 'send_to_follower';
+const SITE_NAME = 'Auri Fell Blog';
 
 function setFollowStatus(msg, ok = true) {
   if (!followStatus) return;
   followStatus.textContent = msg;
-  followStatus.classList.remove('status--error','status--success','is-visible');
+  followStatus.classList.remove('status--error', 'status--success', 'is-visible');
+  if (!msg) return;
   followStatus.classList.add(ok ? 'status--success' : 'status--error', 'is-visible');
 }
 async function sendThanksEmail(toEmail) {
   if (typeof emailjs === 'undefined') throw new Error('EmailJS not loaded');
   return emailjs.send(EJS_SERVICE, EJS_TEMPLATE, { to_email: toEmail, site_name: SITE_NAME });
 }
+let followRequestId = 0;
+let followBusy = false;
+function setFollowBusy(busy) {
+  followBusy = busy;
+  if (submitFollow) submitFollow.disabled = busy;
+  if (unfollowBtn) unfollowBtn.disabled = busy;
+}
+function getFollowEmail() {
+  const email = (followEmail?.value || '').trim().toLowerCase();
+  if (followEmail) followEmail.value = email;
+  if (!email || !followEmail?.checkValidity() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setFollowStatus('Please enter a valid email address.', false);
+    followEmail?.focus();
+    return null;
+  }
+  return email;
+}
 followForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email = (followEmail?.value || "").trim().toLowerCase();
+  if (followBusy) return;
+  const email = getFollowEmail();
   if (!email) return;
+  const requestId = ++followRequestId;
 
-  if (submitFollow) {
-    submitFollow.disabled = true;
-    submitFollow.textContent = "Sending…";
-  }
-  setFollowStatus("", true);
+  setFollowBusy(true);
+  if (submitFollow) submitFollow.textContent = 'Following…';
+  setFollowStatus('', true);
 
   try {
-    await sendThanksEmail(email);
-    await postSubs('subscribe', email);             // ← NEW: add to private repo via Worker
-    setFollowStatus("Thanks! Check your inbox ✉️", true);
-    if (submitFollow) submitFollow.textContent = "Sent ✓";
-    setTimeout(() => openDrawer(null), 1200);
+    await postSubs('subscribe', email);
+    if (requestId === followRequestId) {
+      setFollowStatus('You’re following! Sending your welcome email…', true);
+      if (submitFollow) submitFollow.textContent = 'Following ✓';
+    }
+    try {
+      await sendThanksEmail(email);
+      if (requestId === followRequestId)
+        setFollowStatus('You’re following! Check your inbox ✉️', true);
+    } catch (mailError) {
+      console.warn('Welcome email failed:', mailError);
+      if (requestId === followRequestId)
+        setFollowStatus('You’re following, but the welcome email could not be sent.', true);
+    }
   } catch (err) {
     console.error(err);
-    setFollowStatus("Could not send email. Try again?", false);
-    if (submitFollow) submitFollow.textContent = "Follow";
+    if (requestId === followRequestId) {
+      setFollowStatus('Could not follow right now. Please try again.', false);
+      if (submitFollow) submitFollow.textContent = 'Follow';
+    }
   } finally {
-    if (submitFollow) submitFollow.disabled = false;
+    if (requestId === followRequestId) setFollowBusy(false);
   }
 });
 unfollowBtn?.addEventListener('click', async () => {
-  const email = (followEmail?.value || "").trim().toLowerCase();
-  if (email) { await postSubs('unsubscribe', email); } // ← NEW: remove from repo via Worker
-  setFollowStatus("Unfollowed", false);
-  if (submitFollow) submitFollow.textContent = "Follow";
-  setTimeout(() => openDrawer(null), 1000);
+  if (followBusy) return;
+  const email = getFollowEmail();
+  if (!email) return;
+  const requestId = ++followRequestId;
+  setFollowBusy(true);
+  setFollowStatus('', true);
+  try {
+    await postSubs('unsubscribe', email);
+    if (requestId === followRequestId) {
+      setFollowStatus('Unfollowed. You won’t receive new updates.', true);
+      if (submitFollow) submitFollow.textContent = 'Follow';
+    }
+  } catch (err) {
+    console.error(err);
+    if (requestId === followRequestId)
+      setFollowStatus('Could not unfollow right now. Please try again.', false);
+  } finally {
+    if (requestId === followRequestId) setFollowBusy(false);
+  }
 });
 
-function resetFollowUI(){
-  if (followEmail) followEmail.value = "";
+function resetFollowUI() {
+  followRequestId++;
+  setFollowBusy(false);
+  if (followEmail) followEmail.value = '';
   if (followStatus) {
-    followStatus.textContent = "";
-    followStatus.classList.remove("status--error","status--success","is-visible");
+    followStatus.textContent = '';
+    followStatus.classList.remove('status--error', 'status--success', 'is-visible');
   }
   if (submitFollow) {
-    submitFollow.textContent = "Follow";
-    submitFollow.disabled = false;
+    submitFollow.textContent = 'Follow';
   }
 }
 
@@ -221,9 +295,9 @@ function resetFollowUI(){
 function openDrawer(which) {
   const wasFollowOpen = followCard?.classList.contains('open');
 
-  const openMenu   = which === 'menu';
+  const openMenu = which === 'menu';
   const openFollow = which === 'follow';
-  const anyOpen    = !!which;
+  const anyOpen = !!which;
   if (anyOpen) lastDrawerFocus = document.activeElement;
 
   menuCard?.classList.toggle('open', openMenu);
@@ -231,6 +305,7 @@ function openDrawer(which) {
   document.body.classList.toggle('menu-open', anyOpen);
   backdrop?.classList.toggle('show', anyOpen);
   btnOut?.setAttribute('aria-expanded', String(openMenu));
+  followBtn?.setAttribute('aria-expanded', String(openFollow));
 
   // if we just closed the follow drawer, clear the UI
   if (!anyOpen && wasFollowOpen) {
@@ -243,7 +318,9 @@ function openDrawer(which) {
   if (anyOpen) {
     setTimeout(() => {
       const host = openMenu ? menuCard : followCard;
-      const first = host?.querySelector('input,button,a,select,textarea,[tabindex]:not([tabindex="-1"])');
+      const first = host?.querySelector(
+        'input,button,a,select,textarea,[tabindex]:not([tabindex="-1"])',
+      );
       first?.focus();
     }, 220);
   }
@@ -259,15 +336,19 @@ followBtn?.addEventListener('click', () => {
   openDrawer(isOpen ? null : 'follow');
 });
 followCancel?.addEventListener('click', () => openDrawer(null));
-document.addEventListener('keydown', e => { if (e.key === 'Escape') openDrawer(null); });
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') openDrawer(null);
+});
+document.addEventListener('keydown', (e) => {
   if (e.key !== 'Tab') return;
   if (menuCard?.classList.contains('open')) trapFocus(e, menuCard);
   if (followCard?.classList.contains('open')) trapFocus(e, followCard);
 });
 backdrop?.addEventListener('click', () => openDrawer(null));
-document.addEventListener('click', e => {
-  const inside = e.target.closest('#menuCard, #menuBtn, #menuBtnIn, #followCard, .blog-header .follow-btn');
+document.addEventListener('click', (e) => {
+  const inside = e.target.closest(
+    '#menuCard, #menuBtn, #menuBtnIn, #followCard, .blog-header .follow-btn',
+  );
   if (!inside) openDrawer(null);
 });
 
@@ -283,52 +364,68 @@ function setShown(el, show) {
   el.classList.toggle('hidden', !show);
 }
 
-function applyVisibility(){
+function applyVisibility() {
   const items = postsHost?.querySelectorAll('.blog-post') || [];
-  items.forEach((post, idx) => { post.style.display = (idx < visible) ? '' : 'none'; });
+  items.forEach((post, idx) => {
+    post.style.display = idx < visible ? '' : 'none';
+  });
 }
 
 function updateButtons() {
-  const items  = postsHost?.querySelectorAll('.blog-post') || [];
-  const total  = items.length;
+  const items = postsHost?.querySelectorAll('.blog-post') || [];
+  const total = items.length;
   const moreBtn = document.querySelector('.show-more');
   const lessBtn = document.querySelector('.show-less');
 
-  if (total <= STEP) { setShown(moreBtn, false); setShown(lessBtn, false); return; }
+  if (total <= STEP) {
+    setShown(moreBtn, false);
+    setShown(lessBtn, false);
+    return;
+  }
   setShown(moreBtn, visible < total);
   setShown(lessBtn, visible > STEP);
 }
-function recomputeShowButtons(){
+function recomputeShowButtons() {
   const total = postsHost?.querySelectorAll('.blog-post').length || 0;
   visible = Math.min(total, Math.max(visible || STEP, STEP));
-  applyVisibility(); updateButtons();
+  applyVisibility();
+  updateButtons();
 }
 document.addEventListener('DOMContentLoaded', () => {
   const total = postsHost?.querySelectorAll('.blog-post').length || 0;
-  visible = Math.min(total, STEP); lastDelta = STEP;
-  applyVisibility(); updateButtons();
+  visible = Math.min(total, STEP);
+  lastDelta = STEP;
+  applyVisibility();
+  updateButtons();
 });
 showMoreBtn?.addEventListener('click', () => {
   const total = postsHost?.querySelectorAll('.blog-post').length || 0;
   const remaining = total - visible;
   const delta = Math.min(STEP, remaining);
-  visible += delta; lastDelta = delta;
-  applyVisibility(); updateButtons();
+  if (delta <= 0) return;
+  visible += delta;
+  lastDelta = delta;
+  applyVisibility();
+  updateButtons();
 });
 showLessBtn?.addEventListener('click', () => {
   visible = Math.max(STEP, visible - lastDelta);
   lastDelta = STEP;
-  applyVisibility(); updateButtons();
+  applyVisibility();
+  updateButtons();
 });
 
 /* ---------- GALLERY NORMALIZER + LIGHTBOX ---------- */
-function normalizePostGalleries(root = document){
-  (root.querySelectorAll?.('.post-gallery') || []).forEach(gallery => {
+function normalizePostGalleries(root = document) {
+  (root.querySelectorAll?.('.post-gallery') || []).forEach((gallery) => {
     const thumbs = Array.from(gallery.querySelectorAll('.thumb'));
-    const imgs   = thumbs.map(t => t.querySelector('img')).filter(Boolean);
-    if (!imgs.length) { gallery.classList.add('hidden'); return; }
+    const imgs = thumbs.map((t) => t.querySelector('img')).filter(Boolean);
+    if (!imgs.length) {
+      gallery.classList.add('hidden');
+      return;
+    }
 
-    const allItems = imgs.map(img => {
+    const allItems = imgs.map((img) => {
       const src = img.currentSrc || img.src;
       const alt = img.alt || 'Gallery image';
       const caption = img.dataset.caption?.trim() || img.alt || '';
@@ -338,7 +435,7 @@ function normalizePostGalleries(root = document){
     gallery.classList.add('collage');
 
     if (imgs.length <= 4) {
-      thumbs.slice(imgs.length).forEach(t => t.remove());
+      thumbs.slice(imgs.length).forEach((t) => t.remove());
       if (thumbs[3]) {
         thumbs[3].classList.remove('more');
         thumbs[3].removeAttribute('data-more');
@@ -357,45 +454,57 @@ function normalizePostGalleries(root = document){
       fourth.setAttribute('data-more', `+${extraCount}`);
       let badge = fourth.querySelector('div.more-badge');
       if (!badge) {
-        badge = document.createElement('div'); badge.className = 'more-badge'; fourth.appendChild(badge);
+        badge = document.createElement('div');
+        badge.className = 'more-badge';
+        fourth.appendChild(badge);
       }
       badge.textContent = `+${extraCount}`;
       const fourthImg = fourth.querySelector('img');
-      if (fourthImg && imgs[3]) { fourthImg.src = imgs[3].src; fourthImg.alt = imgs[3].alt || 'Gallery image'; }
-      Array.from(gallery.querySelectorAll('.thumb')).slice(4).forEach(t => t.remove());
+      if (fourthImg && imgs[3]) {
+        fourthImg.src = imgs[3].src;
+        fourthImg.alt = imgs[3].alt || 'Gallery image';
+      }
+      Array.from(gallery.querySelectorAll('.thumb'))
+        .slice(4)
+        .forEach((t) => t.remove());
     }
 
     gallery.onclick = () => openGalleryLightbox(gallery, 0);
   });
 }
 
-/* ---------- LOAD POSTS DIRECTLY FROM GITHUB (single, cache-proof loader) ---------- */
+/* ---------- LOAD POSTS FROM GITHUB ---------- */
 document.addEventListener('DOMContentLoaded', async () => {
   const host = document.querySelector('.blog-posts');
   if (!host) return;
 
-  const reDateSlug = /^\d{4}-\d{2}-\d{2}-/;
-
   try {
-    // 1) list directories in blog/posts
     const res = await fetch(
       `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${encodeURIComponent(GH.postsPath)}?ref=${GH.branch}`,
-      { cache: 'no-store' }
+      { cache: 'no-store' },
     );
-    if (res.status === 404) { host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`; return; }
+    if (res.status === 404) {
+      host.innerHTML = `<p class="muted">No posts yet. Check back soon!</p>`;
+      return;
+    }
     if (!res.ok) throw new Error(`GitHub list failed: ${res.status}`);
     const listing = await res.json();
-    const dirs = (Array.isArray(listing) ? listing : []).filter(e => e.type === 'dir' && /^\d{4}-\d{2}-\d{2}-/.test(e.name));
-    if (!dirs.length) { host.innerHTML = `<p class="muted">No posts yet — check back soon!</p>`; return; }
+    const dirs = (Array.isArray(listing) ? listing : []).filter(
+      (e) => e.type === 'dir' && /^\d{4}-\d{2}-\d{2}-/.test(e.name),
+    );
+    if (!dirs.length) {
+      host.innerHTML = `<p class="muted">No posts yet. Check back soon!</p>`;
+      return;
+    }
 
-    // NEW: prefetch index.md for each dir to read exact fm.date, and keep parsed content to avoid refetch
+    // Read exact dates from front matter, then sort posts.
     const posts = [];
     for (const d of dirs) {
       const slug = d.name;
       try {
         const { md, bust } = await fetchIndexMd(slug);
         const { fm, body } = parseFrontMatter(md);
-        const ts = fm.date ? Date.parse(fm.date) : Date.parse(slug.slice(0,10)); // fallback just in case
+        const ts = fm.date ? Date.parse(fm.date) : Date.parse(slug.slice(0, 10)); // fallback just in case
         posts.push({ slug, fm, body, bust, ts: isNaN(ts) ? 0 : ts });
       } catch (e) {
         console.warn('skip bad post', slug, e);
@@ -403,28 +512,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Sort by exact timestamp DESC, tie-break by slug ASC (stable & deterministic)
-    posts.sort((a, b) => (b.ts - a.ts) || a.slug.localeCompare(b.slug));
+    posts.sort((a, b) => b.ts - a.ts || a.slug.localeCompare(b.slug));
 
     const frag = document.createDocumentFragment();
 
     // Build each article from the pre-parsed posts[]
     for (const p of posts) {
       const { slug, fm, body, bust } = p;
-      const title   = fm.title || 'Untitled';
-      const dateISO = fm.date  || '';
-      const side    = fm.side === 'left' ? 'left' : 'right';
+      const title = fm.title || 'Untitled';
+      const dateISO = fm.date || '';
+      const side = fm.side === 'left' ? 'left' : 'right';
 
-      // hero (no default — render only if provided)
+      // hero (no default; render only if provided)
       let heroHTML = '';
       if (fm.heroUrl) {
         const heroSrc = escapeHTML(String(fm.heroUrl));
         heroHTML = `<img class="post-image" src="${heroSrc}" alt="">`;
       } else if (fm.hero) {
-        const cleanHero = String(fm.hero).replace(/^\.\//,'');
+        const cleanHero = String(fm.hero).replace(/^\.\//, '');
         const heroSrc = withBust(rawUrl(`${GH.postsPath}/${slug}/${cleanHero}`), bust);
         heroHTML = `<img class="post-image" src="${heroSrc}" alt="">`;
       }
-
 
       // gallery thumbs (append same bust to each image)
       const galleryHTML = (() => {
@@ -439,33 +547,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (urlList && urlList.length) {
-          const thumbs = urlList.map((u, i) => {
-            const src = escapeHTML(u);
-            const cap = captions[i]
-              ? ` data-caption="${escapeHTML(String(captions[i]))}"`
-              : '';
-            return `<div class="thumb"><img src="${src}" alt=""${cap}></div>`;
-          }).join('');
+          const thumbs = urlList
+            .map((u, i) => {
+              const src = escapeHTML(u);
+              const cap = captions[i] ? ` data-caption="${escapeHTML(String(captions[i]))}"` : '';
+              return `<div class="thumb"><img src="${src}" alt=""${cap}></div>`;
+            })
+            .join('');
           return `<div class="post-gallery collage">${thumbs}</div>`;
         }
 
         // Fallback: existing local gallery files
         const gallery = Array.isArray(fm.gallery) ? fm.gallery : [];
         if (!gallery.length) return '';
-        const thumbs = gallery.map((g, i) => {
-          const clean = String(g).replace(/^\.\//,'');
-          const src = withBust(rawUrl(`${GH.postsPath}/${slug}/${clean}`), bust);
-          const cap = captions[i]
-            ? ` data-caption="${escapeHTML(String(captions[i]))}"`
-            : '';
-          return `<div class="thumb"><img src="${src}" alt=""${cap}></div>`;
-        }).join('');
+        const thumbs = gallery
+          .map((g, i) => {
+            const clean = String(g).replace(/^\.\//, '');
+            const src = withBust(rawUrl(`${GH.postsPath}/${slug}/${clean}`), bust);
+            const cap = captions[i] ? ` data-caption="${escapeHTML(String(captions[i]))}"` : '';
+            return `<div class="thumb"><img src="${src}" alt=""${cap}></div>`;
+          })
+          .join('');
         return `<div class="post-gallery collage">${thumbs}</div>`;
       })();
 
-
       const article = document.createElement('article');
       article.className = `blog-post ${side}`;
+      article.id = slug;
       article.innerHTML = `
         ${heroHTML}
         <div class="post-content">
@@ -486,12 +594,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // reset "show more / less" to 3 visible
     if (typeof applyVisibility === 'function' && typeof updateButtons === 'function') {
-      visible   = Math.min(STEP, postsHost?.querySelectorAll('.blog-post').length || 0);
+      visible = Math.min(STEP, postsHost?.querySelectorAll('.blog-post').length || 0);
       lastDelta = STEP;
       applyVisibility();
       updateButtons();
     }
 
+    if (window.location.hash) {
+      const target = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   } catch (err) {
     console.error('[public] load failed', err);
     host.innerHTML = `<p class="muted">Couldn’t load posts right now. Try again later.</p>`;
@@ -499,60 +611,81 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /* ---------- LIGHTBOX ---------- */
-let lb,lbImg,lbBlurb,lbCounter,lbPrev,lbNext,lbClose,lbList=[],lbIndex=0;
-function ensureLightbox(){
+let lb,
+  lbImg,
+  lbBlurb,
+  lbCounter,
+  lbPrev,
+  lbNext,
+  lbClose,
+  lbList = [],
+  lbIndex = 0;
+function ensureLightbox() {
   if (lb) return;
   lb = document.createElement('div');
   lb.className = 'gallery-modal';
+  lb.setAttribute('inert', '');
   lb.innerHTML = `
     <div class="gallery-modal__overlay"></div>
     <div class="gallery-modal__frame" role="dialog" aria-modal="true" aria-label="Image gallery">
       <button class="gallery-modal__close" aria-label="Close">✕</button>
-      <button class="gallery-modal__arrow prev" aria-label="Previous">‹</button>
+      <button class="gallery-modal__arrow prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
       <div class="gallery-modal__image-wrap">
         <img class="gallery-modal__img" alt="">
         <div class="gallery-modal__blurb"></div>
         <div class="gallery-modal__counter"></div>
       </div>
-      <button class="gallery-modal__arrow next" aria-label="Next">›</button>
+      <button class="gallery-modal__arrow next" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
     </div>`;
   document.body.appendChild(lb);
-  lbImg     = lb.querySelector('.gallery-modal__img');
+  lbImg = lb.querySelector('.gallery-modal__img');
   lbCounter = lb.querySelector('.gallery-modal__counter');
-  lbBlurb   = lb.querySelector('.gallery-modal__blurb');
-  lbPrev    = lb.querySelector('.gallery-modal__arrow.prev');
-  lbNext    = lb.querySelector('.gallery-modal__arrow.next');
-  lbClose   = lb.querySelector('.gallery-modal__close');
+  lbBlurb = lb.querySelector('.gallery-modal__blurb');
+  lbPrev = lb.querySelector('.gallery-modal__arrow.prev');
+  lbNext = lb.querySelector('.gallery-modal__arrow.next');
+  lbClose = lb.querySelector('.gallery-modal__close');
   lb.querySelector('.gallery-modal__overlay').addEventListener('click', closeGalleryLightbox);
   lbClose.addEventListener('click', closeGalleryLightbox);
   lbPrev.addEventListener('click', () => navGallery(-1));
   lbNext.addEventListener('click', () => navGallery(1));
-  document.addEventListener('keydown', (e)=>{
+  document.addEventListener('keydown', (e) => {
     if (!lb.classList.contains('is-open')) return;
-    if (e.key === 'Escape')     closeGalleryLightbox();
-    if (e.key === 'ArrowLeft')  navGallery(-1);
+    if (e.key === 'Escape') closeGalleryLightbox();
+    if (e.key === 'ArrowLeft') navGallery(-1);
     if (e.key === 'ArrowRight') navGallery(1);
-    if (e.key === 'Tab')        trapFocus(e, lb.querySelector('.gallery-modal__frame'));
+    if (e.key === 'Tab') trapFocus(e, lb.querySelector('.gallery-modal__frame'));
   });
 }
-function openGalleryLightbox(gallery,start=0){
+function openGalleryLightbox(gallery, start = 0) {
   ensureLightbox();
-  try{lbList=JSON.parse(gallery.dataset.images||'[]');}catch{lbList=[];}
-  if(!lbList.length)return;
-  lbIndex=Math.max(0,Math.min(start,lbList.length-1));
+  try {
+    lbList = JSON.parse(gallery.dataset.images || '[]');
+  } catch {
+    lbList = [];
+  }
+  if (!lbList.length) return;
+  lbIndex = Math.max(0, Math.min(start, lbList.length - 1));
   lastGalleryFocus = document.activeElement;
   renderGalleryImage();
+  lb.removeAttribute('inert');
+  // Establish the hidden state before opening, including when the modal was just created.
+  lb.getBoundingClientRect();
   lb.classList.add('is-open');
   lbClose?.focus();
 }
-function closeGalleryLightbox(){
+function closeGalleryLightbox() {
   lb?.classList.remove('is-open');
+  lb?.setAttribute('inert', '');
   if (lastGalleryFocus && typeof lastGalleryFocus.focus === 'function') {
     lastGalleryFocus.focus();
   }
 }
-function navGallery(d){ if(!lbList.length)return; lbIndex=(lbIndex+d+lbList.length)%lbList.length; renderGalleryImage(); }
-function renderGalleryImage(){
+function navGallery(d) {
+  if (!lbList.length) return;
+  lbIndex = (lbIndex + d + lbList.length) % lbList.length;
+  renderGalleryImage();
+}
+function renderGalleryImage() {
   const item = lbList[lbIndex];
   if (!item) return;
   lbImg.src = item.src;

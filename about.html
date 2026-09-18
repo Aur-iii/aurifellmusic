@@ -1,228 +1,220 @@
-<!DOCTYPE html>
-<html lang="en" class="theme-aurora">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Learn more about Auri Fell, an Ontario-based multi-instrumentalist, vocalist, and producer blending jazz, folk, indie, and a cappella influences." />
-  <link rel="canonical" href="https://aurifellmusic.com/about.html" />
-  <meta property="og:site_name" content="Auri Fell Music" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Auri Fell — About" />
-  <meta property="og:description" content="Learn more about Auri Fell, an Ontario-based multi-instrumentalist, vocalist, and producer blending jazz, folk, indie, and a cappella influences." />
-  <meta property="og:url" content="https://aurifellmusic.com/about.html" />
-  <meta property="og:image" content="https://aurifellmusic.com/assets/images/auri-headshot-square.png" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Auri Fell — About" />
-  <meta name="twitter:description" content="Learn more about Auri Fell, an Ontario-based multi-instrumentalist, vocalist, and producer blending jazz, folk, indie, and a cappella influences." />
-  <meta name="twitter:image" content="https://aurifellmusic.com/assets/images/auri-headshot-square.png" />
-  <title>Auri Fell — About</title>
-  <meta name="theme-color" content="#0b0920" />
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/auri-a-color.png" />
-  <link rel="stylesheet" href="./assets/css/site.css" />
-  <link rel="stylesheet" href="./assets/css/about.css" />
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "AboutPage",
-    "url": "https://aurifellmusic.com/about.html",
-    "name": "About Auri Fell",
-    "mainEntity": {
-      "@type": "Person",
-      "name": "Auri Fell",
-      "url": "https://aurifellmusic.com/"
-    }
-  }
-  </script>
-</head>
-<body>
-  <a class="visually-hidden" href="#main">Skip to content</a>
-
-  <!-- HEADER (identical layout to Home) -->
-  <header>
-    <div class="wrap brand-row">
-      <div class="brand">
-        <img class="logo" src="./assets/images/auri-a-color.png" alt="Auri A logo" width="48" height="48" />
-        <span class="title">Auri Fell Music</span>
-      </div>
-
-      <nav aria-label="Primary" id="site-nav">
-        <a class="nav-link" href="index.html">Home</a>
-        <a class="nav-link active" href="about.html">About</a>
-        <a class="nav-link" href="music.html">Music</a>
-        <a class="nav-link" href="contact.html">Contact</a>
-        <a class="nav-link" href="blog.html">Blog</a>
-      </nav>
-
-      <!-- Header dots→lines -->
-      <button class="hamburger" id="menuBtn" aria-controls="menuCard" aria-expanded="false" aria-label="Open menu">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <g class="dots">
-            <circle cx="12" cy="5" r="2"/>
-            <circle cx="12" cy="12" r="2"/>
-            <circle cx="12" cy="19" r="2"/>
-          </g>
-          <g class="lines">
-            <rect x="3" y="5"  width="18" height="2" rx="1"/>
-            <rect x="3" y="11" width="18" height="2" rx="1"/>
-            <rect x="3" y="17" width="18" height="2" rx="1"/>
-          </g>
-        </svg>
-      </button>
-    </div>
-  </header>
-
-  <!-- Mobile menu drawer (same structure as Home) -->
-  <div class="menu-card" id="menuCard" role="dialog" aria-modal="true" aria-label="Menu">
-    <button class="hamburger inside" id="menuBtnIn" aria-label="Close menu">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <g class="dots">
-          <circle cx="12" cy="5" r="2"/>
-          <circle cx="12" cy="12" r="2"/>
-          <circle cx="12" cy="19" r="2"/>
-        </g>
-        <g class="lines">
-          <rect x="3" y="5"  width="18" height="2" rx="1"/>
-          <rect x="3" y="11" width="18" height="2" rx="1"/>
-          <rect x="3" y="17" width="18" height="2" rx="1"/>
-        </g>
-      </svg>
-    </button>
-
-    <nav class="menu-list" aria-label="Mobile">
-      <a class="nav-link" href="index.html">Home</a>
-      <a class="nav-link active" href="about.html">About</a>
-      <a class="nav-link" href="music.html">Music</a>
-      <a class="nav-link" href="contact.html">Contact</a>
-      <a class="nav-link" href="blog.html">Blog</a>
-    </nav>
-  </div>
-
-  <!-- same veil & backdrop as Home -->
-  <div class="page-veil" aria-hidden="true"></div>
-  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
-
-  <main id="main" class="wrap">
-    <!-- HERO -->
-    <section class="hero" aria-label="Intro">
-      <div class="top" style="gap:14px">
-        <img class="wordmark" src="./assets/images/auri-anagram-color.png" alt="Auri Anagram"
-             style="max-width:620px;width:min(72vw,620px);filter:drop-shadow(0 10px 30px rgba(14,9,50,.6))"/>
-      </div>
-    </section>
-
-    <div class="soft-div"></div>
-
-    <!-- ABOUT CARD -->
-    <section aria-label="About Auri">
-      <article class="card" style="display:grid;grid-template-columns:minmax(0,240px) 1fr;gap:18px;align-items:start">
-        <figure style="margin:0">
-          <img
-            src="./assets/images/auri-headshot-square.png"
-            alt="Portrait of Auri Fell"
-            style="width:100%;max-width:240px;aspect-ratio:1/1;object-fit:cover;border-radius:22px;
-                   box-shadow:0 20px 45px rgba(8,6,30,.55);filter:saturate(108%) contrast(102%);" />
-        </figure>
-
-        <div>
-          <h1 class="title-gradient" style="font-size:clamp(26px,3.4vw,36px);margin:0 0 10px 0">About</h1>
-          <p style="color:var(--text);margin:0 0 10px 0">
-            Hi, I'm Auri Fell, a multi-instrumentalist, vocalist, and producer based in Ontario, Canada.
-            I arrange, record, and produce original music and covers, drawing inspiration from jazz, folk, indie, and a cappella singing.
-          </p>
-          <p style="color:var(--text);margin:0 0 10px 0">
-            When I'm not composing or arranging, I'm building little worlds, from games to Blender models to stories.
-            <br>Welcome to my universe!
-          </p>
-        </div>
-      </article>
-      
-      <div class="i-div"></div>
-
-      <article class="card">
-        <h3 class="title-gradient">Why I Create</h3>
-
-        <p style="color:var(--text)">
-          I love crafting, anything and everything, and I never really stop. I'm always making something in my spare time: be that music, art, 3D models, games, worlds, stories, you name it.
-        </p>
-
-        <p style="color:var(--text)">
-          When I started my YouTube channel back in 2019, it was just a side project, but since then, I've been completely sucked into the world of music production, and I've loved every second of it.
-        </p>
-
-        <p style="color:var(--text)">
-          Music is my way of expressing myself, of exploring ideas, of trying new things, of telling stories. It's my way of finding clarity in the chaos of the universe. I find great joy in sharing these parts of myself with the world, so people can get to know me just a little better.
-        </p>
-      </article>
-    </section>
-  </main>
-
-  <footer class="floating">
-      <p class="credits">© <span id="y"></span> Auri Fell • <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a></p>
-  </footer>
-
-  <script>
-  (() => {
-    // Year stamp
-    const yEl = document.getElementById('y');
-    if (yEl) yEl.textContent = new Date().getFullYear();
-
-    // Elements
-    const btnOut   = document.getElementById('menuBtn');
-    const btnIn    = document.getElementById('menuBtnIn');
-    const card     = document.getElementById('menuCard');
-    const backdrop = document.getElementById('backdrop');
-    const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
-    let lastFocus = null;
-
-    function trapFocus(e, root){
-      const nodes = Array.from(root.querySelectorAll(FOCUSABLE)).filter(el => !el.hasAttribute('disabled'));
-      if (!nodes.length) { e.preventDefault(); return; }
-      const first = nodes[0];
-      const last  = nodes[nodes.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
-
-    function setOpen(on){
-      if (!card) return;
-      const willOpen = !!on;
-      if (willOpen) lastFocus = document.activeElement;
-      card.classList.toggle('open', willOpen);
-      document.body.classList.toggle('menu-open', willOpen);
-      btnOut?.classList.toggle('is-open', willOpen);
-      btnIn?.classList.toggle('is-open', willOpen);
-      btnOut?.setAttribute('aria-expanded', String(willOpen));
-      backdrop?.classList.toggle('show', willOpen);
-
-      if (willOpen) {
-        setTimeout(() => {
-          const first = card.querySelector('.menu-list a');
-          first?.focus();
-        }, 280);
-      } else if (lastFocus && typeof lastFocus.focus === 'function') {
-        lastFocus.focus();
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Learn more about Auri Fell, an Ontario-based multi-instrumentalist, vocalist, producer, and maker."
+    />
+    <link rel="canonical" href="https://aurifellmusic.com/about.html" />
+    <title>About Auri Fell</title>
+    <meta name="theme-color" content="#070915" />
+    <link rel="icon" type="image/png" href="./assets/images/auri-a-color.png" />
+    <link rel="stylesheet" href="./assets/css/site.css" />
+    <style>
+      .about-layout {
+        display: grid;
+        grid-template-columns: 0.87fr 1.13fr;
+        gap: clamp(2rem, 7vw, 7.5rem);
       }
-    }
-
-    btnOut?.addEventListener('click', () => setOpen(!card?.classList.contains('open')));
-    btnIn?.addEventListener('click',  () => setOpen(false));
-    backdrop?.addEventListener('click', () => setOpen(false));
-    document.addEventListener('keydown', (e)=>{
-      if (e.key === 'Escape') setOpen(false);
-      if (e.key === 'Tab' && card?.classList.contains('open')) trapFocus(e, card);
-    });
-
-    document.addEventListener('click', (e)=>{
-      const insideCard = e.target.closest('#menuCard');
-      const onBtnOut   = e.target.closest('#menuBtn');
-      const onBtnIn    = e.target.closest('#menuBtnIn');
-      if (!insideCard && !onBtnOut && !onBtnIn) setOpen(false);
-    });
-
-    document.querySelectorAll('#menuCard .menu-list a').forEach(a=>{
-      a.addEventListener('click', ()=> setOpen(false));
-    });
-  })();
-  </script>
-</body>
+      .about-intro {
+        position: sticky;
+        top: 112px;
+        height: fit-content;
+      }
+      .about-intro h1 {
+        max-width: 11ch;
+        margin: 12px 0 0;
+        font-size: clamp(2.8rem, 5vw, 4.8rem);
+        line-height: 0.9;
+        letter-spacing: -0.075em;
+      }
+      .about-studio-image {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        object-position: center;
+        margin-top: 34px;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        box-shadow: var(--shadow);
+      }
+      .about-copy {
+        color: var(--muted);
+        font-size: 1.06rem;
+      }
+      .about-copy p {
+        margin: 0 0 1.3em;
+      }
+      .about-copy h2 {
+        margin: 46px 0 14px;
+        color: var(--text);
+        font-size: 1.65rem;
+        letter-spacing: -0.04em;
+      }
+      .about-copy strong {
+        color: var(--text);
+      }
+      .about-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 32px;
+      }
+      @media (max-width: 800px) {
+        .about-layout {
+          grid-template-columns: 1fr;
+        }
+        .about-intro {
+          position: static;
+        }
+        .about-intro img {
+          width: 130px;
+          margin-top: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="visually-hidden" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap brand-row">
+        <a class="brand" href="index.html" aria-label="Auri Fell Music home"
+          ><img class="logo" src="./assets/images/auri-a-color.png" alt="" /><span class="title"
+            >Auri Fell Music</span
+          ></a
+        >
+        <nav aria-label="Primary" id="site-nav">
+          <a class="nav-link" href="index.html">Home</a
+          ><a class="nav-link active" href="about.html">About</a
+          ><a class="nav-link" href="music.html">Music</a
+          ><a class="nav-link" href="blog.html">Blog</a
+          ><a class="nav-link" href="contact.html">Contact</a>
+        </nav>
+        <button
+          class="hamburger"
+          id="menuBtn"
+          aria-controls="menuCard"
+          aria-expanded="false"
+          aria-label="Open menu"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <g class="dots">
+              <circle cx="12" cy="5" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="12" cy="19" r="2" />
+            </g>
+            <g class="lines">
+              <rect x="3" y="5" width="18" height="2" rx="1" />
+              <rect x="3" y="11" width="18" height="2" rx="1" />
+              <rect x="3" y="17" width="18" height="2" rx="1" />
+            </g>
+          </svg>
+        </button>
+      </div>
+    </header>
+    <div class="menu-card" id="menuCard" role="dialog" aria-modal="true" aria-label="Menu">
+      <nav class="menu-list" aria-label="Mobile">
+        <a href="index.html">Home</a><a class="active" href="about.html">About</a
+        ><a href="music.html">Music</a><a href="blog.html">Blog</a
+        ><a href="contact.html">Contact</a>
+      </nav>
+    </div>
+    <div class="backdrop" id="backdrop"></div>
+    <main id="main" class="wrap page-section">
+      <div class="about-layout">
+        <div class="about-intro">
+          <span class="eyebrow">About</span>
+          <h1>Cozy, queer-coded jazz and little universes.</h1>
+          <img
+            class="about-studio-image"
+            src="./assets/images/about-studio-blur.png"
+            alt="Softly blurred studio scene with a keyboard and glowing pink and blue light."
+          />
+        </div>
+        <div class="about-copy">
+          <p>
+            Hi, I’m <strong>Auri Fell</strong>, a multi-instrumentalist, vocalist, and producer
+            based in Ontario, Canada. I arrange, record, and produce original music and covers,
+            drawing inspiration from jazz, folk, indie, and a cappella singing.
+          </p>
+          <p>
+            When I’m not composing or arranging, I’m building little worlds, from games to Blender
+            models to stories. Welcome to my universe!
+          </p>
+          <h2>Why I Create</h2>
+          <p>
+            I love crafting, anything and everything, and I never really stop. I’m always making
+            something in my spare time: be that music, art, 3D models, games, worlds, stories, you
+            name it.
+          </p>
+          <p>
+            When I started my YouTube channel back in 2019, it was just a side project, but since
+            then, I’ve been completely sucked into the world of music production, and I’ve loved
+            every second of it.
+          </p>
+          <p>
+            Music is my way of expressing myself, of exploring ideas, of trying new things, of
+            telling stories. It’s my way of finding clarity in the chaos of the universe. I find
+            great joy in sharing these parts of myself with the world, so people can get to know me
+            just a little better.
+          </p>
+          <div class="about-links">
+            <a class="button" href="music.html">Listen to my music</a
+            ><a class="button ghost" href="contact.html">Work with me</a>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="floating">
+      <div class="wrap footer-inner">
+        <p class="credits">
+          © <span id="y"></span> Auri Fell ·
+          <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a>
+        </p>
+        <div class="icon-links" aria-label="Social links">
+          <a
+            href="https://www.youtube.com/@AuriFellMusic"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="YouTube"
+            ><svg><use href="./assets/images/social-icons.svg#youtube"></use></svg></a
+          ><a
+            href="https://aurifell-music.bandcamp.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Bandcamp"
+            ><svg><use href="./assets/images/social-icons.svg#bandcamp"></use></svg></a
+          ><a
+            href="https://www.instagram.com/aurifellmusic/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            ><svg><use href="./assets/images/social-icons.svg#instagram"></use></svg></a
+          ><a
+            href="https://www.tiktok.com/@aurifellmusic"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="TikTok"
+            ><svg><use href="./assets/images/social-icons.svg#tiktok"></use></svg></a
+          ><a
+            href="https://www.facebook.com/aurifellmusic/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            ><svg><use href="./assets/images/social-icons.svg#facebook"></use></svg></a
+          ><a
+            href="https://discord.gg/yuPxHuxY4F"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Discord"
+            ><svg><use href="./assets/images/social-icons.svg#discord"></use></svg
+          ></a>
+        </div>
+      </div>
+    </footer>
+    <script src="./assets/scripts/site.js"></script>
+    <script src="./assets/scripts/social-icons.js"></script>
+  </body>
 </html>
