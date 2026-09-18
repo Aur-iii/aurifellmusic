@@ -339,8 +339,8 @@
 .gallery-modal__close {
   position: absolute;
   z-index: 2;
-  top: -8px;
-  right: -8px;
+  top: 0;
+  right: 0;
   width: 38px;
   height: 38px;
 }
@@ -399,7 +399,8 @@
     height: 28px;
   }
   .gallery-modal__close {
-    right: 0;
-    top: -14px;
+    /* Match the right arrow's 9px gap from the image column. */
+    right: -9px;
+    top: 0;
   }
 }

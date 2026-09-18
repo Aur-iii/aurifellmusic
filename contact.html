@@ -184,6 +184,17 @@
         const subject = document.getElementById('subject');
         const status = document.getElementById('formStatus');
         const honeypot = document.getElementById('hp');
+        let statusTimer;
+        const showStatus = (text, color, duration = 0) => {
+          clearTimeout(statusTimer);
+          status.style.color = color;
+          status.textContent = text;
+          if (duration) {
+            statusTimer = setTimeout(() => {
+              if (status.textContent === text) status.textContent = '';
+            }, duration);
+          }
+        };
         emailjs.init({ publicKey: 'MLLlLku8J8USwTVeg' });
         const toggleCustom = () => {
           const other = reason.value === 'Other';
@@ -202,26 +213,22 @@
           event.preventDefault();
           if (honeypot.value) return;
           if (!email.checkValidity()) {
-            status.style.color = 'var(--red)';
-            status.textContent = 'Please enter a valid email address.';
+            showStatus('Please enter a valid email address.', 'var(--red)', 5000);
             email.reportValidity();
             return;
           }
           if (reason.value === 'Other' && !customTitle.value.trim()) {
-            status.style.color = 'var(--yellow)';
-            status.textContent = 'Please add a title.';
+            showStatus('Please add a title.', 'var(--yellow)', 5000);
             customTitle.focus();
             return;
           }
           if (!message.value.trim()) {
-            status.style.color = 'var(--yellow)';
-            status.textContent = 'Please add a message.';
+            showStatus('Please add a message.', 'var(--yellow)');
             return;
           }
           subject.value =
             reason.value === 'Other' ? customTitle.value.trim() : '[' + reason.value + ']';
-          status.style.color = 'var(--muted)';
-          status.textContent = 'Sending…';
+          showStatus('Sending…', 'var(--muted)');
           try {
             const result = await emailjs.sendForm(
               'service_aurifellmusic',
@@ -229,15 +236,13 @@
               form,
             );
             if (result.status !== 200) throw new Error('EmailJS error');
-            status.style.color = 'var(--green)';
-            status.textContent = 'Message sent! Thank you 💙';
+            showStatus('Message sent! Thank you 💙', 'var(--green)', 5000);
             form.reset();
             toggleCustom();
             grow();
           } catch (error) {
             console.error(error);
-            status.style.color = 'var(--red)';
-            status.textContent = 'Something went wrong. Please try again.';
+            showStatus('Something went wrong. Please try again.', 'var(--red)');
           }
         });
       })();
