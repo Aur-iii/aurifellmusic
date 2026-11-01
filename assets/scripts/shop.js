@@ -195,7 +195,12 @@
   // Static hosting only needs a slug index; every listing is populated from its MD file.
   async function fetchProduct(slug) {
     if (!slugPattern.test(slug)) throw new Error('Invalid product address.');
-    const response = await fetch(`${root}${slug}/index.md`, { cache: 'no-store' });
+    let response = await fetch(`${root}${slug}/index.md`, { cache: 'no-store' });
+    // GitHub Pages converts front-matter Markdown to HTML, so read the source on a 404.
+    if (response.status === 404) {
+      const raw = `https://raw.githubusercontent.com/Aur-iii/aurifellmusic/main/shop/products/${slug}/index.md`;
+      response = await fetch(`${raw}?t=${Date.now()}`, { cache: 'no-store' });
+    }
     if (!response.ok) throw new Error('Product not found.');
     return parseProduct(await response.text(), slug);
   }
