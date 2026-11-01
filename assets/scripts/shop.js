@@ -35,6 +35,21 @@
     } catch { return null; }
   }
 
+  function retailerName(url) {
+    try {
+      const host = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
+      const known = {
+        'sheetmusicdirect.com': 'Sheet Music Direct',
+        'sheetmusicplus.com': 'Sheet Music Plus',
+        'musicnotes.com': 'Musicnotes',
+        'arrangeme.com': 'ArrangeMe',
+        'bandcamp.com': 'Bandcamp',
+      };
+      const domain = Object.keys(known).find((name) => host === name || host.endsWith(`.${name}`));
+      return domain ? known[domain] : host;
+    } catch { return ''; }
+  }
+
   function element(tag, className, text) {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -159,15 +174,14 @@
     const actions = element('div', 'shop-purchase');
     const links = Array.isArray(product.purchaseLinks) ? product.purchaseLinks : [];
     for (const link of links) {
-      const url = safePurchase(link.url);
-      const website = String(link.label || '').trim().replace(/^(?:purchase|buy)\s+(?:(?:on|from)\s+)?/i, '');
-      const placeholder = product.status === 'sample' || previewOnly;
-      if (!website || (!placeholder && !url)) continue;
+      const url = safePurchase(typeof link === 'string' ? link : link?.url);
+      if (!url) continue;
+      const website = retailerName(url);
       const node = element('a', 'btn', `Purchase on ${website}`);
-      node.href = placeholder ? '#' : url;
+      node.href = previewOnly ? '#' : url;
       node.target = '_blank';
       node.rel = 'noopener noreferrer';
-      if (placeholder) {
+      if (previewOnly) {
         node.setAttribute('aria-disabled', 'true');
         node.title = 'Preview only - purchase link not available yet';
         node.addEventListener('click', (event) => event.preventDefault());
