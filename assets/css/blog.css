@@ -19,8 +19,8 @@
 .blog-lead h1 {
   margin: 10px 0 10px;
   font-size: clamp(2.4rem, 5vw, 4.35rem);
-  line-height: 0.96;
-  letter-spacing: -0.065em;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
 }
 .blog-lead p {
   margin: 0;
@@ -92,8 +92,8 @@
 .post-title {
   margin: 0 0 10px;
   font-size: 1.45rem;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+  line-height: 1.16;
+  letter-spacing: -0.02em;
 }
 .post-content p {
   color: var(--muted);
@@ -211,7 +211,8 @@
 .follow-title {
   margin: 0;
   font-size: 1.4rem;
-  letter-spacing: -0.04em;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 .follow-form {
   display: grid;

@@ -59,8 +59,8 @@
   margin: 0 0 8px;
   max-width: 11ch;
   font-size: clamp(2.05rem, 4vw, 3.5rem);
-  line-height: 0.94;
-  letter-spacing: -0.065em;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
 }
 .latest-release .meta {
   margin: 0 0 10px;
@@ -216,8 +216,8 @@
 .lb-title {
   margin: 0 38px 8px 0;
   font-size: 2rem;
-  line-height: 1;
-  letter-spacing: -0.05em;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
 }
 .lb-meta {
   color: var(--accent-light);
@@ -340,8 +340,8 @@
   max-width: 11ch;
   margin: 0 38px 8px 0;
   font-size: clamp(2.05rem, 4vw, 3.5rem);
-  line-height: 0.94;
-  letter-spacing: -0.065em;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
   overflow-wrap: anywhere;
 }
 .lb-blurb {
