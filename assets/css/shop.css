@@ -264,6 +264,7 @@ button.shop-filter[aria-pressed='true'] {
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
+  object-position: center top;
 }
 
 .shop-detail-copy {
