@@ -76,23 +76,47 @@
     <div class="backdrop" id="backdrop"></div>
     <main id="main" class="wrap contact-page">
       <div class="contact-layout">
-        <section class="card contact-blurb">
+        <div class="page-heading contact-blurb">
           <span class="eyebrow">Contact</span>
           <h1>Let’s make something.</h1>
           <p>
             For general inquiries, commissions, collaborations, or just a nice note, I’d love to
             hear from you.
           </p>
-        </section>
-        <section class="card contact-panel">
+        </div>
+        <section class="contact-panel" aria-label="Contact form">
           <form id="contactForm" class="contact-form" novalidate>
             <label
-              >What are you reaching out about?<select id="reason" name="reason" required>
-                <option value="General Inquiry" selected>General inquiry</option>
-                <option value="Commission">Commission</option>
-                <option value="Collaboration">Collaboration</option>
-                <option value="Other">Other (custom title)</option>
-              </select></label
+              >First name<input
+                id="firstName"
+                name="first_name"
+                type="text"
+                autocomplete="given-name"
+                required
+                placeholder="First name" /></label
+            ><label
+              >Last name<input
+                id="lastName"
+                name="last_name"
+                type="text"
+                autocomplete="family-name"
+                required
+                placeholder="Last name" /></label
+            ><div class="contact-reason-field">
+              <span class="field-label" id="reasonFieldLabel">What are you reaching out about?</span>
+              <details class="contact-reason" id="reasonMenu">
+                <summary aria-labelledby="reasonFieldLabel selectedReason">
+                  <span id="selectedReason">General inquiry</span>
+                </summary>
+                <div class="contact-reason-options">
+                  <button type="button" data-reason="General Inquiry" aria-pressed="true">General inquiry</button>
+                  <button type="button" data-reason="Commission" aria-pressed="false">Commission</button>
+                  <button type="button" data-reason="Collaboration" aria-pressed="false">Collaboration</button>
+                  <button type="button" data-reason="Other" aria-pressed="false">Other (custom title)</button>
+                </div>
+              </details>
+              <input type="hidden" id="reason" name="reason" value="General Inquiry" />
+            </div
             ><label
               >Your email<input
                 id="email"
@@ -183,8 +207,14 @@
     <script>
       (() => {
         const form = document.getElementById('contactForm');
+        const firstName = document.getElementById('firstName');
+        const lastName = document.getElementById('lastName');
         const email = document.getElementById('email');
         const reason = document.getElementById('reason');
+        const reasonMenu = document.getElementById('reasonMenu');
+        const reasonSummary = reasonMenu.querySelector('summary');
+        const selectedReason = document.getElementById('selectedReason');
+        const reasonButtons = [...reasonMenu.querySelectorAll('[data-reason]')];
         const customRow = document.getElementById('customTitleRow');
         const customTitle = document.getElementById('customTitle');
         const message = document.getElementById('message');
@@ -208,8 +238,54 @@
           customRow.style.display = other ? '' : 'none';
           customTitle.required = other;
         };
-        reason.addEventListener('change', toggleCustom);
-        toggleCustom();
+        let reasonCloseTimer;
+        const closeReason = () => {
+          if (!reasonMenu.open || reasonMenu.classList.contains('is-closing')) return;
+          if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+            reasonMenu.open = false;
+            return;
+          }
+          reasonMenu.classList.add('is-closing');
+          reasonCloseTimer = window.setTimeout(() => {
+            reasonMenu.open = false;
+            reasonMenu.classList.remove('is-closing');
+          }, 180);
+        };
+        // Keep the visible choice and the EmailJS form value in sync.
+        const setReason = (value) => {
+          const selected = reasonButtons.find((button) => button.dataset.reason === value);
+          if (!selected) return;
+          reason.value = value;
+          selectedReason.textContent = selected.textContent.trim();
+          reasonButtons.forEach((button) => {
+            button.setAttribute('aria-pressed', String(button === selected));
+          });
+          toggleCustom();
+        };
+        reasonSummary.addEventListener('click', (event) => {
+          event.preventDefault();
+          if (reasonMenu.open && !reasonMenu.classList.contains('is-closing')) closeReason();
+          else {
+            window.clearTimeout(reasonCloseTimer);
+            reasonMenu.classList.remove('is-closing');
+            reasonMenu.open = true;
+          }
+        });
+        document.addEventListener('pointerdown', (event) => {
+          if (!reasonMenu.contains(event.target)) closeReason();
+        });
+        reasonMenu.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') {
+            closeReason();
+            reasonSummary.focus();
+          }
+        });
+        reasonButtons.forEach((button) => button.addEventListener('click', () => {
+          setReason(button.dataset.reason);
+          closeReason();
+          reasonSummary.focus();
+        }));
+        setReason(reason.value);
         const grow = () => {
           message.style.height = 'auto';
           message.style.height = message.scrollHeight + 'px';
@@ -219,6 +295,18 @@
         form.addEventListener('submit', async (event) => {
           event.preventDefault();
           if (honeypot.value) return;
+          firstName.value = firstName.value.trim();
+          lastName.value = lastName.value.trim();
+          if (!firstName.value) {
+            showStatus('Please enter your first name.', 'var(--yellow)', 5000);
+            firstName.focus();
+            return;
+          }
+          if (!lastName.value) {
+            showStatus('Please enter your last name.', 'var(--yellow)', 5000);
+            lastName.focus();
+            return;
+          }
           if (!email.checkValidity()) {
             showStatus('Please enter a valid email address.', 'var(--red)', 5000);
             email.reportValidity();
@@ -245,7 +333,7 @@
             if (result.status !== 200) throw new Error('EmailJS error');
             showStatus('Message sent! Thank you 💙', 'var(--green)', 5000);
             form.reset();
-            toggleCustom();
+            setReason(reason.value);
             grow();
           } catch (error) {
             console.error(error);

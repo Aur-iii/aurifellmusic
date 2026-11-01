@@ -4,9 +4,13 @@
 .blog-lead {
   display: grid;
   grid-template-columns: 150px minmax(0, 1fr);
-  gap: 28px;
-  align-items: center;
+  column-gap: 28px;
+  row-gap: 10px;
+  align-items: start;
   margin-bottom: 46px;
+}
+.blog-lead > .eyebrow {
+  grid-column: 1 / -1;
 }
 .blog-headshot {
   width: 150px;
@@ -17,7 +21,7 @@
   box-shadow: var(--shadow);
 }
 .blog-lead h1 {
-  margin: 10px 0 10px;
+  margin: 0 0 10px;
   font-size: clamp(2.4rem, 5vw, 4.35rem);
   line-height: 1.05;
   letter-spacing: -0.025em;
