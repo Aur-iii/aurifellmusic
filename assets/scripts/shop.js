@@ -322,6 +322,15 @@
     if (!page) return;
     const slug = page === 'detail' ? new URLSearchParams(location.search).get('product') || '' : '';
     const hasProduct = slugPattern.test(slug);
+    const hideInvalidDetail = () => {
+      let robots = document.querySelector('meta[name="robots"]');
+      if (!robots) {
+        robots = document.createElement('meta');
+        robots.name = 'robots';
+        document.head.append(robots);
+      }
+      robots.content = 'noindex';
+    };
     const showGalleryLink = (text) => {
       const message = document.getElementById('shopError');
       const link = document.createElement('a');
@@ -342,6 +351,7 @@
       return;
     }
     if (page === 'detail' && !hasProduct) {
+      hideInvalidDetail();
       showGalleryLink('No product was selected. Open a listing from the gallery.');
       return;
     }
@@ -353,8 +363,14 @@
         const product = await fetchProduct(slug);
         renderDetail(product, document.getElementById('shopDetail'));
         document.title = `${product.title} | Auri Fell Music`;
+        if (product.summary) document.querySelector('meta[name="description"]').content = product.summary;
+        const canonical = document.createElement('link');
+        canonical.rel = 'canonical';
+        canonical.href = `https://aurifellmusic.com/shop-product.html?product=${encodeURIComponent(slug)}`;
+        document.head.append(canonical);
       }
     } catch (error) {
+      if (page === 'detail') hideInvalidDetail();
       const message = document.getElementById('shopError');
       if (message) { message.hidden = false; message.textContent = error.message; }
     }
