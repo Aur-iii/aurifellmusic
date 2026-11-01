@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Explore sheet music and arrangements by Auri Fell." />
+    <title>Shop | Auri Fell Music</title>
+    <meta name="theme-color" content="#070915" />
+    <link rel="icon" type="image/png" href="./assets/images/auri-a-color.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&amp;family=Jost:ital,wght@0,100..900;1,100..900&amp;display=swap" />
+    <link rel="stylesheet" href="./assets/css/site.css" />
+    <link rel="stylesheet" href="./assets/css/shop.css" />
+    <script src="./assets/scripts/site.js" defer></script>
+    <script src="./assets/scripts/shop.js" defer></script>
+  </head>
+  <body data-shop-page="catalog">
+    <a class="visually-hidden" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap brand-row">
+        <a class="brand" href="index.html" aria-label="Auri Fell Music home"><img class="logo" src="./assets/images/auri-a-color.png" alt="" /><span class="title">Auri Fell Music</span></a>
+        <nav aria-label="Primary" id="site-nav"><a class="nav-link" href="index.html">Home</a><a class="nav-link" href="about.html">About</a><a class="nav-link" href="music.html">Music</a><a class="nav-link" href="blog.html">Blog</a><a class="nav-link active" href="shop.html">Shop</a><a class="nav-link" href="contact.html">Contact</a></nav>
+        <button class="hamburger" id="menuBtn" aria-controls="menuCard" aria-expanded="false" aria-label="Open menu"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><g class="dots"><circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" /></g><g class="lines"><rect x="3" y="5" width="18" height="2" rx="1" /><rect x="3" y="11" width="18" height="2" rx="1" /><rect x="3" y="17" width="18" height="2" rx="1" /></g></svg></button>
+      </div>
+    </header>
+    <div class="menu-card" id="menuCard" role="dialog" aria-modal="true" aria-label="Menu"><nav class="menu-list" aria-label="Mobile"><a href="index.html">Home</a><a href="about.html">About</a><a href="music.html">Music</a><a href="blog.html">Blog</a><a class="active" href="shop.html">Shop</a><a href="contact.html">Contact</a></nav></div>
+    <div class="backdrop" id="backdrop"></div>
+    <main id="main" class="wrap shop-page">
+      <div class="page-heading">
+        <span class="eyebrow">Shop</span>
+        <h1>Music to make your own.</h1>
+        <p>Arrangements, scores, and little pieces of my universe for your music stand.</p>
+      </div>
+      <section aria-label="Shop products">
+        <div class="shop-toolbar"><div class="shop-filter-list" id="shopFilters" aria-label="Filter products"></div><div class="shop-toolbar-right"><span class="muted shop-count" id="shopCount"></span><details class="shop-sort" id="shopSort"><summary>Sort: <span>Newest first</span></summary><div class="shop-sort-options"><button type="button" data-sort="newest">Newest first</button><button type="button" data-sort="oldest">Oldest first</button><button type="button" data-sort="title">Title A-Z</button><button type="button" data-sort="price-low">Price: low to high</button><button type="button" data-sort="price-high">Price: high to low</button></div></details></div></div>
+        <div class="shop-grid" id="shopGrid" aria-live="polite"></div>
+        <p class="muted" id="shopEmpty" hidden>No sheet music here yet. Check back soon.</p>
+        <div class="shop-controls" id="shopControls" hidden>
+          <button class="show-more" type="button" hidden>Show more</button>
+          <button class="show-less" type="button" hidden>Show less</button>
+        </div>
+        <p class="card shop-error" id="shopError" role="alert" hidden></p>
+      </section>
+    </main>
+    <footer class="floating">
+      <div class="wrap footer-inner">
+        <p class="credits">
+          &copy; <span id="y"></span> Auri Fell &middot;
+          <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a>
+        </p>
+        <div class="icon-links" aria-label="Social links">
+          <a
+            href="https://www.youtube.com/@AuriFellMusic"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="YouTube"
+            ><svg><use href="./assets/images/social-icons.svg#youtube"></use></svg></a
+          ><a
+            href="https://aurifell-music.bandcamp.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Bandcamp"
+            ><svg><use href="./assets/images/social-icons.svg#bandcamp"></use></svg></a
+          ><a
+            href="https://www.instagram.com/aurifellmusic/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            ><svg><use href="./assets/images/social-icons.svg#instagram"></use></svg></a
+          ><a
+            href="https://www.tiktok.com/@aurifellmusic"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="TikTok"
+            ><svg><use href="./assets/images/social-icons.svg#tiktok"></use></svg></a
+          ><a
+            href="https://www.facebook.com/aurifellmusic/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            ><svg><use href="./assets/images/social-icons.svg#facebook"></use></svg></a
+          ><a
+            href="https://discord.gg/yuPxHuxY4F"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Discord"
+            ><svg><use href="./assets/images/social-icons.svg#discord"></use></svg
+          ></a>
+        </div>
+      </div>
+    </footer>
+    <script src="./assets/scripts/social-icons.js"></script>
+  </body>
+</html>
