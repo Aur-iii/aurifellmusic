@@ -258,11 +258,14 @@ button.shop-filter[aria-pressed='true'] {
 .shop-detail-art {
   position: relative;
   overflow: hidden;
+  align-self: stretch;
 }
 
 .shop-detail-image {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  aspect-ratio: 1;
+  height: 100%;
   object-fit: cover;
   object-position: center top;
 }
@@ -364,6 +367,7 @@ button.shop-filter[aria-pressed='true'] {
   }
   .shop-detail-art {
     max-width: 520px;
+    aspect-ratio: 1;
   }
 }
 
