@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Confirm Blog Request | Auri Fell Music</title>
+    <meta name="theme-color" content="#070915" />
+    <link rel="icon" type="image/png" href="./assets/images/auri-a-color.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Abril+Fatface&amp;family=Jost:ital,wght@0,100..900;1,100..900&amp;display=swap"
+    />
+    <link rel="stylesheet" href="./assets/css/site.css" />
+    <link rel="stylesheet" href="./assets/css/blog-confirm.css" />
+    <script src="./assets/scripts/blog-confirm.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap brand-row">
+        <a class="brand" href="index.html" aria-label="Auri Fell Music home">
+          <img class="logo" src="./assets/images/auri-a-color.png" alt="" />
+          <span class="title">Auri Fell Music</span>
+        </a>
+        <a class="button" href="blog.html">Back to blog</a>
+      </div>
+    </header>
+    <main class="wrap confirm-main" id="main">
+      <section class="confirm-panel" aria-labelledby="confirmTitle">
+        <span class="eyebrow">The Blog</span>
+        <h1 id="confirmTitle">One last step.</h1>
+        <p class="muted" id="confirmMessage">
+          Press confirm to finish your request. Nothing changes until you do.
+        </p>
+        <button class="button" type="button" id="confirmButton" hidden>Confirm</button>
+        <p class="confirm-status" id="confirmStatus" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+    <footer class="floating">
+      <div class="wrap footer-inner">
+        <p class="credits">
+          © <span id="y"></span> Auri Fell ·
+          <a href="mailto:auri@aurifellmusic.com">auri@aurifellmusic.com</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

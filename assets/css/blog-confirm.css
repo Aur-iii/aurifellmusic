@@ -1,0 +1,38 @@
+.confirm-main {
+  display: grid;
+  flex: 1;
+  align-items: center;
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+
+.confirm-panel {
+  max-width: 680px;
+}
+
+.confirm-panel h1 {
+  margin: 12px 0 18px;
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  line-height: 1.05;
+}
+
+.confirm-panel p {
+  max-width: 48ch;
+}
+
+.confirm-panel .button {
+  margin-top: 14px;
+}
+
+.confirm-panel .button[hidden] {
+  display: none;
+}
+
+.confirm-status {
+  min-height: 1.5em;
+  color: var(--muted);
+}
+
+.confirm-status.error {
+  color: var(--red);
+}
