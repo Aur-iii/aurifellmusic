@@ -1,9 +1,13 @@
 .confirm-main {
-  display: grid;
   flex: 1;
-  align-items: center;
-  padding-top: 64px;
-  padding-bottom: 64px;
+  padding: 35px 0 110px;
+}
+
+.confirm-back {
+  display: inline-block;
+  margin-bottom: 29px;
+  color: var(--accent-light);
+  font-weight: 750;
 }
 
 .confirm-panel {
@@ -35,4 +39,10 @@
 
 .confirm-status.error {
   color: var(--red);
+}
+
+@media (max-width: 630px) {
+  .confirm-main {
+    padding: 26px 0 74px;
+  }
 }
