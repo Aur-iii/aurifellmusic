@@ -41,7 +41,7 @@ if (!token || !/^[A-Za-z0-9_-]{43}$/.test(token)) {
         throw new Error(result.error || 'confirmation_failed');
       }
 
-      title.textContent = result.action === 'subscribe' ? 'Welcome to the family!' : 'You’re unsubscribed.';
+      title.textContent = result.action === 'subscribe' ? 'You’re following!' : 'You’ve unfollowed.';
       message.textContent = result.action === 'subscribe'
         ? 'You’ll get notified when new blog posts go up. Stay cozy!'
         : 'You won’t receive future blog updates. You’re welcome back anytime.';
