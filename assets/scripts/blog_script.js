@@ -144,7 +144,7 @@ function parseFrontMatter(md) {
 }
 
 /* ---------- SUBSCRIPTIONS WORKER ---------- */
-const WORKER_URL = 'https://auri-subs.auri-e60.workers.dev'; // e.g., https://auri-subs.yourname.workers.dev
+const WORKER_URL = 'https://auri-subs-v2.auri-e60.workers.dev';
 
 async function postSubs(action, email) {
   const r = await fetch(WORKER_URL, {
@@ -187,21 +187,13 @@ async function fetchIndexMd(slug) {
   return { md: await r2.text(), bust: String(Date.now()) };
 }
 
-/* ---------- FOLLOW: EmailJS (optional) ---------- */
-const EJS_SERVICE = 'service_aurifellmusic';
-const EJS_TEMPLATE = 'send_to_follower';
-const SITE_NAME = 'Auri Fell Blog';
-
+/* ---------- FOLLOW / UNFOLLOW ---------- */
 function setFollowStatus(msg, ok = true) {
   if (!followStatus) return;
   followStatus.textContent = msg;
   followStatus.classList.remove('status--error', 'status--success', 'is-visible');
   if (!msg) return;
   followStatus.classList.add(ok ? 'status--success' : 'status--error', 'is-visible');
-}
-async function sendThanksEmail(toEmail) {
-  if (typeof emailjs === 'undefined') throw new Error('EmailJS not loaded');
-  return emailjs.send(EJS_SERVICE, EJS_TEMPLATE, { to_email: toEmail, site_name: SITE_NAME });
 }
 let followRequestId = 0;
 let followBusy = false;
@@ -228,23 +220,14 @@ followForm?.addEventListener('submit', async (e) => {
   const requestId = ++followRequestId;
 
   setFollowBusy(true);
-  if (submitFollow) submitFollow.textContent = 'Following…';
+  if (submitFollow) submitFollow.textContent = 'Sending…';
   setFollowStatus('', true);
 
   try {
     await postSubs('subscribe', email);
     if (requestId === followRequestId) {
-      setFollowStatus('You’re following! Sending your welcome email…', true);
-      if (submitFollow) submitFollow.textContent = 'Following ✓';
-    }
-    try {
-      await sendThanksEmail(email);
-      if (requestId === followRequestId)
-        setFollowStatus('You’re following! Check your inbox ✉️', true);
-    } catch (mailError) {
-      console.warn('Welcome email failed:', mailError);
-      if (requestId === followRequestId)
-        setFollowStatus('You’re following, but the welcome email could not be sent.', true);
+      setFollowStatus('Check your inbox to confirm your follow request.', true);
+      if (submitFollow) submitFollow.textContent = 'Follow';
     }
   } catch (err) {
     console.error(err);
@@ -266,7 +249,7 @@ unfollowBtn?.addEventListener('click', async () => {
   try {
     await postSubs('unsubscribe', email);
     if (requestId === followRequestId) {
-      setFollowStatus('Unfollowed. You won’t receive new updates.', true);
+      setFollowStatus('Check your inbox to confirm your unfollow request.', true);
       if (submitFollow) submitFollow.textContent = 'Follow';
     }
   } catch (err) {
