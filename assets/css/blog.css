@@ -69,7 +69,16 @@
   background: var(--panel);
   box-shadow: var(--shadow);
   overflow: auto;
+  scroll-margin-top: 94px;
 }
+.post-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.post-topline .post-date { margin: 0; }
 .post-image {
   width: 180px;
   height: 180px;

@@ -292,6 +292,35 @@ button.button:hover {
   background: #83b5ff;
   border-color: #83b5ff;
 }
+.share-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .03);
+  color: var(--accent-light);
+  font: 700 .78rem/1.2 var(--font-body);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.share-link:hover {
+  transform: translateY(-2px);
+  border-color: rgba(165, 199, 255, .55);
+  background: rgba(92, 158, 255, .1);
+}
+.share-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.share-link svg { width: 16px; height: 16px; flex: none; }
+.share-link .share-link-copied-icon { display: none; }
+.share-link.is-copied .share-link-icon { display: none; }
+.share-link.is-copied .share-link-copied-icon { display: block; color: #74c0fc; }
 .icon-links {
   display: flex;
   flex-wrap: wrap;

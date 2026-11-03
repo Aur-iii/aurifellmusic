@@ -374,6 +374,29 @@ function recomputeShowButtons() {
   applyVisibility();
   updateButtons();
 }
+
+function revealLinkedPost(smooth = false) {
+  let slug;
+  try {
+    slug = decodeURIComponent(window.location.hash.slice(1));
+  } catch {
+    return;
+  }
+  if (!slug) return;
+  const posts = Array.from(postsHost?.querySelectorAll('.blog-post') || []);
+  const index = posts.findIndex((post) => post.id === slug);
+  if (index < 0) return;
+
+  visible = Math.max(visible, Math.min(posts.length, Math.ceil((index + 1) / STEP) * STEP));
+  applyVisibility();
+  updateButtons();
+  requestAnimationFrame(() => posts[index].scrollIntoView({
+    behavior: smooth ? 'smooth' : 'instant',
+    block: 'start',
+  }));
+}
+
+window.addEventListener('hashchange', () => revealLinkedPost(true));
 document.addEventListener('DOMContentLoaded', () => {
   const total = postsHost?.querySelectorAll('.blog-post').length || 0;
   visible = Math.min(total, STEP);
@@ -558,14 +581,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       article.className = `blog-post ${side}`;
       article.id = slug;
       article.innerHTML = `
+        <div class="post-topline">
+          <p class="post-date">${toDateText(dateISO)}</p>
+        </div>
         ${heroHTML}
         <div class="post-content">
-          <p class="post-date">${toDateText(dateISO)}</p>
           <h3 class="post-title">${escapeHTML(title)}</h3>
           ${bodyToParagraphs(body)}
           ${galleryHTML}
         </div>
       `;
+      const shareButton = window.AuriShare?.createButton({
+        url: `https://aurifellmusic.com/blog.html#${encodeURIComponent(slug)}`,
+        title,
+      });
+      if (shareButton) article.querySelector('.post-topline').append(shareButton);
       frag.appendChild(article);
     }
 
@@ -583,10 +613,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateButtons();
     }
 
-    if (window.location.hash) {
-      const target = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
-      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    revealLinkedPost();
   } catch (err) {
     console.error('[public] load failed', err);
     host.innerHTML = `<p class="muted">Couldn’t load posts right now. Try again later.</p>`;

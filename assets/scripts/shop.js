@@ -3,6 +3,8 @@
   const root = `${siteBase}shop/products/`;
   const imageFallback = `${siteBase}assets/images/auri-anagram-color.png`;
   const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+  const productShareUrl = (slug) =>
+    `https://aurifellmusic.com/shop-product.html?product=${encodeURIComponent(slug)}`;
 
   // Read one product's simple YAML-style front matter and Markdown body.
   function parseProduct(markdown, slug) {
@@ -76,12 +78,13 @@
 
   // These renderers are shared by the public pages and the local admin previews.
   function createCard(product, onOpen) {
-    const card = element('a', 'card shop-card');
-    card.href = `shop-product.html?product=${encodeURIComponent(product.slug)}`;
-    if (onOpen) card.addEventListener('click', (event) => { event.preventDefault(); onOpen(product); });
+    const card = element('div', 'card shop-card');
+    const link = element('a', 'shop-card-link');
+    link.href = `shop-product.html?product=${encodeURIComponent(product.slug)}`;
+    if (onOpen) link.addEventListener('click', (event) => { event.preventDefault(); onOpen(product); });
     const art = element('div', 'shop-card-art');
     art.append(image(product, 'shop-card-image'));
-    card.append(art);
+    link.append(art);
     const copy = element('div', 'shop-card-copy');
     copy.append(element('span', 'eyebrow', product.category || 'Sheet music'));
     copy.append(element('h3', 'shop-card-title', product.title || 'Untitled'));
@@ -89,7 +92,14 @@
     const bottom = element('div', 'shop-card-bottom');
     bottom.append(element('span', 'shop-card-arrow', 'View details'));
     copy.append(bottom);
-    card.append(copy);
+    link.append(copy);
+    card.append(link);
+    const share = window.AuriShare?.createButton({
+      url: productShareUrl(product.slug),
+      title: product.title || 'shop product',
+      previewOnly: Boolean(onOpen),
+    });
+    if (share) { share.classList.add('shop-card-share'); card.append(share); }
     return card;
   }
 
@@ -159,7 +169,15 @@
     art.append(image(product, 'shop-detail-image'));
     const content = element('div', 'shop-detail-copy');
     const heading = element('div', 'page-heading shop-detail-heading');
-    heading.append(element('span', 'eyebrow', product.category || 'Sheet music'));
+    const topline = element('div', 'shop-detail-topline');
+    topline.append(element('span', 'eyebrow', product.category || 'Sheet music'));
+    const share = window.AuriShare?.createButton({
+      url: productShareUrl(product.slug),
+      title: product.title || 'shop product',
+      previewOnly,
+    });
+    if (share) topline.append(share);
+    heading.append(topline);
     heading.append(element('h1', 'shop-detail-title', product.title || 'Untitled'));
     heading.append(element('p', 'shop-detail-summary', product.summary || ''));
     content.append(heading);
